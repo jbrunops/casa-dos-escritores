@@ -1,0 +1,89 @@
+/* Variáveis CSS globais */
+:root {
+    /* Tipografia */
+    --font-primary: "Poppins", sans-serif;
+
+    /* Cores */
+    --color-primary: #4a4fbc;
+    --color-secondary: #2f3159;
+    --color-text: #333333;
+    --color-light-text: #666666;
+    --color-background: #ffffff;
+    --color-light: #f5f5f5;
+    --color-border: #e0e0e0;
+    --color-error: #e53e3e;
+    --color-success: #2f855a;
+    --color-warning: #f59e0b;
+    --color-info: #3182ce;
+
+    /* Status de publicação */
+    --color-publish: #38a169;
+    --color-unpublish: #e53e3e;
+
+    /* Espaçamento */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+
+    /* Margens auxiliares */
+    --margin-xs: 0.25rem;
+    --margin-sm: 0.5rem;
+    --margin-md: 1rem;
+    --margin-lg: 1.5rem;
+    --margin-xl: 2rem;
+
+    /* Classes utilitárias */
+    --ml-1: 0.25rem;
+    --mr-1: 0.25rem;
+    --mt-1: 0.25rem;
+    --mb-1: 0.25rem;
+
+    /* Transições */
+    --transition-fast: 0.2s;
+    --transition-normal: 0.3s;
+
+    /* Sombras */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+    /* Border radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-full: 9999px;
+}
+
+/* Dark mode - preparado para implementação futura */
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Tema escuro - descomentado quando implementar */
+        /*
+    --color-background: #121212;
+    --color-light: #1e1e1e;
+    --color-border: #333333;
+    --color-text: #f5f5f5;
+    --color-light-text: #a0a0a0;
+    */
+    }
+}
+
+/* Classes auxiliares para espaçamento - para uso com ícones */
+.mr-1 {
+    margin-right: var(--margin-xs);
+}
+
+.ml-1 {
+    margin-left: var(--margin-xs);
+}
+
+.mt-1 {
+    margin-top: var(--margin-xs);
+}
+
+.mb-1 {
+    margin-bottom: var(--margin-xs);
+}

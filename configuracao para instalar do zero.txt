@@ -1,0 +1,11 @@
+-------------------------------------------------
+npx create-next-app@latest .
+-------------------------------------------------
+npm install @supabase/ssr @supabase/supabase-js @tiptap/extension-heading @tiptap/extension-image @tiptap/extension-link @tiptap/extension-placeholder @tiptap/extension-text-align @tiptap/extension-typography @tiptap/extension-underline @tiptap/pm @tiptap/react @tiptap/starter-kit dompurify lucide-react
+-------------------------------------------------
+.env.local
+
+NEXT_PUBLIC_SUPABASE_URL=https://kkykesdoqdeagnuvlxao.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtreWtlc2RvcWRlYWdudXZseGFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1MDQ2ODMsImV4cCI6MjA1ODA4MDY4M30.T5i7LFYpxE8u69bX3_SWkk5biRluaG26xoAd_IKj8hk
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtreWtlc2RvcWRlYWdudXZseGFvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MjUwNDY4MywiZXhwIjoyMDU4MDgwNjgzfQ.JpIla7hVlbFcugAj-vu28MZP6cerGsQ7uEUZqFMmKVs
+-------------------------------------------------

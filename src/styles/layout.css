@@ -1,0 +1,541 @@
+/* Layout, estrutura e componentes principais da UI */
+
+/* Header */
+.site-header {
+    width: 100%;
+    background-color: white;
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.75rem 0;
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-md);
+    width: 100%;
+}
+
+/* Logo */
+.site-logo {
+    margin-right: var(--space-xl);
+}
+
+.site-logo a {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.site-logo a:hover {
+    text-decoration: none;
+}
+
+/* Mobile menu toggle */
+.mobile-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--color-text);
+    cursor: pointer;
+    padding: var(--space-xs);
+}
+
+/* Main navigation */
+.main-navigation {
+    flex: 1;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 1.5rem;
+}
+
+.nav-item {
+    position: relative;
+}
+
+/* Melhoria no alinhamento dos ícones */
+.nav-icon-container,
+.dropdown-icon-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+.dropdown-icon-container {
+    margin-left: 4px;
+    margin-right: 0;
+}
+
+/* Navbar links e botões */
+.nav-link {
+    color: var(--color-text);
+    text-decoration: none;
+    font-weight: 500;
+    padding: var(--space-sm) 0;
+    display: inline-flex;
+    align-items: center;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--color-primary);
+}
+
+/* Dropdown Toggle */
+.dropdown-toggle {
+    background: none;
+    border: none;
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text);
+    cursor: pointer;
+    padding: var(--space-sm) 0;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-toggle:hover,
+.dropdown-toggle:focus {
+    color: var(--color-primary);
+}
+
+.dropdown-icon {
+    transition: transform var(--transition-fast);
+}
+
+.dropdown-toggle.is-active .dropdown-icon {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+    position: absolute;
+    left: -1rem;
+    top: 100%;
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-border);
+    padding: var(--space-md);
+    margin-top: var(--space-sm);
+    min-width: 200px;
+    z-index: 100;
+    opacity: 0;
+    animation: fadeIn 0.2s forwards;
+}
+
+.dropdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--space-sm);
+}
+
+.dropdown-item {
+    padding: var(--space-sm) var(--space-md);
+    color: var(--color-text);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: all 0.15s;
+    display: block;
+}
+
+/* Remover o hover de cores nos dropdowns */
+.dropdown-item:hover {
+    color: var(--color-primary);
+    text-decoration: none;
+    background-color: transparent;
+}
+
+.dropdown-item.view-all {
+    grid-column: span 2;
+    text-align: center;
+    color: var(--color-primary);
+    font-weight: 500;
+    margin-top: var(--space-sm);
+    border-top: 1px solid var(--color-border);
+    padding-top: 0.75rem;
+}
+
+/* Search container */
+.search-container {
+    flex: 1;
+    max-width: 400px;
+    margin: 0 var(--space-md);
+}
+
+.search-form {
+    width: 100%;
+}
+
+.search-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.6rem 1rem 0.6rem 2.8rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    transition: all var(--transition-fast);
+    background-color: var(--color-light);
+}
+
+.search-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(74, 79, 188, 0.1);
+    background-color: white;
+}
+
+.search-button {
+    position: absolute;
+    left: 0.75rem;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-light-text);
+}
+
+.search-icon {
+    transition: color var(--transition-fast);
+}
+
+.search-input:focus + .search-button .search-icon,
+.search-button:hover .search-icon {
+    color: var(--color-primary);
+}
+
+/* Account section */
+.header-actions {
+    display: flex;
+    align-items: center;
+}
+
+.loading-text {
+    font-size: 0.875rem;
+    color: var(--color-light-text);
+}
+
+/* User account dropdown */
+.user-account {
+    position: relative;
+}
+
+.account-button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    border: none;
+    background-color: transparent;
+    padding: var(--space-sm) var(--space-md);
+    font-weight: 500;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.account-button:hover,
+.account-button.is-active {
+    color: var(--color-primary);
+}
+
+.account-name {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.account-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-border);
+    width: 220px;
+    z-index: 100;
+    overflow: hidden;
+    opacity: 0;
+    animation: fadeIn 0.2s forwards;
+}
+
+.account-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: all 0.15s;
+}
+
+.account-link:hover {
+    color: var(--color-primary);
+    text-decoration: none;
+    background-color: transparent;
+}
+
+.account-icon {
+    color: var(--color-light-text);
+}
+
+.account-link:hover .account-icon,
+.account-link.active .account-icon {
+    color: var(--color-primary);
+}
+
+.account-link.logout {
+    background: none;
+    border: none;
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+}
+
+.account-link.logout:hover {
+    color: var(--color-error);
+}
+
+.account-link.logout:hover .account-icon {
+    color: var(--color-error);
+}
+
+.account-divider {
+    height: 1px;
+    background-color: var(--color-border);
+    margin: 0.25rem 0;
+}
+
+/* Auth Actions */
+.auth-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.auth-link {
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.auth-link.login {
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+}
+
+.auth-link.signup {
+    background-color: var(--color-primary);
+    color: white;
+    border: 1px solid var(--color-primary);
+}
+
+.auth-link:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+}
+
+.auth-link.login:hover {
+    border-color: var(--color-primary);
+}
+
+.auth-link.signup:hover {
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-light-text);
+    font-size: 0.875rem;
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Melhorias para consistência entre menu categorias e conta */
+.dropdown-menu,
+.account-dropdown {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background-color: white;
+    z-index: 100;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+    .dropdown-menu {
+        min-width: 350px;
+    }
+
+    .dropdown-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .mobile-toggle {
+        display: block;
+        order: 1;
+    }
+
+    .site-logo {
+        margin-right: 0;
+        flex: 1;
+        order: 2;
+        text-align: center;
+    }
+
+    .header-actions {
+        order: 3;
+    }
+
+    .main-navigation {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: white;
+        box-shadow: var(--shadow-md);
+        padding: var(--space-md);
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all var(--transition-normal);
+        z-index: 99;
+    }
+
+    .main-navigation.is-active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .nav-menu {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    .nav-link,
+    .dropdown-toggle {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: var(--radius-sm);
+    }
+
+    .nav-link:hover,
+    .dropdown-toggle:hover,
+    .nav-link.active {
+        background-color: var(--color-light);
+    }
+
+    .dropdown-menu {
+        position: static;
+        min-width: 100%;
+        width: 100%;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+        padding: 0.5rem;
+        animation: none;
+    }
+
+    .dropdown-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .account-name {
+        max-width: 100px;
+    }
+
+    .search-container {
+        position: relative;
+        order: 4;
+        width: 100%;
+        max-width: none;
+        margin: 0.75rem 0 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-container {
+        padding: 0 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .site-logo a {
+        font-size: 1.25rem;
+    }
+
+    .auth-actions {
+        gap: 0.5rem;
+    }
+
+    .auth-link {
+        padding: 0.5rem;
+    }
+
+    .account-dropdown {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        width: 100%;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        border-bottom: none;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .account-link {
+        padding: var(--space-md);
+    }
+}

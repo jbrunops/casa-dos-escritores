@@ -1,0 +1,8 @@
+/* Importações principais */
+@import "../styles/base.css";
+@import "../styles/layout.css";
+@import "../styles/components.css";
+@import "../styles/pages.css";
+@import "../styles/editor.css";
+@import "../styles/story-editor.css";
+@import "../styles/dashboard.css";

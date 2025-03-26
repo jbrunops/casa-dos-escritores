@@ -1,0 +1,371 @@
+/* src/styles/story-pages.css */
+
+/* Estilos finais para as páginas de criação e edição de histórias */
+
+/* Layout principal da página */
+.story-editor-container {
+    max-width: 1200px;
+    margin: 0 auto 3rem;
+    padding: 2rem;
+    background-color: #fff;
+}
+
+/* Cabeçalho do editor */
+.story-editor-header {
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.story-editor-header h1 {
+    margin: 0;
+    padding: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.story-editor-subtitle {
+    font-size: 0.9rem;
+    color: var(--color-light-text);
+    text-align: right;
+}
+
+/* Link para voltar ao dashboard */
+.back-dashboard {
+    text-align: left;
+    margin-bottom: 1.5rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* Status na área superior */
+.story-status-area {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.5rem;
+}
+
+.story-status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Espaçamento entre "Status:" e o badge */
+}
+
+.story-status-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--color-light-text);
+}
+
+.story-status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.story-status-badge.published {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.story-status-badge.draft {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+/* Formulário principal */
+.story-editor-form {
+    width: 100%;
+}
+
+/* Mensagens de feedback */
+.story-message {
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.story-message.error {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.story-message.success {
+    background-color: #f0fdf4;
+    color: #166534;
+    border: 1px solid #dcfce7;
+}
+
+/* Grupos de formulário com largura consistente */
+.story-form-group {
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.story-form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: 0.95rem;
+}
+
+/* Layout de grid para os campos */
+.story-form-grid {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+/* Inputs e selects com altura consistente */
+.story-input,
+.story-select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    height: 3.25rem; /* Altura consistente */
+    font-size: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: white;
+    transition: all 0.2s ease;
+}
+
+.story-input::placeholder {
+    color: #9ca3af;
+}
+
+.story-input:focus,
+.story-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px rgba(74, 79, 188, 0.1);
+}
+
+.story-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+}
+
+/* Editor com largura consistente */
+.story-editor-wrapper {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+/* Força o TipTap a ter a largura completa */
+.story-editor-wrapper .editor-container,
+.story-editor-wrapper .editor-content,
+.story-editor-wrapper .ProseMirror,
+.story-editor-wrapper .editor-toolbar {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Stats do editor */
+.story-editor-stats {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--color-light-text);
+    padding: 0.75rem 0;
+    margin-top: 0.5rem;
+}
+
+.story-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* Controles de ação */
+.story-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f0f2f5;
+}
+
+.story-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    min-width: 140px;
+    height: 2.75rem;
+}
+
+.story-btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.story-btn-primary:hover:not(:disabled) {
+    background-color: var(--color-secondary);
+}
+
+.story-btn-publish {
+    background-color: #16a34a;
+    color: white;
+}
+
+.story-btn-publish:hover:not(:disabled) {
+    background-color: #15803d;
+}
+
+.story-btn-unpublish {
+    background-color: #ef4444;
+    color: white;
+}
+
+.story-btn-unpublish:hover:not(:disabled) {
+    background-color: #dc2626;
+}
+
+.story-btn-secondary {
+    background-color: white;
+    color: var(--color-text);
+    border: 1px solid #e5e7eb;
+}
+
+.story-btn-secondary:hover:not(:disabled) {
+    background-color: #f9fafb;
+}
+
+.story-btn-view {
+    background-color: white;
+    color: var(--color-primary);
+    border: 1px solid #e5e7eb;
+}
+
+.story-btn-view:hover {
+    background-color: #f9fafb;
+}
+
+.story-btn-delete {
+    background-color: white;
+    color: #ef4444;
+    border: 1px solid #fca5a5;
+}
+
+.story-btn-delete:hover {
+    background-color: #fee2e2;
+}
+
+.story-btn-icon {
+    opacity: 0.8;
+}
+
+.story-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* Loading spinner */
+.btn-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Editor personalizado - overrides do TipTap */
+.ProseMirror {
+    min-height: 400px;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    padding: 1.5rem !important;
+    font-size: 1.05rem !important;
+    width: 100% !important;
+}
+
+.editor-container {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+}
+
+/* Esconder as estatísticas originais do editor */
+.editor-stats {
+    display: none !important;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .story-editor-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .story-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .story-editor-header {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .story-editor-subtitle {
+        text-align: left;
+        margin-top: 0.25rem;
+    }
+
+    .story-status-area {
+        justify-content: flex-start;
+    }
+
+    .story-actions {
+        flex-wrap: wrap;
+    }
+
+    .story-btn {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    .story-editor-stats {
+        flex-wrap: wrap;
+    }
+}
