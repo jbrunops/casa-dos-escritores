@@ -1,3 +1,4 @@
+// src/app/search/page.js
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -124,7 +125,7 @@ export default async function SearchPage({ searchParams }) {
 
         return (
             <div className="search-results-page">
-                <h1>Resultados para "{query}"</h1>
+                <h1>Resultados para &quot;{query}&quot;</h1>
 
                 <div className="search-results-count">
                     Encontrados {stories.length + (profiles?.length || 0)}{" "}
@@ -182,7 +183,8 @@ export default async function SearchPage({ searchParams }) {
 
                     {processedStories.length === 0 ? (
                         <p className="no-results">
-                            Nenhuma história encontrada para "{query}".
+                            Nenhuma história encontrada para &quot;{query}
+                            &quot;.
                             <br />
                             Tente outras palavras-chave ou categorias.
                         </p>

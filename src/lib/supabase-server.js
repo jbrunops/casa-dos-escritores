@@ -9,19 +9,15 @@ export async function createServerSupabaseClient() {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
         {
             cookies: {
-                async get(name) {
+                get(name) {
                     try {
-                        // Usando o método adequado para obter cookies
-                        // sem usar await diretamente no cookieStore.get()
-                        const cookieList = cookieStore.getAll();
-                        const cookie = cookieList.find((c) => c.name === name);
-                        return cookie?.value;
+                        return cookieStore.get(name)?.value;
                     } catch (error) {
                         console.error(`Erro ao obter cookie ${name}:`, error);
                         return null;
                     }
                 },
-                async set(name, value, options) {
+                set(name, value, options) {
                     try {
                         cookieStore.set({
                             name,
@@ -32,7 +28,7 @@ export async function createServerSupabaseClient() {
                         console.error(`Erro ao definir cookie ${name}:`, error);
                     }
                 },
-                async remove(name, options) {
+                remove(name, options) {
                     try {
                         cookieStore.set({
                             name,

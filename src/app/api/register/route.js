@@ -16,13 +16,7 @@ export async function POST(request) {
         // Criar cliente Supabase usando a chave de serviço
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL,
-            process.env.SUPABASE_SERVICE_ROLE_KEY,
-            {
-                auth: {
-                    autoRefreshToken: false,
-                    persistSession: false,
-                },
-            }
+            process.env.SUPABASE_SERVICE_ROLE_KEY
         );
 
         // Verificar se o nome de usuário já existe
@@ -51,7 +45,7 @@ export async function POST(request) {
             {
                 email,
                 password,
-                email_confirm: true, // Confirma o email automaticamente
+                email_confirm: true,
                 user_metadata: { username },
             }
         );
@@ -71,7 +65,7 @@ export async function POST(request) {
             );
         }
 
-        // Inserir perfil diretamente (com o usuário já confirmado)
+        // Inserir perfil
         try {
             const { error: profileError } = await supabase
                 .from("profiles")
@@ -85,8 +79,6 @@ export async function POST(request) {
 
             if (profileError) {
                 console.error("Erro ao criar perfil:", profileError);
-
-                // Mesmo com erro no perfil, retornar sucesso parcial
                 return NextResponse.json({
                     success: true,
                     warning: "Seu perfil será criado no primeiro login",
@@ -107,8 +99,6 @@ export async function POST(request) {
             });
         } catch (profileErr) {
             console.error("Exceção ao criar perfil:", profileErr);
-
-            // Mesmo com erro no perfil, retornar sucesso parcial
             return NextResponse.json({
                 success: true,
                 warning: "Seu perfil será criado no primeiro login",

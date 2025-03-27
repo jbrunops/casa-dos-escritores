@@ -553,7 +553,7 @@ export default function TipTapEditor({
                                 ? "is-active"
                                 : ""
                         }`}
-                        title="Citação acadêmica"
+                        title={"Citação acadêmica"}
                         disabled={viewMode === "preview"}
                     >
                         Citação Acadêmica

@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 
 export async function middleware(request) {
+    // Criamos a resposta de próximo com cabeçalhos adequados
     let response = NextResponse.next({
         request: {
             headers: request.headers,
@@ -9,6 +10,7 @@ export async function middleware(request) {
     });
 
     try {
+        // Criamos um cliente Supabase do lado do servidor
         const supabase = createServerClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL,
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -18,12 +20,6 @@ export async function middleware(request) {
                         return request.cookies.get(name)?.value;
                     },
                     set(name, value, options) {
-                        // Se estivermos em um ambiente onde os cookies podem ser modificados
-                        request.cookies.set({
-                            name,
-                            value,
-                            ...options,
-                        });
                         response.cookies.set({
                             name,
                             value,
@@ -31,12 +27,6 @@ export async function middleware(request) {
                         });
                     },
                     remove(name, options) {
-                        // Se estivermos em um ambiente onde os cookies podem ser modificados
-                        request.cookies.set({
-                            name,
-                            value: "",
-                            ...options,
-                        });
                         response.cookies.set({
                             name,
                             value: "",
@@ -47,6 +37,7 @@ export async function middleware(request) {
             }
         );
 
+        // Obter sessão
         const {
             data: { session },
         } = await supabase.auth.getSession();
