@@ -95,12 +95,6 @@
     display: none;
 }
 
-@media (min-width: 768px) {
-    .view-mode-button span {
-        display: inline;
-    }
-}
-
 /* Container de editor/visualização */
 .editor-preview-container {
     display: flex;

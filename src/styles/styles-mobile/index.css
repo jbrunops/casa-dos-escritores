@@ -1,0 +1,8 @@
+/* Importação de todos os estilos mobile */
+@import "./mobile-base.css";
+@import "./mobile-layout.css";
+@import "./mobile-header.css";
+@import "./mobile-components.css";
+@import "./mobile-dashboard.css";
+@import "./mobile-editor.css";
+@import "./mobile-pages.css";

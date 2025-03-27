@@ -1,0 +1,131 @@
+/* Estilos mobile para o dashboard */
+
+@media (max-width: 1024px) {
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .stories-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .stories-tabs {
+        width: 100%;
+    }
+
+    .tab-button {
+        flex: 1;
+        text-align: center;
+    }
+
+    .stories-table-header {
+        display: none; /* Esconder cabeçalhos em telas pequenas */
+    }
+
+    .story-row {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        gap: 0.75rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .story-title-col {
+        font-size: 1.1rem;
+        padding-right: 0;
+    }
+
+    .story-category-col::before {
+        content: "Categoria: ";
+        font-weight: 500;
+    }
+
+    .story-status-col {
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .story-status-col::before {
+        content: "Status: ";
+        font-weight: 500;
+    }
+
+    .story-stats-col {
+        width: 100%;
+    }
+
+    .story-stats {
+        flex-direction: row;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .story-date-col {
+        width: 100%;
+    }
+
+    .story-actions-col {
+        width: 100%;
+    }
+
+    .story-actions {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-container {
+        padding: 1rem 0.75rem;
+    }
+
+    .dashboard-stats {
+        gap: 0.75rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-card .stat-value {
+        font-size: 1.8rem;
+    }
+
+    .stat-card .stat-label {
+        font-size: 0.9rem;
+    }
+
+    .story-action-btn {
+        padding: 0.3rem;
+        font-size: 0.8rem;
+        min-width: auto;
+    }
+
+    .stories-tabs {
+        gap: 0.25rem;
+    }
+
+    .tab-button {
+        padding: 0.4rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .story-actions-col {
+        margin-top: 0.5rem;
+    }
+}

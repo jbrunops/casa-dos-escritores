@@ -1,0 +1,130 @@
+/* Estilos mobile para o cabeçalho - APENAS para 480px ou menos */
+
+/* Elementos apenas para mobile */
+.mobile-explore-btn,
+.mobile-menu-btn,
+.mobile-menu-dropdown,
+.mobile-user-avatar {
+    display: none; /* Escondido por padrão (desktop) */
+}
+
+/* APENAS para dispositivos móveis pequenos (480px ou menos) */
+@media (max-width: 480px) {
+    /* Esconder elementos que não são necessários no mobile */
+    .search-container,
+    .main-navigation,
+    .header-actions,
+    .mobile-toggle {
+        display: none !important;
+    }
+
+    /* Estrutura do header mobile */
+    .header-container {
+        display: grid !important;
+        grid-template-columns: auto 1fr auto !important;
+        align-items: center !important;
+        padding: 0.5rem 0.75rem !important;
+        flex-wrap: nowrap !important;
+    }
+
+    /* Botão esquerdo - Compass/Explorar */
+    .mobile-explore-btn {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: none !important;
+        border: none !important;
+        color: var(--color-primary) !important;
+        cursor: pointer !important;
+        padding: 0.5rem !important;
+        width: 36px !important;
+        height: 36px !important;
+        z-index: 10 !important;
+    }
+
+    /* Logo centralizado */
+    .site-logo {
+        text-align: center !important;
+        margin: 0 !important;
+    }
+
+    .site-logo a {
+        font-size: 1.15rem !important;
+    }
+
+    /* Botão direito - Menu/Avatar */
+    .mobile-menu-btn {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: none !important;
+        border: none !important;
+        color: var(--color-primary) !important;
+        cursor: pointer !important;
+        padding: 0.5rem !important;
+        width: 36px !important;
+        height: 36px !important;
+        z-index: 10 !important;
+    }
+
+    /* Menu mobile dropdown */
+    .mobile-menu-dropdown {
+        display: block !important;
+        position: fixed !important;
+        top: 60px !important;
+        right: 0 !important;
+        width: 100% !important;
+        background-color: white !important;
+        box-shadow: var(--shadow-md) !important;
+        z-index: 100 !important;
+        border-top: 1px solid var(--color-border) !important;
+        max-height: 0 !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
+        transition: max-height 0.3s ease, opacity 0.3s ease !important;
+    }
+
+    .mobile-menu-dropdown.is-active {
+        max-height: 300px !important;
+        opacity: 1 !important;
+    }
+
+    .mobile-menu-list {
+        padding: 0 !important;
+        margin: 0 !important;
+        list-style: none !important;
+    }
+
+    .mobile-menu-item {
+        border-bottom: 1px solid var(--color-border) !important;
+    }
+
+    .mobile-menu-link {
+        display: block !important;
+        padding: 0.85rem !important;
+        color: var(--color-text) !important;
+        text-decoration: none !important;
+        font-weight: 500 !important;
+    }
+
+    .mobile-menu-link:hover,
+    .mobile-menu-link:active {
+        background-color: var(--color-light) !important;
+        color: var(--color-primary) !important;
+    }
+
+    /* Avatar para usuários logados */
+    .mobile-user-avatar {
+        display: flex !important;
+        width: 28px !important;
+        height: 28px !important;
+        border-radius: 50% !important;
+        overflow: hidden !important;
+        background-color: var(--color-primary) !important;
+        color: white !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+    }
+}
