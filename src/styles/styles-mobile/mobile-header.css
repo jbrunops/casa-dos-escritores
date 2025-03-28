@@ -113,7 +113,7 @@
         color: var(--color-primary) !important;
     }
 
-    /* Avatar para usuários logados */
+    /* Avatar para usuários logados - CORRIGIDO para ser perfeitamente circular */
     .mobile-user-avatar {
         display: flex !important;
         width: 28px !important;
@@ -126,5 +126,10 @@
         justify-content: center !important;
         font-weight: 600 !important;
         font-size: 0.85rem !important;
+        line-height: 1 !important; /* Garante que o texto fique centralizado verticalmente */
+        text-align: center !important; /* Centraliza o texto horizontalmente */
+        aspect-ratio: 1 / 1 !important; /* Garante proporção quadrada */
+        min-width: 28px !important; /* Garante largura mínima */
+        min-height: 28px !important; /* Garante altura mínima */
     }
 }
