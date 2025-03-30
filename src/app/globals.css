@@ -9,3 +9,6 @@
 
 /* Importação dos estilos mobile */
 @import "../styles/styles-mobile/index.css";
+
+/* Adicione esta linha ao final do arquivo */
+@import "../styles/notifications.css";

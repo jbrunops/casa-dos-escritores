@@ -13,6 +13,7 @@ import {
     Menu,
     Compass,
 } from "lucide-react";
+import NotificationBell from "./NotificationBell";
 
 export default function Header() {
     const pathname = usePathname();
@@ -173,6 +174,21 @@ export default function Header() {
                 <div className="site-logo">
                     <Link href="/">Casa Dos Escritores</Link>
                 </div>
+
+                {/* Elemento de notificação mobile - posicionado entre explorar e avatar */}
+                {user && isMobile && (
+                    <div
+                        style={{
+                            position: "absolute",
+                            right: "45px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            zIndex: 20,
+                        }}
+                    >
+                        <NotificationBell />
+                    </div>
+                )}
 
                 {/* Elementos apenas para mobile */}
                 <button
@@ -356,6 +372,9 @@ export default function Header() {
                 <div className="search-container">
                     {/* Seu formulário de busca existente */}
                 </div>
+
+                {/* Adicionar NotificationBell apenas na versão desktop */}
+                {user && !isMobile && <NotificationBell />}
 
                 <div className="header-actions">
                     {loading ? (

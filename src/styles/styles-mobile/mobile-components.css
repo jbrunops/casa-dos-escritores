@@ -102,3 +102,44 @@
         padding: var(--space-md);
     }
 }
+
+@media (max-width: 768px) {
+    /* Reduzir recuo para comentários aninhados em dispositivos móveis */
+    .nested-comment {
+        margin-left: 10px;
+        padding-left: 5px;
+    }
+
+    /* Ajustar o tamanho do texto */
+    .comment-text {
+        font-size: 0.95rem;
+    }
+
+    .reply-button {
+        font-size: 0.7rem;
+    }
+
+    .comment-avatar,
+    .comment-avatar-placeholder {
+        width: 20px;
+        height: 20px;
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Mais ajustes para telas muito pequenas */
+    .nested-comment {
+        margin-left: 5px;
+    }
+
+    .comment-container .comment {
+        margin-left: 0 !important; /* Sobrescrever o estilo inline para telas muito pequenas */
+        padding: var(--space-sm) var(--space-xs);
+    }
+
+    .reply-indicator {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+}
