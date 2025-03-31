@@ -1,4 +1,3 @@
-// src/components/Comments.js
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -24,27 +23,6 @@ export default function Comments({ storyId, sessionId, authorId }) {
         if (sessionId) {
             fetchUsername();
         }
-
-        // Configurar subscription para atualizações em tempo real
-        const subscription = supabase
-            .channel("comments_changes")
-            .on(
-                "postgres_changes",
-                {
-                    event: "*",
-                    schema: "public",
-                    table: "comments",
-                    filter: `story_id=eq.${storyId}`,
-                },
-                () => {
-                    loadComments();
-                }
-            )
-            .subscribe();
-
-        return () => {
-            subscription.unsubscribe();
-        };
     }, [storyId, sessionId]);
 
     // Se estamos respondendo a um comentário, focar no input
@@ -54,7 +32,7 @@ export default function Comments({ storyId, sessionId, authorId }) {
         }
     }, [replyTo]);
 
-    // Função para carregar comentários de forma confiável
+    // Função para carregar comentários
     const loadComments = async () => {
         try {
             if (!storyId) {
@@ -82,37 +60,7 @@ export default function Comments({ storyId, sessionId, authorId }) {
                 return;
             }
 
-            // Organizar comentários em uma estrutura hierárquica
-            const commentMap = {};
-            const rootComments = [];
-
-            // Primeiro, mapear todos os comentários por ID
-            data.forEach((comment) => {
-                commentMap[comment.id] = {
-                    ...comment,
-                    replies: [],
-                };
-            });
-
-            // Em seguida, construir a hierarquia
-            data.forEach((comment) => {
-                if (comment.parent_id) {
-                    // Se tem parent_id, é uma resposta
-                    if (commentMap[comment.parent_id]) {
-                        commentMap[comment.parent_id].replies.push(
-                            commentMap[comment.id]
-                        );
-                    } else {
-                        // Se o pai não existir (por algum motivo), tratar como comentário raiz
-                        rootComments.push(commentMap[comment.id]);
-                    }
-                } else {
-                    // Se não tem parent_id, é um comentário raiz
-                    rootComments.push(commentMap[comment.id]);
-                }
-            });
-
-            setComments(rootComments);
+            setComments(data || []);
         } catch (err) {
             console.error("Exceção ao carregar comentários:", err);
             setComments([]);
@@ -135,6 +83,7 @@ export default function Comments({ storyId, sessionId, authorId }) {
         }
     }
 
+    // Usar a API para adicionar comentários
     async function handleSubmitComment(e) {
         e.preventDefault();
 
@@ -152,102 +101,107 @@ export default function Comments({ storyId, sessionId, authorId }) {
         setError(null);
 
         try {
+            // Verificar se storyId é válido
+            if (!storyId) {
+                console.error("storyId inválido:", storyId);
+                throw new Error("ID da história inválido");
+            }
+
+            // Verificar se sessionId é válido
+            if (!sessionId) {
+                console.error("sessionId inválido:", sessionId);
+                throw new Error("ID do usuário inválido");
+            }
+
+            // Preparar dados para a API
             const commentData = {
                 text: newComment,
-                story_id: storyId,
-                author_id: sessionId,
-                parent_id: replyTo ? replyTo.id : null,
+                storyId: storyId,
+                authorId: sessionId,
+                parentId: replyTo ? replyTo.id : null,
             };
 
-            const { data: comment, error: insertError } = await supabase
-                .from("comments")
-                .insert([commentData])
-                .select();
+            console.log("Enviando para API:", commentData);
 
-            if (insertError) {
-                console.error("Erro ao inserir comentário:", insertError);
-                throw insertError;
+            // Fazer requisição para a API
+            const response = await fetch("/api/comments", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(commentData),
+            });
+
+            const result = await response.json();
+            console.log("Resposta da API:", result);
+
+            if (!response.ok) {
+                const errorMessage =
+                    result.error || "Erro ao adicionar comentário";
+                const errorDetails = result.details
+                    ? JSON.stringify(result.details)
+                    : "";
+                throw new Error(`${errorMessage} ${errorDetails}`);
             }
 
-            // Criar notificação para o autor da história (se não for o próprio comentarista)
-            if (authorId && authorId !== sessionId) {
-                await createNotification({
-                    user_id: authorId,
-                    type: "comment",
-                    content: `${username} comentou em sua história.`,
-                    related_id: storyId,
-                    sender_id: sessionId,
-                    additional_data: {
-                        story_id: storyId,
-                        comment_id: comment[0].id,
-                    },
-                });
-            }
-
-            // Se for uma resposta, notificar o autor do comentário original
-            if (replyTo && replyTo.author_id !== sessionId) {
-                await createNotification({
-                    user_id: replyTo.author_id,
-                    type: "reply",
-                    content: `${username} respondeu ao seu comentário.`,
-                    related_id: storyId,
-                    sender_id: sessionId,
-                    additional_data: {
-                        story_id: storyId,
-                        comment_id: comment[0].id,
-                        parent_comment_id: replyTo.id,
-                    },
-                });
-            }
-
+            // Sucesso!
             setNewComment("");
-            setSuccess(true);
             setReplyTo(null);
+            setSuccess(true);
+
+            // Recarregar comentários
             await loadComments();
 
             setTimeout(() => {
                 setSuccess(false);
             }, 3000);
         } catch (err) {
-            console.error("Erro ao publicar comentário:", err);
-            setError(
-                "Não foi possível enviar seu comentário. Por favor, tente novamente."
-            );
+            console.error("Erro detalhado:", err);
+            setError(`Erro: ${err.message}`);
         } finally {
             setSubmitting(false);
-        }
-    }
-
-    // Função para criar notificações
-    async function createNotification(notificationData) {
-        try {
-            const { error } = await supabase
-                .from("notifications")
-                .insert([notificationData]);
-
-            if (error) {
-                console.error("Erro ao criar notificação:", error);
-            }
-        } catch (error) {
-            console.error("Exceção ao criar notificação:", error);
         }
     }
 
     // Função para iniciar uma resposta a um comentário
     const handleReply = (comment) => {
         setReplyTo(comment);
-        setNewComment(`@${comment.profiles.username} `);
+        setNewComment(`@${comment.profiles?.username || "Usuário"} `);
     };
 
-    // Função para cancelar a resposta
+    // Cancelar resposta
     const cancelReply = () => {
         setReplyTo(null);
         setNewComment("");
     };
 
-    // Renderizar comentário e suas respostas recursivamente
-    const renderComment = (comment, level = 0) => {
-        return (
+    // Renderizar comentários hierarquicamente
+    const renderComments = () => {
+        // Agrupar comentários por hierarquia
+        const commentMap = {};
+        const rootComments = [];
+
+        // Mapear todos os comentários por ID
+        comments.forEach((comment) => {
+            const commentWithReplies = { ...comment, replies: [] };
+            commentMap[comment.id] = commentWithReplies;
+
+            if (!comment.parent_id) {
+                rootComments.push(commentWithReplies);
+            }
+        });
+
+        // Adicionar respostas aos pais
+        comments.forEach((comment) => {
+            if (comment.parent_id && commentMap[comment.parent_id]) {
+                commentMap[comment.parent_id].replies.push(
+                    commentMap[comment.id]
+                );
+            }
+        });
+
+        // Renderizar recursivamente
+        const renderComment = (comment, level = 0) => (
             <div
                 key={comment.id}
                 className={`comment-container ${
@@ -309,6 +263,8 @@ export default function Comments({ storyId, sessionId, authorId }) {
                 )}
             </div>
         );
+
+        return rootComments.map((comment) => renderComment(comment));
     };
 
     return (
@@ -317,15 +273,7 @@ export default function Comments({ storyId, sessionId, authorId }) {
                 <span className="comment-icon-container mr-1">
                     <MessageSquare size={20} />
                 </span>
-                Comentários (
-                {comments.reduce(
-                    (count, comment) =>
-                        count +
-                        1 +
-                        (comment.replies ? comment.replies.length : 0),
-                    0
-                )}
-                )
+                Comentários ({comments.length})
             </h3>
 
             {sessionId ? (
@@ -344,7 +292,8 @@ export default function Comments({ storyId, sessionId, authorId }) {
                     {replyTo && (
                         <div className="reply-indicator">
                             <span>
-                                Respondendo para {replyTo.profiles.username}
+                                Respondendo para{" "}
+                                {replyTo.profiles?.username || "Usuário"}
                             </span>
                             <button
                                 type="button"
@@ -392,7 +341,7 @@ export default function Comments({ storyId, sessionId, authorId }) {
                         Nenhum comentário ainda. Seja o primeiro a comentar!
                     </p>
                 ) : (
-                    comments.map((comment) => renderComment(comment))
+                    renderComments()
                 )}
             </div>
 
