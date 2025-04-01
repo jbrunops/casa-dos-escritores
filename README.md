@@ -2,7 +2,7 @@
 
 ## Descrição do Projeto
 
-Casa dos Escritores é uma plataforma web para escritores compartilharem histórias, comentarem, interagirem e desenvolverem sua comunidade literária. Construída com Next.js, Supabase e Tailwind CSS, a aplicação oferece uma experiência completa de publicação e leitura.
+Casa dos Escritores é uma plataforma web para escritores compartilharem histórias, comentarem, interagirem e desenvolverem sua comunidade literária. Construída com Next.js, Supabase e CSS puro com media queries, a aplicação oferece uma experiência completa de publicação e leitura.
 
 ## Recursos Principais
 
@@ -58,7 +58,7 @@ Casa dos Escritores é uma plataforma web para escritores compartilharem histór
 
 ### Experiência do Usuário
 
--   📱 Design responsivo
+-   📱 Design responsivo com media queries
 -   🌓 Tema claro/escuro (preparado para implementação)
 -   ⚡ Carregamento rápido
 -   🖼️ Suporte a imagens em histórias
@@ -67,8 +67,8 @@ Casa dos Escritores é uma plataforma web para escritores compartilharem histór
 
 -   **Frontend**: Next.js 15
 -   **Estilização**:
-    -   CSS Modules
-    -   Media Queries personalizadas
+    -   CSS Puro
+    -   Media Queries
     -   Variáveis CSS
 -   **Backend**: Supabase
 -   **Autenticação**: Supabase Auth
@@ -89,7 +89,7 @@ Casa dos Escritores é uma plataforma web para escritores compartilharem histór
 1. Clone o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/casa-dos-escritores.git
+git clone https://github.com/jbrunops/casa-dos-escritores.git
 cd casa-dos-escritores
 ```
 
@@ -139,8 +139,6 @@ src/
 
 ## Deploy
 
-## Deploy
-
 Configurações para implantação:
 
 -   **Provedor Recomendado**: Vercel
@@ -167,14 +165,23 @@ Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
 ## Contato
 
-Seu Nome - [Seu Email]
+João Brunops - [jbrunops@gmail.com](mailto:jbrunops@gmail.com)
 
 Link do Projeto: [https://github.com/jbrunops/casa-dos-escritores](https://github.com/jbrunops/casa-dos-escritores)
 
----
+## Considerações Finais
 
-## Screenshots
+**Nota**: Este projeto foi desenvolvido como um ambiente de escrita colaborativa, permitindo que escritores compartilhem e interajam com suas histórias de forma intuitiva e envolvente.
 
-[Adicione screenshots das principais telas do seu projeto]
+### Melhorias Futuras
 
-**Nota**: Este projeto foi desenvolvido como parte de um curso/projeto pessoal e serve como exemplo de aplicação web fullstack com Next.js e Supabase.
+-   [ ] Implementação de tema escuro
+-   [ ] Sistema de seguidores
+-   [ ] Exportação de histórias
+-   [ ] Integração com serviços de publicação
+
+## Agradecimentos
+
+-   Supabase pela infraestrutura backend
+-   Next.js pelo framework frontend
+-   Todos os colaboradores e escritores que tornam esta plataforma possível
