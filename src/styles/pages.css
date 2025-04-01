@@ -440,6 +440,10 @@
     margin-bottom: var(--space-lg);
 }
 
+.admin-actions-bar button {
+    width: 15rem;
+}
+
 .refresh-button {
     background-color: var(--color-light);
     color: var(--color-text);
@@ -455,7 +459,7 @@
 }
 
 .refresh-button:hover:not(:disabled) {
-    background-color: var(--color-border);
+    background-color: #fafafa;
 }
 
 .refresh-button:disabled {
