@@ -1,4 +1,3 @@
-// src/app/dashboard/page.js
 "use client";
 
 import { useState, useEffect } from "react";
@@ -6,6 +5,15 @@ import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import Link from "next/link";
 import DeleteModal from "@/components/DeleteModal";
+import {
+    PlusCircle,
+    Trash2,
+    Edit3,
+    Eye,
+    RefreshCw,
+    BookOpen,
+    MessageSquare,
+} from "lucide-react";
 
 export default function DashboardPage() {
     const [user, setUser] = useState(null);
@@ -35,24 +43,16 @@ export default function DashboardPage() {
     useEffect(() => {
         async function fetchData() {
             try {
-                console.log("Iniciando carregamento do dashboard");
                 // Verificar se o usuário está autenticado
                 const {
                     data: { session },
                 } = await supabase.auth.getSession();
 
                 if (!session || !session.user) {
-                    console.log(
-                        "Nenhuma sessão encontrada, redirecionando para login"
-                    );
                     router.push("/login");
                     return;
                 }
 
-                console.log(
-                    "Sessão encontrada, ID do usuário:",
-                    session.user.id
-                );
                 setUser(session.user);
 
                 // Buscar perfil do usuário
@@ -67,10 +67,6 @@ export default function DashboardPage() {
                     if (profileError) {
                         console.error("Erro ao buscar perfil:", profileError);
                     } else {
-                        console.log(
-                            "Perfil recuperado:",
-                            profileData?.username
-                        );
                         setProfile(profileData || {});
                     }
                 } catch (profileError) {
@@ -105,7 +101,6 @@ export default function DashboardPage() {
 
     async function fetchUserStories(userId) {
         try {
-            console.log("Buscando histórias para o usuário:", userId);
             setLoadingStories(true);
 
             const { data, error } = await supabase
@@ -125,14 +120,8 @@ export default function DashboardPage() {
                 .order("created_at", { ascending: false });
 
             if (error) {
-                console.error(
-                    "Erro retornado pelo Supabase ao buscar histórias:",
-                    error
-                );
                 throw error;
             }
-
-            console.log("Histórias recuperadas:", data?.length || 0);
 
             // Para cada história, buscar contagem de comentários
             const storiesWithComments = await Promise.all(
@@ -144,10 +133,6 @@ export default function DashboardPage() {
                             .eq("story_id", story.id);
 
                         if (countError) {
-                            console.warn(
-                                `Erro ao contar comentários para história ${story.id}:`,
-                                countError
-                            );
                             return {
                                 ...story,
                                 comment_count: 0,
@@ -159,10 +144,6 @@ export default function DashboardPage() {
                             comment_count: count || 0,
                         };
                     } catch (err) {
-                        console.error(
-                            `Exceção ao contar comentários para história ${story.id}:`,
-                            err
-                        );
                         return {
                             ...story,
                             comment_count: 0,
@@ -171,10 +152,6 @@ export default function DashboardPage() {
                 })
             );
 
-            console.log(
-                "Histórias com contagens de comentários:",
-                storiesWithComments?.length || 0
-            );
             setStories(storiesWithComments || []);
         } catch (error) {
             console.error("Erro ao buscar histórias:", error);
@@ -186,7 +163,6 @@ export default function DashboardPage() {
 
     async function fetchUserStats(userId) {
         try {
-            console.log("Buscando estatísticas para o usuário:", userId);
             setLoadingStats(true);
 
             // Buscar todas as histórias do usuário
@@ -196,17 +172,8 @@ export default function DashboardPage() {
                 .eq("author_id", userId);
 
             if (storiesError) {
-                console.error(
-                    "Erro ao buscar histórias para estatísticas:",
-                    storiesError
-                );
                 throw storiesError;
             }
-
-            console.log(
-                "Histórias encontradas para estatísticas:",
-                allStories?.length || 0
-            );
 
             // Calcular estatísticas básicas
             const totalStories = allStories?.length || 0;
@@ -217,12 +184,6 @@ export default function DashboardPage() {
                     (sum, story) => sum + (parseInt(story.view_count) || 0),
                     0
                 ) || 0;
-
-            console.log("Estatísticas calculadas:", {
-                totalStories,
-                publishedStories,
-                totalViews,
-            });
 
             // Buscar todos os comentários para as histórias do usuário
             let totalComments = 0;
@@ -236,17 +197,8 @@ export default function DashboardPage() {
                         .select("id", { count: "exact" })
                         .in("story_id", storyIds);
 
-                    if (commentsError) {
-                        console.error(
-                            "Erro ao buscar contagem de comentários:",
-                            commentsError
-                        );
-                    } else {
+                    if (!commentsError) {
                         totalComments = count || 0;
-                        console.log(
-                            "Total de comentários encontrados:",
-                            totalComments
-                        );
                     }
                 }
             }
@@ -259,11 +211,21 @@ export default function DashboardPage() {
             });
         } catch (error) {
             console.error("Erro ao buscar estatísticas:", error);
-            // Manter os valores padrão em caso de erro
         } finally {
             setLoadingStats(false);
         }
     }
+
+    const refreshData = async () => {
+        if (!user) return;
+
+        try {
+            await fetchUserStories(user.id);
+            await fetchUserStats(user.id);
+        } catch (error) {
+            console.error("Erro ao atualizar dados:", error);
+        }
+    };
 
     const openDeleteModal = (storyId, storyTitle) => {
         setDeleteModal({
@@ -287,14 +249,12 @@ export default function DashboardPage() {
         setDeleting(true);
 
         try {
-            console.log("Excluindo história:", deleteModal.storyId);
             const { error } = await supabase
                 .from("stories")
                 .delete()
                 .eq("id", deleteModal.storyId);
 
             if (error) {
-                console.error("Erro ao excluir história:", error);
                 throw error;
             }
 
@@ -345,7 +305,7 @@ export default function DashboardPage() {
 
     if (loading) {
         return (
-            <div className="loading-container">
+            <div className="dashboard-loading">
                 <div className="loader-large"></div>
                 <p>Carregando seu painel...</p>
             </div>
@@ -355,78 +315,104 @@ export default function DashboardPage() {
     return (
         <div className="dashboard-container">
             <div className="dashboard-header">
-                <div className="dashboard-welcome">
+                <div className="welcome-section">
                     <h1>Meu Dashboard</h1>
-                    <p>Olá, {profile?.username || "Escritor"}</p>
+                    <p>Bem-vindo, {profile?.username || "Escritor"}</p>
                 </div>
-                <Link href="/dashboard/new" className="new-story-button">
-                    Nova História
-                </Link>
-            </div>
 
-            <div className="dashboard-stats">
-                <div className="stat-card">
-                    <div className="stat-value">{stats.totalStories}</div>
-                    <div className="stat-label">Histórias</div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-value">{stats.publishedStories}</div>
-                    <div className="stat-label">Publicadas</div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-value">{stats.totalViews}</div>
-                    <div className="stat-label">Visualizações</div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-value">{stats.totalComments}</div>
-                    <div className="stat-label">Comentários</div>
+                <div className="actions-section">
+                    <button
+                        onClick={refreshData}
+                        className="refresh-button"
+                        aria-label="Atualizar dados"
+                    >
+                        <RefreshCw size={20} />
+                    </button>
+
+                    <Link href="/dashboard/new" className="new-story-button">
+                        <span className="button-text">Nova História</span>
+                        <PlusCircle size={20} />
+                    </Link>
                 </div>
             </div>
 
             {successMessage && (
-                <div className="success-notification">{successMessage}</div>
+                <div className="success-message">{successMessage}</div>
             )}
+
+            <div className="stats-section">
+                <div className="stat-card">
+                    <div className="stat-content">
+                        <span className="stat-value">{stats.totalStories}</span>
+                        <span className="stat-label">Total de histórias</span>
+                    </div>
+                </div>
+
+                <div className="stat-card">
+                    <div className="stat-content">
+                        <span className="stat-value">
+                            {stats.publishedStories}
+                        </span>
+                        <span className="stat-label">Publicadas</span>
+                    </div>
+                </div>
+
+                <div className="stat-card">
+                    <div className="stat-content">
+                        <span className="stat-value">{stats.totalViews}</span>
+                        <span className="stat-label">Visualizações</span>
+                    </div>
+                </div>
+
+                <div className="stat-card">
+                    <div className="stat-content">
+                        <span className="stat-value">
+                            {stats.totalComments}
+                        </span>
+                        <span className="stat-label">Comentários</span>
+                    </div>
+                </div>
+            </div>
 
             <div className="stories-section">
                 <div className="stories-header">
                     <h2>Minhas Histórias</h2>
+
                     <div className="stories-tabs">
                         <button
-                            className={`tab-button ${
+                            className={`tab-btn ${
                                 activeTab === "all" ? "active" : ""
                             }`}
                             onClick={() => setActiveTab("all")}
                         >
-                            Todas ({stories.length})
+                            Todas
                         </button>
                         <button
-                            className={`tab-button ${
+                            className={`tab-btn ${
                                 activeTab === "published" ? "active" : ""
                             }`}
                             onClick={() => setActiveTab("published")}
                         >
-                            Publicadas (
-                            {stories.filter((s) => s.is_published).length})
+                            Publicadas
                         </button>
                         <button
-                            className={`tab-button ${
+                            className={`tab-btn ${
                                 activeTab === "drafts" ? "active" : ""
                             }`}
                             onClick={() => setActiveTab("drafts")}
                         >
-                            Rascunhos (
-                            {stories.filter((s) => !s.is_published).length})
+                            Rascunhos
                         </button>
                     </div>
                 </div>
 
                 {loadingStories ? (
-                    <div className="loading-indicator">
+                    <div className="stories-loading">
                         <div className="loader-large"></div>
                         <p>Carregando histórias...</p>
                     </div>
                 ) : filteredStories.length === 0 ? (
-                    <div className="empty-state">
+                    <div className="empty-stories">
                         <p>
                             {activeTab === "all"
                                 ? "Você ainda não criou nenhuma história."
@@ -434,123 +420,92 @@ export default function DashboardPage() {
                                 ? "Você ainda não publicou nenhuma história."
                                 : "Você não tem nenhum rascunho."}
                         </p>
-                        <Link
-                            href="/dashboard/new"
-                            className="create-story-link"
-                        >
-                            Criar Nova História
+                        <Link href="/dashboard/new" className="create-first">
+                            Criar minha primeira história
                         </Link>
                     </div>
                 ) : (
                     <div className="stories-list">
-                        <div className="stories-table-header">
-                            <div className="story-title-col">Título</div>
-                            <div className="story-category-col">Categoria</div>
-                            <div className="story-status-col">Status</div>
-                            <div className="story-stats-col">Estatísticas</div>
-                            <div className="story-date-col">Data</div>
-                            <div className="story-actions-col">Ações</div>
-                        </div>
-
                         {filteredStories.map((story) => (
-                            <div key={story.id} className="story-row">
-                                <div
-                                    className="story-title-col"
-                                    title={story.title}
-                                >
-                                    {story.title}
-                                </div>
+                            <div key={story.id} className="story-item">
+                                <div className="story-main">
+                                    <h3 className="story-title">
+                                        {story.title}
+                                    </h3>
 
-                                <div className="story-category-col">
-                                    {story.category || "Sem categoria"}
-                                </div>
-
-                                <div className="story-status-col">
-                                    <span
-                                        className={`status-badge ${
-                                            story.is_published
-                                                ? "published"
-                                                : "draft"
-                                        }`}
-                                    >
-                                        {story.is_published
-                                            ? "Publicado"
-                                            : "Rascunho"}
-                                    </span>
-                                </div>
-
-                                <div className="story-stats-col">
-                                    <div className="story-stats">
-                                        <span
-                                            className="story-stat-item"
-                                            title="Visualizações"
-                                        >
-                                            {story.view_count || 0}{" "}
-                                            visualizações
+                                    <div className="story-details">
+                                        <span className="story-category">
+                                            {story.category || "Sem categoria"}
                                         </span>
+
                                         <span
-                                            className="story-stat-item"
-                                            title="Comentários"
+                                            className={`story-status ${
+                                                story.is_published
+                                                    ? "published"
+                                                    : "draft"
+                                            }`}
                                         >
-                                            {story.comment_count || 0}{" "}
-                                            comentários
+                                            {story.is_published
+                                                ? "Publicado"
+                                                : "Rascunho"}
                                         </span>
                                     </div>
-                                </div>
 
-                                <div className="story-date-col">
-                                    <div className="date-info">
-                                        <div
-                                            className="created-date"
-                                            title="Data de criação"
-                                        >
-                                            {formatDate(story.created_at)}
-                                        </div>
-                                        {story.updated_at &&
-                                            story.updated_at !==
-                                                story.created_at && (
-                                                <div
-                                                    className="updated-date"
-                                                    title="Última atualização"
-                                                >
-                                                    atualizado:{" "}
+                                    <div className="story-meta">
+                                        <div className="story-stats">
+                                            <span className="stat-item">
+                                                <Eye size={14} />
+                                                <span>
+                                                    {story.view_count || 0}
+                                                </span>
+                                            </span>
+                                            <span className="stat-item">
+                                                <MessageSquare size={14} />
+                                                <span>
+                                                    {story.comment_count || 0}
+                                                </span>
+                                            </span>
+                                            <span className="stat-item">
+                                                <BookOpen size={14} />
+                                                <span>
                                                     {formatDate(
-                                                        story.updated_at
+                                                        story.created_at
                                                     )}
-                                                </div>
-                                            )}
+                                                </span>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="story-actions-col">
-                                    <div className="story-actions">
-                                        <Link
-                                            href={`/story/${story.id}`}
-                                            className="story-action-btn view"
-                                            title="Visualizar"
-                                        >
-                                            Ver
-                                        </Link>
-                                        <Link
-                                            href={`/dashboard/edit/${story.id}`}
-                                            className="story-action-btn edit"
-                                            title="Editar"
-                                        >
-                                            Editar
-                                        </Link>
-                                        <button
-                                            onClick={() =>
-                                                openDeleteModal(
-                                                    story.id,
-                                                    story.title
-                                                )
-                                            }
-                                            className="story-action-btn delete"
-                                            title="Excluir"
-                                        >
-                                            Excluir
-                                        </button>
-                                    </div>
+                                <div className="story-actions">
+                                    <Link
+                                        href={`/story/${story.id}`}
+                                        className="action-btn view-btn"
+                                        title="Visualizar"
+                                    >
+                                        <Eye size={18} />
+                                    </Link>
+
+                                    <Link
+                                        href={`/dashboard/edit/${story.id}`}
+                                        className="action-btn edit-btn"
+                                        title="Editar"
+                                    >
+                                        <Edit3 size={18} />
+                                    </Link>
+
+                                    <button
+                                        onClick={() =>
+                                            openDeleteModal(
+                                                story.id,
+                                                story.title
+                                            )
+                                        }
+                                        className="action-btn delete-btn"
+                                        title="Excluir"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
                                 </div>
                             </div>
                         ))}
