@@ -398,7 +398,7 @@ export default function EditStoryPage() {
                     </div>
                 </div>
 
-                <div className="story-actions-mobile">
+                <div className="story-actions">
                     <Link
                         href={`/story/${id}`}
                         className="story-btn story-btn-view"
