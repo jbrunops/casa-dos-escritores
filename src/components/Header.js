@@ -311,8 +311,6 @@ export default function Header() {
                         <li
                             className="nav-item has-dropdown"
                             ref={categoryDropdownRef}
-                            onMouseEnter={() => setShowCategoryDropdown(true)}
-                            onMouseLeave={() => setShowCategoryDropdown(false)}
                         >
                             <button
                                 className="nav-link dropdown-toggle"
@@ -380,12 +378,7 @@ export default function Header() {
                     {loading ? (
                         <div className="loading-text">Carregando...</div>
                     ) : user ? (
-                        <div
-                            className="user-account"
-                            ref={userDropdownRef}
-                            onMouseEnter={() => setShowUserDropdown(true)}
-                            onMouseLeave={() => setShowUserDropdown(false)}
-                        >
+                        <div className="user-account" ref={userDropdownRef}>
                             <button
                                 className={`account-button ${
                                     showUserDropdown ? "is-active" : ""
