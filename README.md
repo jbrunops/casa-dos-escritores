@@ -66,13 +66,17 @@ Casa dos Escritores é uma plataforma web para escritores compartilharem histór
 ## Tecnologias Utilizadas
 
 -   **Frontend**: Next.js 15
--   **Estilização**: Tailwind CSS
+-   **Estilização**:
+    -   CSS Modules
+    -   Media Queries personalizadas
+    -   Variáveis CSS
 -   **Backend**: Supabase
 -   **Autenticação**: Supabase Auth
 -   **Editor de Texto**: Tiptap
 -   **Bibliotecas Adicionais**:
     -   Lucide React (ícones)
     -   DOMPurify (sanitização de HTML)
+    -   React Hooks
 
 ## Pré-requisitos
 
@@ -135,14 +139,19 @@ src/
 
 ## Deploy
 
-Recomendado para Vercel:
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+## Deploy
 
-Configurações importantes:
+Configurações para implantação:
 
--   Build Command: `npm run build`
--   Start Command: `npm start`
--   Variáveis de ambiente: Configure no Vercel
+-   **Provedor Recomendado**: Vercel
+-   **Build Command**: `npm run build`
+-   **Start Command**: `npm start`
+
+### Variáveis de Ambiente Necessárias
+
+-   `NEXT_PUBLIC_SUPABASE_URL`
+-   `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+-   `SUPABASE_SERVICE_ROLE_KEY`
 
 ## Contribuição
 
