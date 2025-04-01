@@ -204,28 +204,8 @@ export default function EditProfilePage() {
             setSuccess(true);
 
             // Redirecionar após 1.5 segundos
-            // Redirecionar após 1.5 segundos com tratamento de erro
             setTimeout(() => {
-                try {
-                    // Garantir que o nome de usuário seja codificado corretamente
-                    const encodedUsername = encodeURIComponent(username);
-                    console.log(
-                        "Redirecionando para:",
-                        `/profile/${encodedUsername}`
-                    );
-
-                    // Primeiro navegar usando o router
-                    router.push(`/profile/${encodedUsername}`);
-
-                    // Como fallback, adicionar redirecionamento direto
-                    setTimeout(() => {
-                        window.location.href = `/profile/${encodedUsername}`;
-                    }, 500);
-                } catch (redirectError) {
-                    console.error("Erro ao redirecionar:", redirectError);
-                    // Fallback para a página principal em caso de erro
-                    window.location.href = "/dashboard";
-                }
+                router.push(`/profile/${username}`);
             }, 1500);
         } catch (err) {
             console.error("Erro ao atualizar perfil:", err);

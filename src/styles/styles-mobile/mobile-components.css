@@ -1,145 +1,118 @@
-/* Estilos mobile para componentes UI */
+/* Estilos mobile para o editor */
 
-/* Breakpoint para dispositivos móveis */
 @media (max-width: 768px) {
-    /* Botões */
-    .story-actions {
+    /* Correção específica para os botões de ação do editor */
+    .story-editor-container .story-actions {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
+        gap: 0.5rem !important;
+    }
+
+    .story-editor-container .story-actions .story-btn {
+        width: 100% !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* Estilos originais abaixo */
+    .editor-preview-container.split {
         flex-direction: column;
-        align-items: stretch;
     }
 
-    .story-btn {
+    .editor-pane.split,
+    .preview-pane.split {
         width: 100%;
+        height: 300px;
     }
 
-    .modal-actions {
-        flex-direction: column;
+    .editor-pane.split {
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
     }
 
-    .comment-submit-btn {
-        width: 100%;
-    }
-
-    /* Cartões e cards */
-    .card {
-        margin-bottom: var(--space-md);
-    }
-
-    .card-content {
-        padding: var(--space-sm);
-    }
-
-    /* Formulários */
-    .form-group {
-        margin-bottom: var(--space-md);
-    }
-
-    input,
-    textarea,
-    select {
-        font-size: 16px; /* Prevenir zoom em iOS */
-    }
-
-    /* Comentários */
-    .comment {
-        padding: var(--space-sm);
-    }
-
-    .comment-form textarea {
-        min-height: 100px;
-    }
-
-    /* Paginação */
-    .pagination {
+    .editor-toolbar {
         flex-wrap: wrap;
-        gap: var(--space-sm);
         justify-content: center;
+        padding: var(--space-xs);
+        gap: var(--space-xs);
     }
 
-    .pagination-numbers {
-        order: 3;
-        width: 100%;
-        justify-content: center;
-        margin-top: var(--space-sm);
+    .toolbar-button {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.8rem;
     }
 
-    .pagination-number {
-        width: 2rem;
-        height: 2rem;
+    .toolbar-group {
+        margin-bottom: var(--space-xs);
     }
-}
 
-/* Breakpoint para dispositivos móveis pequenos */
-@media (max-width: 480px) {
-    /* Ajustes para telas muito pequenas */
-    .card-header,
-    .card-content,
-    .card-footer {
+    .editor-content {
+        min-height: 250px;
         padding: var(--space-sm);
     }
 
-    .badge {
-        font-size: 0.7rem;
-        padding: 0.2rem 0.5rem;
-    }
-
-    .comment-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .story-card h3 {
-        font-size: 1.1rem;
-    }
-
-    .story-meta-line {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .modal-container {
-        width: 95%;
+    .preview-content {
         padding: var(--space-md);
     }
+
+    .view-mode-buttons {
+        margin-left: 0;
+        margin-top: var(--space-xs);
+        width: 100%;
+        justify-content: center;
+    }
 }
 
-@media (max-width: 768px) {
-    /* Reduzir recuo para comentários aninhados em dispositivos móveis */
-    .nested-comment {
-        margin-left: 10px;
-        padding-left: 5px;
+@media (max-width: 480px) {
+    .story-editor-container {
+        padding: 1rem 0.75rem;
     }
 
-    /* Ajustar o tamanho do texto */
-    .comment-text {
+    .editor-toolbar {
+        padding: var(--space-xs) 0;
+    }
+
+    .toolbar-button {
+        padding: var(--space-xs);
+        font-size: 0.75rem;
+    }
+
+    .toolbar-divider {
+        margin: 0 var(--space-xs);
+    }
+
+    .editor-content,
+    .preview-content {
         font-size: 0.95rem;
     }
 
-    .reply-button {
-        font-size: 0.7rem;
+    .bubble-menu {
+        flex-wrap: wrap;
     }
 
-    .comment-avatar,
-    .comment-avatar-placeholder {
-        width: 20px;
-        height: 20px;
-        font-size: 0.65rem;
-    }
-}
-
-@media (max-width: 480px) {
-    /* Mais ajustes para telas muito pequenas */
-    .nested-comment {
-        margin-left: 5px;
+    .dropdown-menu {
+        min-width: 250px;
+        right: -50px;
     }
 
-    .comment-container .comment {
-        margin-left: 0 !important; /* Sobrescrever o estilo inline para telas muito pequenas */
-        padding: var(--space-sm) var(--space-xs);
+    .editor-stats {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-xs);
     }
 
-    .reply-indicator {
-        padding: 6px 8px;
+    .story-editor-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .story-editor-subtitle {
         font-size: 0.8rem;
+    }
+
+    .story-btn {
+        height: auto;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
     }
 }

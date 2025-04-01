@@ -218,8 +218,6 @@ export default function TipTapEditor({
                     </button>
                 </div>
 
-                <div className="toolbar-divider"></div>
-
                 <div className="toolbar-group">
                     <button
                         type="button"
@@ -275,8 +273,6 @@ export default function TipTapEditor({
                     </button>
                 </div>
 
-                <div className="toolbar-divider"></div>
-
                 <div className="toolbar-group">
                     <button
                         type="button"
@@ -318,8 +314,6 @@ export default function TipTapEditor({
                         " Citação
                     </button>
                 </div>
-
-                <div className="toolbar-divider"></div>
 
                 <div className="toolbar-group">
                     <button
@@ -494,11 +488,6 @@ export default function TipTapEditor({
                     </div>
                 </div>
 
-                <div className="toolbar-divider"></div>
-
-                {/* Novos botões para citações e formatos acadêmicos */}
-                <div className="toolbar-group"></div>
-
                 {/* Botão para verificação ortográfica */}
                 <div className="toolbar-divider"></div>
                 <div className="toolbar-group">
@@ -551,6 +540,17 @@ export default function TipTapEditor({
                     >
                         <Eye size={16} />
                         <span>Visualizar</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => toggleViewMode("split")}
+                        className={`view-mode-button ${
+                            viewMode === "split" ? "active" : ""
+                        }`}
+                        title="Visualização dividida"
+                    >
+                        <Columns size={16} />
+                        <span>Dividido</span>
                     </button>
                 </div>
             </div>

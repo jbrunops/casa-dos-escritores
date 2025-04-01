@@ -1,6 +1,20 @@
 /* Estilos mobile para o editor */
 
 @media (max-width: 768px) {
+    /* Correção específica para os botões de ação do editor */
+    .story-editor-container .story-actions {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
+        gap: 0.5rem !important;
+    }
+
+    .story-editor-container .story-actions .story-btn {
+        width: 100% !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* Estilos originais abaixo */
     .editor-preview-container.split {
         flex-direction: column;
     }
@@ -96,10 +110,9 @@
         font-size: 0.8rem;
     }
 
-    /* botões */
-    .story-actions-mobile {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
+    .story-btn {
+        height: auto;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
     }
 }

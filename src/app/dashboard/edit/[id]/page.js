@@ -425,9 +425,7 @@ export default function EditStoryPage() {
                         }`}
                     >
                         <Send className="story-btn-icon" size={18} />
-                        <span>
-                            {isPublished ? "Colocar em Rascunho" : "Publicar"}
-                        </span>
+                        <span>{isPublished ? "Despublicar" : "Publicar"}</span>
                     </button>
                     <button
                         type="submit"

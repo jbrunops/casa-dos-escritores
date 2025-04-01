@@ -1,216 +1,118 @@
-/* Estilos mobile para o dashboard */
+/* Estilos mobile para o editor */
 
-/* Tablets */
-@media (max-width: 1024px) {
-    .dashboard-container .stats-section {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* Tablets e dispositivos móveis grandes */
 @media (max-width: 768px) {
-    .dashboard-container {
-        padding: 24px 16px;
+    /* Correção específica para os botões de ação do editor */
+    .story-editor-container .story-actions {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
+        gap: 0.5rem !important;
     }
 
-    .dashboard-header {
+    .story-editor-container .story-actions .story-btn {
+        width: 100% !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* Estilos originais abaixo */
+    .editor-preview-container.split {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-        margin-bottom: 24px;
     }
 
-    .actions-section {
+    .editor-pane.split,
+    .preview-pane.split {
         width: 100%;
-        justify-content: space-between;
+        height: 300px;
     }
 
-    .stories-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
+    .editor-pane.split {
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
     }
 
-    .stories-tabs {
+    .editor-toolbar {
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: var(--space-xs);
+        gap: var(--space-xs);
+    }
+
+    .toolbar-button {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.8rem;
+    }
+
+    .toolbar-group {
+        margin-bottom: var(--space-xs);
+    }
+
+    .editor-content {
+        min-height: 250px;
+        padding: var(--space-sm);
+    }
+
+    .preview-content {
+        padding: var(--space-md);
+    }
+
+    .view-mode-buttons {
+        margin-left: 0;
+        margin-top: var(--space-xs);
         width: 100%;
-    }
-
-    .tab-btn {
-        flex: 1;
-        text-align: center;
+        justify-content: center;
     }
 }
 
-/* Dispositivos móveis */
 @media (max-width: 480px) {
-    .dashboard-container {
-        padding: 16px 12px;
+    .story-editor-container {
+        padding: 1rem 0.75rem;
     }
 
-    .welcome-section h1 {
-        font-size: 24px;
+    .editor-toolbar {
+        padding: var(--space-xs) 0;
     }
 
-    .welcome-section p {
-        font-size: 14px;
+    .toolbar-button {
+        padding: var(--space-xs);
+        font-size: 0.75rem;
     }
 
-    .dashboard-container .stats-section {
-        grid-template-columns: 1fr;
-        gap: 16px;
+    .toolbar-divider {
+        margin: 0 var(--space-xs);
     }
 
-    .dashboard-container .stat-card {
-        padding: 24px 16px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        text-align: left;
+    .editor-content,
+    .preview-content {
+        font-size: 0.95rem;
     }
 
-    .dashboard-container .stat-content {
-        flex-direction: row;
-        gap: 16px;
-        width: 100%;
-        justify-content: space-between;
-        align-items: center;
+    .bubble-menu {
+        flex-wrap: wrap;
     }
 
-    .dashboard-container .stat-value {
-        font-size: 28px;
-        margin-bottom: 0;
+    .dropdown-menu {
+        min-width: 250px;
+        right: -50px;
     }
 
-    .stories-header {
-        padding: 16px;
-    }
-
-    /* .stories-list {
-        padding: 8px 16px;
-    } */
-
-    .story-item {
+    .editor-stats {
         flex-direction: column;
         align-items: flex-start;
-        padding: 16px 0;
-        position: relative;
-        width: 100%;
-        box-sizing: border-box;
+        gap: var(--space-xs);
     }
 
-    .story-title {
-        padding-right: 110px; /* Space for actions */
-        margin-bottom: 12px;
-        width: 100%;
-        box-sizing: border-box;
-        word-break: break-word;
+    .story-editor-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
-    .story-details {
-        flex-wrap: wrap;
-        width: 100%;
+    .story-editor-subtitle {
+        font-size: 0.8rem;
     }
 
-    .story-actions {
-        position: absolute;
-        top: 12px;
-        right: 0;
-        margin: 0;
-        padding: 0;
-    }
-
-    .action-btn {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        margin: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .action-btn svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    .story-actions {
-        display: flex;
-        align-items: center;
-        gap: 6px; /* Slightly smaller gap on mobile */
-    }
-
-    /* Improving tap targets on mobile */
-    .tab-btn {
-        height: 40px;
-    }
-
-    .story-stats {
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-
-    /* Mobile touch improvements */
-    .refresh-button,
-    .new-story-button,
-    .action-btn {
-        min-height: 44px; /* Minimum touch target size */
-    }
-
-    /* Optimizing spacing between items */
-    .empty-stories {
-        padding: 32px 16px;
-    }
-
-    /* Fix for mobile action buttons */
-    .view-btn,
-    .edit-btn,
-    .delete-btn {
-        touch-action: manipulation;
-    }
-
-    /* Better alignment for status badges */
-    .story-status {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Better spacing for story items */
-    .story-main {
-        width: 100%;
-    }
-
-    /* Improve text readability on small screens */
-    .dashboard-container .stat-label {
-        font-size: 13px;
-    }
-
-    /* Mobile loading states */
-    .dashboard-loading,
-    .stories-loading {
-        padding: 40px 0;
-    }
-
-    /* Fix para telas muito pequenas (< 360px) */
-    @media (max-width: 360px) {
-        .story-title {
-            padding-right: 90px; /* Menos espaço para os botões */
-            font-size: 15px;
-        }
-
-        .story-actions {
-            gap: 4px; /* Gap ainda menor */
-        }
-
-        .action-btn {
-            width: 28px;
-            height: 28px;
-        }
-
-        .action-btn svg {
-            width: 14px;
-            height: 14px;
-        }
+    .story-btn {
+        height: auto;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
     }
 }
