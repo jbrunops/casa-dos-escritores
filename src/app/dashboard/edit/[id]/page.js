@@ -398,7 +398,7 @@ export default function EditStoryPage() {
                     </div>
                 </div>
 
-                <div className="story-actions">
+                <div className="story-actions-mobile">
                     <Link
                         href={`/story/${id}`}
                         className="story-btn story-btn-view"
@@ -425,7 +425,9 @@ export default function EditStoryPage() {
                         }`}
                     >
                         <Send className="story-btn-icon" size={18} />
-                        <span>{isPublished ? "Despublicar" : "Publicar"}</span>
+                        <span>
+                            {isPublished ? "Colocar em Rascunho" : "Publicar"}
+                        </span>
                     </button>
                     <button
                         type="submit"
