@@ -425,7 +425,7 @@ export default function DashboardPage() {
                         </Link>
                     </div>
                 ) : (
-                    <div className="stories-list">
+                    <div className="stories-list-dashboard">
                         {filteredStories.map((story) => (
                             <div key={story.id} className="story-item">
                                 <div className="story-main">

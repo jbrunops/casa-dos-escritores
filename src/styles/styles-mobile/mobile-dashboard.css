@@ -2,7 +2,7 @@
 
 /* Tablets */
 @media (max-width: 1024px) {
-    .stats-section {
+    .dashboard-container .stats-section {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -55,20 +55,20 @@
         font-size: 14px;
     }
 
-    .stats-section {
+    .dashboard-container .stats-section {
         grid-template-columns: 1fr;
         gap: 16px;
     }
 
-    .stat-card {
-        padding: 16px;
+    .dashboard-container .stat-card {
+        padding: 24px 16px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         text-align: left;
     }
 
-    .stat-content {
+    .dashboard-container .stat-content {
         flex-direction: row;
         gap: 16px;
         width: 100%;
@@ -76,8 +76,8 @@
         align-items: center;
     }
 
-    .stat-value {
-        font-size: 24px;
+    .dashboard-container .stat-value {
+        font-size: 28px;
         margin-bottom: 0;
     }
 
@@ -182,7 +182,7 @@
     }
 
     /* Improve text readability on small screens */
-    .stat-label {
+    .dashboard-container .stat-label {
         font-size: 13px;
     }
 
