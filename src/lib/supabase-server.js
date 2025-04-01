@@ -13,12 +13,14 @@ export async function createServerSupabaseClient() {
                     try {
                         return cookieStore.get(name)?.value;
                     } catch (error) {
+                        // Tratar erro de forma silenciosa
                         console.error(`Erro ao obter cookie ${name}:`, error);
                         return null;
                     }
                 },
-                set(name, value, options) {
+                set(name, value, options = {}) {
                     try {
+                        // No servidor, use o método correto
                         cookieStore.set({
                             name,
                             value,
@@ -28,7 +30,7 @@ export async function createServerSupabaseClient() {
                         console.error(`Erro ao definir cookie ${name}:`, error);
                     }
                 },
-                remove(name, options) {
+                remove(name, options = {}) {
                     try {
                         cookieStore.set({
                             name,

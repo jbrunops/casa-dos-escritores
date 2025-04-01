@@ -216,25 +216,6 @@ export default function TipTapEditor({
                     >
                         H2
                     </button>
-                    <button
-                        type="button"
-                        onClick={() =>
-                            editor
-                                .chain()
-                                .focus()
-                                .toggleHeading({ level: 3 })
-                                .run()
-                        }
-                        className={`toolbar-button ${
-                            editor.isActive("heading", { level: 3 })
-                                ? "is-active"
-                                : ""
-                        }`}
-                        title="Título 3"
-                        disabled={viewMode === "preview"}
-                    >
-                        H3
-                    </button>
                 </div>
 
                 <div className="toolbar-divider"></div>
@@ -516,89 +497,7 @@ export default function TipTapEditor({
                 <div className="toolbar-divider"></div>
 
                 {/* Novos botões para citações e formatos acadêmicos */}
-                <div className="toolbar-group">
-                    <button
-                        type="button"
-                        onClick={() =>
-                            editor.chain().focus().toggleBlockquote().run()
-                        }
-                        className={`toolbar-button ${
-                            editor.isActive("blockquote") &&
-                            !editor.getAttributes("blockquote").class
-                                ? "is-active"
-                                : ""
-                        }`}
-                        title="Citação padrão"
-                        disabled={viewMode === "preview"}
-                    >
-                        Citação
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            // Adiciona classe específica para citação acadêmica
-                            editor
-                                .chain()
-                                .focus()
-                                .toggleNode("blockquote", "blockquote")
-                                .updateAttributes("blockquote", {
-                                    class: "academic-quote",
-                                })
-                                .run();
-                        }}
-                        className={`toolbar-button ${
-                            editor.isActive("blockquote") &&
-                            editor.getAttributes("blockquote").class ===
-                                "academic-quote"
-                                ? "is-active"
-                                : ""
-                        }`}
-                        title={"Citação acadêmica"}
-                        disabled={viewMode === "preview"}
-                    >
-                        Citação Acadêmica
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            // Adiciona footnote (nota de rodapé)
-                            const id = `footnote-${Math.floor(
-                                Math.random() * 1000
-                            )}`;
-                            editor
-                                .chain()
-                                .focus()
-                                .insertContent(
-                                    `<sup class="footnote-ref" id="${id}-ref"><a href="#${id}">[nota]</a></sup>`
-                                )
-                                .run();
-                            // Adiciona a nota de rodapé no final se ela não existir
-                            if (!document.getElementById("footnotes-section")) {
-                                editor
-                                    .chain()
-                                    .focus()
-                                    .insertContent(
-                                        '<div id="footnotes-section" class="footnotes"><hr/><h3>Notas de Rodapé</h3></div>'
-                                    )
-                                    .run();
-                            }
-                            // Adiciona a nota específica
-                            const footnotesSection =
-                                document.getElementById("footnotes-section");
-                            if (footnotesSection) {
-                                const footnote = document.createElement("div");
-                                footnote.id = id;
-                                footnote.className = "footnote";
-                                footnote.innerHTML = `<sup><a href="#${id}-ref">[^]</a></sup> <span class="footnote-content">Adicione sua nota aqui</span>`;
-                                footnotesSection.appendChild(footnote);
-                            }
-                        }}
-                        title="Adicionar nota de rodapé"
-                        disabled={viewMode === "preview"}
-                    >
-                        Nota de Rodapé
-                    </button>
-                </div>
+                <div className="toolbar-group"></div>
 
                 {/* Botão para verificação ortográfica */}
                 <div className="toolbar-divider"></div>
@@ -652,17 +551,6 @@ export default function TipTapEditor({
                     >
                         <Eye size={16} />
                         <span>Visualizar</span>
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => toggleViewMode("split")}
-                        className={`view-mode-button ${
-                            viewMode === "split" ? "active" : ""
-                        }`}
-                        title="Visualização dividida"
-                    >
-                        <Columns size={16} />
-                        <span>Dividido</span>
                     </button>
                 </div>
             </div>
