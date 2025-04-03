@@ -28,7 +28,6 @@ Casa dos Escritores é uma plataforma dedicada a escritores que desejam comparti
 
 ### Interface
 - **Design Responsivo**: Adaptação para dispositivos móveis e desktop
-- **Modo Noturno**: Alternância entre temas claro e escuro
 - **Editor de Texto Rico**: Interface WYSIWYG para formatação de conteúdo
 
 ## Estrutura do Projeto
