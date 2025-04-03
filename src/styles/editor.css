@@ -468,3 +468,37 @@
     margin-left: var(--space-xs);
     text-decoration: line-through;
 }
+
+/* Animação para o spinner */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.btn-spinner {
+    animation: spin 1s linear infinite;
+}
+
+/* Garantir que o editor funcione bem com as novas classes */
+.story-editor-wrapper .editor-container,
+.chapter-editor-wrapper .editor-container {
+    border: none !important;
+    box-shadow: none !important;
+    margin-bottom: 0 !important;
+}
+
+.story-editor-wrapper .ProseMirror,
+.chapter-editor-wrapper .ProseMirror {
+    min-height: 400px;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    padding: 1.5rem !important;
+    font-size: 1.05rem !important;
+}
+
+/* Esconder estatísticas originais do editor quando usado em editores personalizados */
+.story-editor-wrapper .editor-stats,
+.chapter-editor-wrapper .editor-stats {
+    display: none !important;
+}

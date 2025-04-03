@@ -2,6 +2,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { generateSlug } from "@/lib/utils";
 
 export const metadata = {
     title: "Resultados de pesquisa",
@@ -192,7 +193,7 @@ export default async function SearchPage({ searchParams }) {
                         <div className="story-results">
                             {processedStories.map((story) => (
                                 <Link
-                                    href={`/story/${story.id}`}
+                                    href={`/story/${generateSlug(story.title, story.id)}`}
                                     key={story.id}
                                     className="story-result-card"
                                 >

@@ -5,6 +5,11 @@
         grid-template-columns: 1fr;
         gap: var(--space-lg);
     }
+    
+    /* Series page */
+    .series-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
@@ -20,6 +25,39 @@
     .features-grid {
         grid-template-columns: 1fr;
         gap: var(--space-md);
+    }
+    
+    /* Series page */
+    .series-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .series-container .series-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .series-container .series-cover {
+        width: 200px;
+        height: 300px;
+        margin: 0 auto;
+    }
+    
+    .series-container .series-info {
+        width: 100%;
+    }
+    
+    .series-container .series-meta {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .series-container .series-actions {
+        justify-content: center;
     }
 
     /* Profile page */
@@ -93,6 +131,47 @@
 
     .feature-card h3 {
         font-size: 1.1rem;
+    }
+    
+    /* Series page */
+    .series-browse-page {
+        padding: 1rem 0.5rem;
+    }
+    
+    .series-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .series-subtitle {
+        font-size: 0.9rem;
+    }
+    
+    .series-card {
+        padding: 0.75rem;
+    }
+    
+    .series-card-image {
+        height: 180px;
+    }
+    
+    .series-title {
+        font-size: 1rem;
+    }
+    
+    .series-container .chapters-section {
+        padding: 0.5rem;
+    }
+    
+    .series-container .chapter-item {
+        padding: 0.75rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .series-container .chapter-actions {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 0.5rem;
     }
 
     /* Story page */

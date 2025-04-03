@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import { Edit, BookOpen, Share2, MessageSquare } from "lucide-react";
+import { Edit, BookOpen, Share2, MessageSquare, BookText } from "lucide-react";
+import SeriesHighlights from "@/components/SeriesHighlights";
+import { generateSlug } from "@/lib/utils";
 
 export default async function HomePage() {
     const supabase = await createServerSupabaseClient();
@@ -19,7 +21,57 @@ export default async function HomePage() {
         )
         .eq("is_published", true)
         .order("created_at", { ascending: false })
-        .limit(10);
+        .limit(8); // Reduzindo para 8 para deixar espaço para capítulos
+
+    // Buscar últimos capítulos
+    let latestChaptersData = [];
+    try {
+        // Primeiro buscar os capítulos básicos
+        const { data: latestChapters } = await supabase
+            .from("chapters")
+            .select("id, title, content, chapter_number, series_id, author_id, created_at")
+            .not('series_id', 'is', null)
+            .order("created_at", { ascending: false })
+            .limit(6);
+
+        // Processar cada capítulo para buscar detalhes relacionados
+        if (latestChapters && latestChapters.length > 0) {
+            const chaptersWithDetails = await Promise.all(
+                latestChapters.map(async (chapter) => {
+                    // Buscar dados da série relacionada
+                    const { data: series } = await supabase
+                        .from("series")
+                        .select("title, id, cover_url")
+                        .eq("id", chapter.series_id)
+                        .single();
+                    
+                    // Buscar dados do autor
+                    const { data: author } = await supabase
+                        .from("profiles")
+                        .select("username")
+                        .eq("id", chapter.author_id)
+                        .single();
+                    
+                    return {
+                        ...chapter,
+                        series,
+                        author,
+                        type: 'chapter'
+                    };
+                })
+            );
+            
+            latestChaptersData = chaptersWithDetails;
+        }
+    } catch (error) {
+        console.error("Erro ao buscar últimos capítulos:", error);
+    }
+
+    // Combinar histórias e capítulos, ordenados por data
+    const recentContent = [
+        ...(recentStories || []).map(item => ({ ...item, type: 'story' })),
+        ...(latestChaptersData || []).map(item => ({ ...item, type: 'chapter' }))
+    ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 10);
 
     // Obter as histórias com mais comentários
     // Primeiro buscar todas as histórias publicadas
@@ -47,14 +99,63 @@ export default async function HomePage() {
             return {
                 ...story,
                 comment_count: count || 0,
+                type: 'story'
             };
         })
     );
 
-    // Ordenar por número de comentários (decrescente) e pegar os 10 primeiros
-    const mostCommentedStories = storiesWithCommentCounts
-        .sort((a, b) => b.comment_count - a.comment_count)
-        .slice(0, 10);
+    // Buscar todos os capítulos (para os mais comentados)
+    const { data: allChapters } = await supabase
+        .from("chapters")
+        .select("id, title, content, chapter_number, series_id, author_id, created_at")
+        .not('series_id', 'is', null);
+
+    // Buscar detalhes adicionais para cada capítulo
+    const chaptersWithDetails = await Promise.all(
+        (allChapters || []).map(async (chapter) => {
+            // Buscar série relacionada
+            const { data: series } = await supabase
+                .from("series")
+                .select("title, id")
+                .eq("id", chapter.series_id)
+                .single();
+            
+            // Buscar autor
+            const { data: author } = await supabase
+                .from("profiles")
+                .select("username")
+                .eq("id", chapter.author_id)
+                .single();
+            
+            return {
+                ...chapter,
+                series,
+                author
+            };
+        })
+    );
+
+    // Buscar o número de comentários para cada capítulo
+    const chaptersWithCommentCounts = await Promise.all(
+        (chaptersWithDetails || []).map(async (chapter) => {
+            const { count } = await supabase
+                .from("comments")
+                .select("*", { count: "exact" })
+                .eq("chapter_id", chapter.id);
+
+            return {
+                ...chapter,
+                comment_count: count || 0,
+                type: 'chapter'
+            };
+        })
+    );
+
+    // Combinar histórias e capítulos, ordenados por número de comentários
+    const allContentWithComments = [
+        ...storiesWithCommentCounts,
+        ...chaptersWithCommentCounts
+    ].sort((a, b) => b.comment_count - a.comment_count).slice(0, 10);
 
     // Buscar os 10 escritores mais ativos (que mais publicam)
     // Primeiro, buscar todos os escritores com contagem de publicações
@@ -137,29 +238,63 @@ export default async function HomePage() {
                     <div className="column">
                         <h2>Histórias Recentes</h2>
                         <div className="stories-list">
-                            {recentStories?.length === 0 ? (
+                            {recentContent?.length === 0 ? (
                                 <p>Nenhuma história publicada ainda.</p>
                             ) : (
-                                recentStories?.map((story) => (
-                                    <Link
-                                        href={`/story/${story.id}`}
-                                        key={story.id}
-                                        className="story-card"
-                                    >
-                                        <h3>{story.title}</h3>
-                                        <div className="story-meta-line">
-                                            <span className="author-name">
-                                                {story.profiles.username}
-                                            </span>
-                                            <span className="story-date">
-                                                {formatDate(story.created_at)}
-                                            </span>
-                                        </div>
-                                        <p className="story-summary">
-                                            {createSummary(story.content)}
-                                        </p>
-                                    </Link>
-                                ))
+                                recentContent.map((content) => 
+                                    content.type === 'story' ? (
+                                        <Link
+                                            href={`/story/${generateSlug(content.title, content.id)}`}
+                                            key={`story-${content.id}`}
+                                            className="story-card"
+                                        >
+                                            <h3>{content.title}</h3>
+                                            <div className="story-meta-line">
+                                                <span className="author-name">
+                                                    {content.type === 'chapter' ? content.author.username : content.profiles.username}
+                                                </span>
+                                                <span className="story-date">
+                                                    {formatDate(content.created_at)}
+                                                </span>
+                                            </div>
+                                            <p className="story-summary">
+                                                {createSummary(content.content)}
+                                            </p>
+                                        </Link>
+                                    ) : (
+                                        <Link
+                                            href={`/chapter/${generateSlug(content.title, content.id)}`}
+                                            key={`chapter-${content.id}`}
+                                            className="chapter-card"
+                                        >
+                                            <div className="chapter-card-badge">
+                                                Capítulo
+                                            </div>
+                                            <h3>{content.title}</h3>
+                                            
+                                            <div className="chapter-series-info">
+                                                <BookText size={15} />
+                                                <span>Série: {content.series?.title}</span>
+                                                <span className="chapter-number">
+                                                    Cap. {content.chapter_number}
+                                                </span>
+                                            </div>
+                                            
+                                            <div className="chapter-meta-line">
+                                                <span className="author-name">
+                                                    {content.type === 'chapter' ? content.author?.username : content.profiles.username}
+                                                </span>
+                                                <span className="story-date">
+                                                    {formatDate(content.created_at)}
+                                                </span>
+                                            </div>
+                                            
+                                            <p className="chapter-summary">
+                                                {createSummary(content.content)}
+                                            </p>
+                                        </Link>
+                                    )
+                                )
                             )}
                         </div>
                     </div>
@@ -168,43 +303,91 @@ export default async function HomePage() {
                     <div className="column">
                         <h2>Mais Comentados</h2>
                         <div className="stories-list">
-                            {mostCommentedStories?.length === 0 ? (
+                            {allContentWithComments?.length === 0 ? (
                                 <p>Nenhuma história comentada ainda.</p>
                             ) : (
-                                mostCommentedStories?.map((story) => (
-                                    <Link
-                                        href={`/story/${story.id}`}
-                                        key={story.id}
-                                        className="story-card"
-                                    >
-                                        <h3>{story.title}</h3>
-                                        <div className="story-meta-line">
-                                            <span className="author-name">
-                                                {story.profiles.username}
-                                            </span>
-                                            <div className="meta-right">
-                                                <span className="story-date">
-                                                    {formatDate(
-                                                        story.created_at
-                                                    )}
+                                allContentWithComments.map((content) => 
+                                    content.type === 'story' ? (
+                                        <Link
+                                            href={`/story/${generateSlug(content.title, content.id)}`}
+                                            key={`story-${content.id}`}
+                                            className="story-card"
+                                        >
+                                            <h3>{content.title}</h3>
+                                            <div className="story-meta-line">
+                                                <span className="author-name">
+                                                    {content.type === 'chapter' ? content.author.username : content.profiles.username}
                                                 </span>
-                                                <span className="comment-badge">
-                                                    <span className="comment-icon-container">
-                                                        <MessageSquare
-                                                            size={14}
-                                                        />
+                                                <div className="meta-right">
+                                                    <span className="story-date">
+                                                        {formatDate(
+                                                            content.created_at
+                                                        )}
                                                     </span>
-                                                    <span>
-                                                        {story.comment_count}
+                                                    <span className="comment-badge">
+                                                        <span className="comment-icon-container">
+                                                            <MessageSquare
+                                                                size={14}
+                                                            />
+                                                        </span>
+                                                        <span>
+                                                            {content.comment_count}
+                                                        </span>
                                                     </span>
+                                                </div>
+                                            </div>
+                                            <p className="story-summary">
+                                                {createSummary(content.content)}
+                                            </p>
+                                        </Link>
+                                    ) : (
+                                        <Link
+                                            href={`/chapter/${generateSlug(content.title, content.id)}`}
+                                            key={`chapter-${content.id}`}
+                                            className="chapter-card"
+                                        >
+                                            <div className="chapter-card-badge">
+                                                Capítulo
+                                            </div>
+                                            <h3>{content.title}</h3>
+                                            
+                                            <div className="chapter-series-info">
+                                                <BookText size={15} />
+                                                <span>Série: {content.series?.title}</span>
+                                                <span className="chapter-number">
+                                                    Cap. {content.chapter_number}
                                                 </span>
                                             </div>
-                                        </div>
-                                        <p className="story-summary">
-                                            {createSummary(story.content)}
-                                        </p>
-                                    </Link>
-                                ))
+                                            
+                                            <div className="chapter-meta-line">
+                                                <span className="author-name">
+                                                    {content.type === 'chapter' ? content.author?.username : content.profiles.username}
+                                                </span>
+                                                <div className="meta-right">
+                                                    <span className="story-date">
+                                                        {formatDate(
+                                                            content.created_at
+                                                        )}
+                                                    </span>
+                                                    <span className="comment-badge">
+                                                        <span className="comment-icon-container">
+                                                            <MessageSquare
+                                                                size={14}
+                                                            />
+                                                        </span>
+                                                        <span>
+                                                            {content.comment_count}
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            
+                                            <p className="chapter-summary">
+                                                {createSummary(content.content)}
+                                            </p>
+                                        </Link>
+                                    )
+                                )
                             )}
                         </div>
                     </div>
@@ -262,6 +445,11 @@ export default async function HomePage() {
                         </div>
                     </div>
                 </div>
+            </section>
+
+            {/* NOVA SEÇÃO: Séries Destacadas */}
+            <section className="series-highlights-section">
+                <SeriesHighlights />
             </section>
 
             <section className="features-section">

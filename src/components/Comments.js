@@ -5,7 +5,15 @@ import { createBrowserClient } from "@/lib/supabase-browser";
 import Link from "next/link";
 import { RefreshCw, MessageSquare, Reply, X } from "lucide-react";
 
-export default function Comments({ storyId, sessionId, authorId }) {
+export default function Comments({
+    storyId,
+    contentId,
+    contentType,
+    sessionId,
+    userId,
+    authorId,
+    isSeriesComment = false,
+}) {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
     const [replyTo, setReplyTo] = useState(null);
@@ -15,15 +23,39 @@ export default function Comments({ storyId, sessionId, authorId }) {
     const [success, setSuccess] = useState(false);
     const supabase = createBrowserClient();
     const commentInputRef = useRef(null);
+    const [userSession, setUserSession] = useState(null);
 
+    // Determinar o ID e tipo de conteúdo para comentários
+    const id = contentId || storyId;
+    const type = contentType || (isSeriesComment ? "series" : "story");
+    // Usar userId se fornecido, senão usar sessionId
+    const currentUserId = userId || sessionId;
+    
+    // Se não temos userId do servidor, tentar buscar com supabase browser client
+    useEffect(() => {
+        async function getUserSession() {
+            if (!currentUserId) {
+                try {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (session?.user) {
+                        setUserSession(session.user.id);
+                        fetchUsername(session.user.id);
+                    }
+                } catch (err) {
+                    console.error("Erro ao obter sessão:", err);
+                }
+            } else {
+                fetchUsername(currentUserId);
+            }
+        }
+        
+        getUserSession();
+    }, [currentUserId, supabase]);
+    
     useEffect(() => {
         // Carregar comentários iniciais
         loadComments();
-
-        if (sessionId) {
-            fetchUsername();
-        }
-    }, [storyId, sessionId]);
+    }, [id]);
 
     // Se estamos respondendo a um comentário, focar no input
     useEffect(() => {
@@ -35,31 +67,46 @@ export default function Comments({ storyId, sessionId, authorId }) {
     // Função para carregar comentários
     const loadComments = async () => {
         try {
-            if (!storyId) {
-                console.error("storyId é inválido:", storyId);
+            if (!id) {
+                console.error(`ID do conteúdo é inválido:`, id);
                 return;
             }
 
-            const { data, error } = await supabase
+            console.log("Carregando comentários para:", {
+                contentId: id,
+                contentType: type,
+            });
+
+            let query = supabase
                 .from("comments")
                 .select(
                     `
-                    id, 
-                    text,
-                    created_at,
-                    author_id,
-                    parent_id,
-                    profiles(username, avatar_url)
+                id, 
+                text,
+                created_at,
+                author_id,
+                parent_id,
+                profiles(username, avatar_url)
                 `
-                )
-                .eq("story_id", storyId)
-                .order("created_at", { ascending: true });
+                );
+            
+            // Aplicar filtro com base no tipo de conteúdo
+            if (type === "chapter") {
+                query = query.eq("chapter_id", id);
+            } else if (type === "series") {
+                query = query.eq("series_id", id);
+            } else {
+                query = query.eq("story_id", id);
+            }
+            
+            const { data, error } = await query.order("created_at", { ascending: true });
 
             if (error) {
                 console.error("Erro ao buscar comentários:", error);
                 return;
             }
 
+            console.log("Comentários carregados:", data?.length || 0);
             setComments(data || []);
         } catch (err) {
             console.error("Exceção ao carregar comentários:", err);
@@ -67,12 +114,14 @@ export default function Comments({ storyId, sessionId, authorId }) {
         }
     };
 
-    async function fetchUsername() {
+    async function fetchUsername(uid) {
+        if (!uid) return;
+        
         try {
             const { data } = await supabase
                 .from("profiles")
                 .select("username")
-                .eq("id", sessionId)
+                .eq("id", uid)
                 .single();
 
             if (data) {
@@ -86,8 +135,11 @@ export default function Comments({ storyId, sessionId, authorId }) {
     // Usar a API para adicionar comentários
     async function handleSubmitComment(e) {
         e.preventDefault();
+        
+        // Verificar se está logado
+        const activeUserId = currentUserId || userSession;
 
-        if (!sessionId) {
+        if (!activeUserId) {
             setError("Você precisa estar logado para comentar");
             return;
         }
@@ -101,25 +153,27 @@ export default function Comments({ storyId, sessionId, authorId }) {
         setError(null);
 
         try {
-            // Verificar se storyId é válido
-            if (!storyId) {
-                console.error("storyId inválido:", storyId);
-                throw new Error("ID da história inválido");
-            }
-
-            // Verificar se sessionId é válido
-            if (!sessionId) {
-                console.error("sessionId inválido:", sessionId);
-                throw new Error("ID do usuário inválido");
+            // Verificar se ID é válido
+            if (!id) {
+                console.error("ID inválido:", id);
+                throw new Error(`ID do ${type} inválido`);
             }
 
             // Preparar dados para a API
             const commentData = {
                 text: newComment,
-                storyId: storyId,
-                authorId: sessionId,
+                authorId: activeUserId,
                 parentId: replyTo ? replyTo.id : null,
             };
+
+            // Adicionar o ID adequado com base no tipo de comentário
+            if (type === "chapter") {
+                commentData.chapterId = id;
+            } else if (type === "series") {
+                commentData.seriesId = id;
+            } else {
+                commentData.storyId = id;
+            }
 
             console.log("Enviando para API:", commentData);
 
@@ -240,7 +294,7 @@ export default function Comments({ storyId, sessionId, authorId }) {
                         </span>
                     </div>
                     <p className="comment-text">{comment.text}</p>
-                    {sessionId && (
+                    {currentUserId && (
                         <div className="comment-actions">
                             <button
                                 onClick={() => handleReply(comment)}
@@ -276,7 +330,7 @@ export default function Comments({ storyId, sessionId, authorId }) {
                 Comentários ({comments.length})
             </h3>
 
-            {sessionId ? (
+            {currentUserId ? (
                 <form onSubmit={handleSubmitComment} className="comment-form">
                     {error && (
                         <div className="error-message comment-error">

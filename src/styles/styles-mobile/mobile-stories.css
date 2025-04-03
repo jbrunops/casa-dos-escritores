@@ -1,0 +1,119 @@
+/* Estilos mobile para o módulo de histórias */
+
+/* Versão tablet (768px ou menos) */
+@media (max-width: 768px) {
+    /* Lista de histórias */
+    .stories-list {
+        display: grid;
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    /* Cards de histórias */
+    .story-card, .chapter-card {
+        padding: 16px !important;
+    }
+
+    .story-card h3, .chapter-card h3 {
+        font-size: 1.1rem !important;
+    }
+
+    .story-meta-line, .chapter-meta-line {
+        flex-wrap: wrap !important;
+    }
+
+    .story-summary, .chapter-summary {
+        -webkit-line-clamp: 2 !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* Capítulos dentro de séries */
+    .chapters-list {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .chapter-item {
+        padding: 12px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .chapter-actions {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+}
+
+/* Versão celular (480px ou menos) */
+@media (max-width: 480px) {
+    /* Lista de histórias */
+    .stories-list {
+        gap: 12px !important;
+    }
+
+    /* Cards de histórias */
+    .story-card, .chapter-card {
+        padding: 12px !important;
+    }
+
+    .story-card h3, .chapter-card h3 {
+        font-size: 1rem !important;
+        margin-bottom: 6px !important;
+    }
+
+    .author-name, .story-date {
+        font-size: 0.75rem !important;
+    }
+
+    .story-summary, .chapter-summary {
+        margin-top: 6px !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* Badge de capítulo */
+    .chapter-card-badge {
+        font-size: 0.7rem !important;
+        padding: 2px 8px !important;
+    }
+
+    /* Informações do capítulo */
+    .chapter-series-info {
+        font-size: 0.75rem !important;
+        gap: 4px !important;
+    }
+
+    .chapter-number {
+        font-size: 0.7rem !important;
+    }
+
+    /* Badge de comentários */
+    .comment-badge {
+        padding: 2px 6px !important;
+        font-size: 0.7rem !important;
+    }
+
+    /* Capítulos em séries */
+    .chapter-title {
+        font-size: 0.95rem !important;
+    }
+
+    .chapter-meta {
+        font-size: 0.75rem !important;
+    }
+
+    .chapter-actions {
+        flex-direction: row !important;
+        justify-content: flex-end !important;
+        gap: 8px !important;
+    }
+
+    .chapter-view-btn, 
+    .chapter-edit-btn, 
+    .chapter-delete-btn {
+        width: auto !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 5px 10px !important;
+        font-size: 0.8rem !important;
+    }
+} 

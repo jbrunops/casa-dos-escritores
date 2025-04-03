@@ -13,9 +13,15 @@ import {
     RefreshCw,
     BookOpen,
     MessageSquare,
+    Layers,
+    Plus, // Adicione esta linha
 } from "lucide-react";
+import { generateSlug } from "@/lib/utils";
 
 export default function DashboardPage() {
+    const [series, setSeries] = useState([]);
+    const [loadingSeries, setLoadingSeries] = useState(true);
+    const [seriesTab, setSeriesTab] = useState("all");
     const [user, setUser] = useState(null);
     const [profile, setProfile] = useState(null);
     const [stories, setStories] = useState([]);
@@ -78,6 +84,12 @@ export default function DashboardPage() {
                     await fetchUserStories(session.user.id);
                 } catch (storiesError) {
                     console.error("Exceção ao buscar histórias:", storiesError);
+                }
+
+                try {
+                    await fetchUserSeries(session.user.id);
+                } catch (seriesError) {
+                    console.error("Exceção ao buscar séries:", seriesError);
                 }
 
                 // Buscar estatísticas
@@ -161,6 +173,71 @@ export default function DashboardPage() {
         }
     }
 
+    // Este é o trecho que precisa ser localizado e atualizado no arquivo src/app/dashboard/page.js
+    // Procure pela função que busca séries e sua contagem de capítulos
+
+    async function fetchUserSeries(userId) {
+        try {
+            setLoadingSeries(true);
+
+            const { data, error } = await supabase
+                .from("series")
+                .select(
+                    `
+                id,
+                title,
+                created_at,
+                updated_at,
+                is_completed,
+                genre,
+                view_count
+            `
+                )
+                .eq("author_id", userId)
+                .order("created_at", { ascending: false });
+
+            if (error) {
+                throw error;
+            }
+
+            // Para cada série, buscar contagem de capítulos
+            const seriesWithChapters = await Promise.all(
+                (data || []).map(async (serie) => {
+                    try {
+                        const { count, error: countError } = await supabase
+                            .from("chapters") // AQUI: Alterado de "stories" para "chapters"
+                            .select("id", { count: "exact" })
+                            .eq("series_id", serie.id);
+
+                        if (countError) {
+                            return {
+                                ...serie,
+                                chapter_count: 0,
+                            };
+                        }
+
+                        return {
+                            ...serie,
+                            chapter_count: count || 0,
+                        };
+                    } catch (err) {
+                        return {
+                            ...serie,
+                            chapter_count: 0,
+                        };
+                    }
+                })
+            );
+
+            setSeries(seriesWithChapters || []);
+        } catch (error) {
+            console.error("Erro ao buscar séries:", error);
+            setSeries([]);
+        } finally {
+            setLoadingSeries(false);
+        }
+    }
+
     async function fetchUserStats(userId) {
         try {
             setLoadingStats(true);
@@ -227,11 +304,12 @@ export default function DashboardPage() {
         }
     };
 
-    const openDeleteModal = (storyId, storyTitle) => {
+    const openDeleteModal = (id, title, type = "story") => {
         setDeleteModal({
             open: true,
-            storyId,
-            title: storyTitle,
+            id,
+            title,
+            type, // tipo pode ser "story" ou "series"
         });
     };
 
@@ -243,27 +321,51 @@ export default function DashboardPage() {
         });
     };
 
-    const handleDeleteStory = async () => {
-        if (!deleteModal.storyId) return;
+    // Renomeie para handleDelete
+    const handleDelete = async () => {
+        if (!deleteModal.id) return;
 
         setDeleting(true);
 
         try {
-            const { error } = await supabase
-                .from("stories")
-                .delete()
-                .eq("id", deleteModal.storyId);
+            if (deleteModal.type === "series") {
+                // Primeiro, excluir todos os capítulos associados
+                await supabase
+                    .from("stories")
+                    .delete()
+                    .eq("series_id", deleteModal.id);
 
-            if (error) {
-                throw error;
+                // Então excluir a série
+                const { error } = await supabase
+                    .from("series")
+                    .delete()
+                    .eq("id", deleteModal.id);
+
+                if (error) throw error;
+
+                // Atualizar a lista de séries
+                setSeries(
+                    series.filter((serie) => serie.id !== deleteModal.id)
+                );
+            } else {
+                // Código existente para excluir histórias
+                const { error } = await supabase
+                    .from("stories")
+                    .delete()
+                    .eq("id", deleteModal.id);
+
+                if (error) throw error;
+
+                // Atualizar a lista de histórias
+                setStories(
+                    stories.filter((story) => story.id !== deleteModal.id)
+                );
             }
 
-            // Atualizar a lista de histórias
-            setStories(
-                stories.filter((story) => story.id !== deleteModal.storyId)
-            );
             setSuccessMessage(
-                `A história "${deleteModal.title}" foi excluída com sucesso.`
+                `${deleteModal.type === "series" ? "Série" : "História"} "${
+                    deleteModal.title
+                }" foi excluída com sucesso.`
             );
 
             // Atualizar estatísticas
@@ -276,9 +378,11 @@ export default function DashboardPage() {
                 setSuccessMessage("");
             }, 5000);
         } catch (error) {
-            console.error("Erro ao excluir história:", error);
+            console.error("Erro ao excluir:", error);
             alert(
-                "Não foi possível excluir a história. Por favor, tente novamente."
+                `Não foi possível excluir ${
+                    deleteModal.type === "series" ? "a série" : "a história"
+                }. Por favor, tente novamente.`
             );
         } finally {
             setDeleting(false);
@@ -479,7 +583,7 @@ export default function DashboardPage() {
 
                                 <div className="story-actions">
                                     <Link
-                                        href={`/story/${story.id}`}
+                                        href={`/story/${generateSlug(story.title, story.id)}`}
                                         className="action-btn view-btn"
                                         title="Visualizar"
                                     >
@@ -513,12 +617,49 @@ export default function DashboardPage() {
                 )}
             </div>
 
+            {/* Link para a página de séries - substituindo a tabela */}
+            <div className="series-link-section">
+                <div className="series-link-header">
+                    <h2>Minhas Séries</h2>
+                    <Link href="/series" className="view-all-series-link">
+                        <BookOpen size={18} />
+                        <span>Ver minhas séries</span>
+                    </Link>
+                </div>
+                
+                <div className="series-stats-card">
+                    <div className="series-stats-content">
+                        <div className="series-stats-item">
+                            <span className="series-stats-label">Total de séries</span>
+                            <span className="series-stats-value">{series.length}</span>
+                        </div>
+                        <div className="series-stats-item">
+                            <span className="series-stats-label">Completas</span>
+                            <span className="series-stats-value">
+                                {series.filter(s => s.is_completed).length}
+                            </span>
+                        </div>
+                        <div className="series-stats-item">
+                            <span className="series-stats-label">Em andamento</span>
+                            <span className="series-stats-value">
+                                {series.filter(s => !s.is_completed).length}
+                            </span>
+                        </div>
+                    </div>
+                    <Link href="/dashboard/new-series" className="create-series-link">
+                        <Plus size={16} />
+                        <span>Nova Série</span>
+                    </Link>
+                </div>
+            </div>
+
             {/* Modal de confirmação de exclusão */}
             <DeleteModal
                 isOpen={deleteModal.open}
                 onClose={closeDeleteModal}
-                onConfirm={handleDeleteStory}
+                onConfirm={handleDelete}
                 title={deleteModal.title}
+                type={deleteModal.type}
             />
         </div>
     );

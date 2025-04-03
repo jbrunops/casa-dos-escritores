@@ -19,22 +19,32 @@ export async function createServerSupabaseClient() {
                 },
                 set(name, value, options) {
                     try {
-                        cookieStore.set({
-                            name,
-                            value,
-                            ...options,
-                        });
+                        // Ensure we're in a server context
+                        if (typeof cookieStore.set === 'function') {
+                            cookieStore.set({
+                                name,
+                                value,
+                                ...options,
+                            });
+                        } else {
+                            console.warn("Tentativa de definir cookie fora de um Server Action ou Route Handler");
+                        }
                     } catch (error) {
                         console.error(`Erro ao definir cookie ${name}:`, error);
                     }
                 },
                 remove(name, options) {
                     try {
-                        cookieStore.set({
-                            name,
-                            value: "",
-                            ...options,
-                        });
+                        // Ensure we're in a server context
+                        if (typeof cookieStore.set === 'function') {
+                            cookieStore.set({
+                                name,
+                                value: "",
+                                ...options,
+                            });
+                        } else {
+                            console.warn("Tentativa de remover cookie fora de um Server Action ou Route Handler");
+                        }
                     } catch (error) {
                         console.error(`Erro ao remover cookie ${name}:`, error);
                     }

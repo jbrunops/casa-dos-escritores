@@ -1429,3 +1429,13 @@
     background-color: var(--color-error);
     color: white;
 }
+
+/* Prevenir sublinhado em qualquer tipo de card na página inicial */
+.story-card:hover,
+.chapter-card:hover,
+.series-card:hover,
+.series-highlight-card:hover,
+.writer-card:hover,
+.feature-card:hover {
+    text-decoration: none !important;
+}

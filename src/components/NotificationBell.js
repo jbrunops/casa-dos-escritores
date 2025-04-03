@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import { Bell } from "lucide-react";
 import Link from "next/link";
+import { generateSlug } from "@/lib/utils";
 
 export default function NotificationBell() {
     const [notifications, setNotifications] = useState([]);
@@ -97,7 +98,11 @@ export default function NotificationBell() {
         try {
             const { data, error } = await supabase
                 .from("notifications")
-                .select("*, profiles(username, avatar_url)")
+                .select(`
+                    *,
+                    profiles(username, avatar_url),
+                    additional_data
+                `)
                 .eq("user_id", userId)
                 .order("created_at", { ascending: false })
                 .limit(20);
@@ -203,15 +208,18 @@ export default function NotificationBell() {
 
     // Determinar URL de redirecionamento com base no tipo de notificação
     const getNotificationUrl = (notification) => {
-        if (!notification.related_id) return "#";
-
         switch (notification.type) {
             case "comment":
             case "reply":
-                return `/story/${
-                    notification.additional_data?.story_id ||
-                    notification.related_id
-                }`;
+                // Para histórias, usar slug
+                if (notification.additional_data?.story_id) {
+                    return `/story/${generateSlug(
+                        notification.additional_data?.story_title || "",
+                        notification.additional_data?.story_id
+                    )}`;
+                }
+                // Para capítulos, manter apenas o ID por enquanto
+                return `/story/${notification.related_id}`;
             default:
                 return "#";
         }
@@ -235,7 +243,7 @@ export default function NotificationBell() {
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Notificações"
             >
-                <Bell size={20} />
+                <Bell size={isMobile ? 28 : 20} />
                 {unreadCount > 0 && (
                     <span className="notification-badge">{unreadCount}</span>
                 )}

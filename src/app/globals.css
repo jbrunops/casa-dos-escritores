@@ -12,3 +12,13 @@
 
 /* Adicione esta linha ao final do arquivo */
 @import "../styles/notifications.css";
+
+/* Adicione estas linhas no final do arquivo */
+@import "../styles/series.css";
+@import "../styles/series-editor.css";
+
+/* Adicione esta linha no final do arquivo */
+@import "../styles/content-type.css";
+
+/* Importação dos estilos de capítulos */
+@import "../styles/chapters.css";

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { generateSlug } from "@/lib/utils";
 
 export async function generateMetadata({ params }) {
     const username = await Promise.resolve(params.username);
@@ -222,8 +223,8 @@ export default async function ProfilePage({ params }) {
                                         <div className="profile-stories-grid">
                                             {categoryStories.map((story) => (
                                                 <Link
+                                                    href={`/story/${generateSlug(story.title, story.id)}`}
                                                     key={story.id}
-                                                    href={`/story/${story.id}`}
                                                     className="story-card"
                                                 >
                                                     <h4>{story.title}</h4>

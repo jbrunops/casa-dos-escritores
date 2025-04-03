@@ -1,5 +1,6 @@
 "use client";
 
+import MobileSeries from "./MobileSeries";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
@@ -12,6 +13,7 @@ import {
     LayoutDashboard,
     Menu,
     Compass,
+    BookOpen,
 } from "lucide-react";
 import NotificationBell from "./NotificationBell";
 
@@ -20,6 +22,7 @@ export default function Header() {
     const router = useRouter();
     const [user, setUser] = useState(null);
     const [username, setUsername] = useState("");
+    const [avatarUrl, setAvatarUrl] = useState("");
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
     const [showUserDropdown, setShowUserDropdown] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -74,7 +77,7 @@ export default function Header() {
                     // Buscar perfil do usuário com tratamento de erro
                     const { data, error } = await supabase
                         .from("profiles")
-                        .select("username, role")
+                        .select("username, role, avatar_url")
                         .eq("id", session.user.id)
                         .single();
 
@@ -86,6 +89,7 @@ export default function Header() {
                     if (data) {
                         setUsername(data.username);
                         setIsAdmin(data.role === "admin");
+                        setAvatarUrl(data.avatar_url);
                     }
                 }
             } catch (error) {
@@ -106,6 +110,7 @@ export default function Header() {
                 setUser(null);
                 setUsername("");
                 setIsAdmin(false);
+                setAvatarUrl("");
             }
         });
 
@@ -167,7 +172,7 @@ export default function Header() {
                     onClick={navigateToExplore}
                     aria-label="Explorar categorias"
                 >
-                    <Compass size={22} />
+                    <Compass size={28} />
                 </button>
 
                 {/* ELEMENTOS DESKTOP E MOBILE */}
@@ -185,6 +190,7 @@ export default function Header() {
                             transform: "translateY(-50%)",
                             zIndex: 20,
                         }}
+                        className="mobile-notification-container"
                     >
                         <NotificationBell />
                     </div>
@@ -198,10 +204,18 @@ export default function Header() {
                 >
                     {user ? (
                         <div className="mobile-user-avatar">
-                            {username.charAt(0).toUpperCase()}
+                            {avatarUrl ? (
+                                <img 
+                                    src={avatarUrl} 
+                                    alt={username || "Usuário"} 
+                                    className="avatar-image"
+                                />
+                            ) : (
+                                username.charAt(0).toUpperCase()
+                            )}
                         </div>
                     ) : (
-                        <Menu size={22} />
+                        <Menu size={28} />
                     )}
                 </button>
 
@@ -234,6 +248,10 @@ export default function Header() {
                                         Cadastrar
                                     </Link>
                                 </li>
+                                {/* Adicione esta linha */}
+                                <MobileSeries
+                                    onClick={() => setShowMobileMenu(false)}
+                                />
                             </>
                         ) : (
                             /* Usuário logado */
@@ -247,6 +265,10 @@ export default function Header() {
                                         Meu Painel
                                     </Link>
                                 </li>
+                                {/* Adicione esta linha */}
+                                <MobileSeries
+                                    onClick={() => setShowMobileMenu(false)}
+                                />
                                 <li className="mobile-menu-item">
                                     <Link
                                         href={`/profile/${encodeURIComponent(
@@ -363,6 +385,23 @@ export default function Header() {
                                     </div>
                                 </div>
                             )}
+                        </li>
+
+                        {/* ADICIONE O NOVO ITEM DE MENU AQUI */}
+                        <li className="nav-item">
+                            <Link
+                                href="/series"
+                                className={
+                                    pathname.startsWith("/series")
+                                        ? "nav-link active"
+                                        : "nav-link"
+                                }
+                            >
+                                <span className="nav-icon-container">
+                                    <BookOpen size={16} />
+                                </span>
+                                <span>Séries</span>
+                            </Link>
                         </li>
                     </ul>
                 </nav>

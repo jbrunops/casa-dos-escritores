@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
                     rel="stylesheet"
                 />
             </head>
-            <body>
+            <body suppressHydrationWarning>
                 <Header />
                 <main className="content-wrapper">{children}</main>
                 <footer>

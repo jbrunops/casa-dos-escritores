@@ -37,8 +37,8 @@
         color: var(--color-primary) !important;
         cursor: pointer !important;
         padding: 0.5rem !important;
-        width: 36px !important;
-        height: 36px !important;
+        width: 40px !important;
+        height: 40px !important;
         z-index: 10 !important;
     }
 
@@ -62,9 +62,42 @@
         color: var(--color-primary) !important;
         cursor: pointer !important;
         padding: 0.5rem !important;
-        width: 36px !important;
-        height: 36px !important;
+        width: 40px !important;
+        height: 40px !important;
         z-index: 10 !important;
+    }
+
+    /* Notificação no header */
+    .mobile-notification-container {
+        position: absolute !important;
+        right: 45px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        z-index: 20 !important;
+    }
+
+    .notification-bell-container {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .notification-icon-wrapper {
+        width: 40px !important;
+        height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .notification-badge {
+        top: 0 !important;
+        right: 0 !important;
+        width: 18px !important;
+        height: 18px !important;
+        font-size: 0.7rem !important;
+        display: flex !important;
+        align-items: center !important;
     }
 
     /* Menu mobile dropdown */
@@ -107,6 +140,18 @@
         font-weight: 500 !important;
     }
 
+    /* Estilo para alinhar corretamente o ícone e o texto no menu mobile */
+    .mobile-menu-link-content {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+    }
+
+    .mobile-menu-icon {
+        color: var(--color-primary) !important;
+        flex-shrink: 0 !important;
+    }
+
     .mobile-menu-link:hover,
     .mobile-menu-link:active {
         background-color: var(--color-light) !important;
@@ -116,8 +161,8 @@
     /* Avatar para usuários logados - CORRIGIDO para ser perfeitamente circular */
     .mobile-user-avatar {
         display: flex !important;
-        width: 28px !important;
-        height: 28px !important;
+        width: 32px !important;
+        height: 32px !important;
         border-radius: 50% !important;
         overflow: hidden !important;
         background-color: var(--color-primary) !important;
@@ -125,11 +170,23 @@
         align-items: center !important;
         justify-content: center !important;
         font-weight: 600 !important;
-        font-size: 0.85rem !important;
-        line-height: 1 !important; /* Garante que o texto fique centralizado verticalmente */
-        text-align: center !important; /* Centraliza o texto horizontalmente */
-        aspect-ratio: 1 / 1 !important; /* Garante proporção quadrada */
-        min-width: 28px !important; /* Garante largura mínima */
-        min-height: 28px !important; /* Garante altura mínima */
+        font-size: 1rem !important;
+        line-height: 1 !important;
+        text-align: center !important;
+        flex-shrink: 0 !important;
+        position: relative !important;
+    }
+    
+    /* Estilo para a imagem do avatar */
+    .avatar-image {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        object-position: center !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
     }
 }

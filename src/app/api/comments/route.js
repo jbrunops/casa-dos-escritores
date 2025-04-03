@@ -3,89 +3,158 @@ import { NextResponse } from "next/server";
 
 export async function POST(request) {
     try {
-        const { text, storyId, authorId, parentId } = await request.json();
-
-        console.log("API recebeu:", { text, storyId, authorId, parentId });
-
-        // Validação básica
-        if (!text || !storyId || !authorId) {
-            console.log("Campos obrigatórios ausentes");
-            return NextResponse.json(
-                { error: "Campos obrigatórios ausentes" },
-                { status: 400 }
-            );
-        }
-
-        // Criar cliente Supabase usando a chave de serviço
+        // Criar cliente supabase
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL,
             process.env.SUPABASE_SERVICE_ROLE_KEY
         );
 
-        console.log("URL do Supabase:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-        console.log(
-            "Chave de serviço definida:",
-            !!process.env.SUPABASE_SERVICE_ROLE_KEY
-        );
+        // Obter dados da requisição
+        const { text, authorId, storyId, seriesId, chapterId, parentId } = await request.json();
 
-        // Criar objeto de comentário
+        // Verificar campos obrigatórios
+        if (!text || !text.trim()) {
+            return NextResponse.json(
+                { error: "O texto do comentário é obrigatório" },
+                { status: 400 }
+            );
+        }
+
+        if (!authorId) {
+            return NextResponse.json(
+                { error: "O ID do autor é obrigatório" },
+                { status: 400 }
+            );
+        }
+
+        // É necessário ter ou storyId ou seriesId ou chapterId
+        if (!storyId && !seriesId && !chapterId) {
+            return NextResponse.json(
+                { error: "É necessário especificar storyId, seriesId ou chapterId" },
+                { status: 400 }
+            );
+        }
+
+        // Verificar se o usuário existe
+        const { data: userExists, error: userError } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("id", authorId)
+            .single();
+
+        if (userError || !userExists) {
+            console.error("Erro ao verificar usuário:", userError);
+            return NextResponse.json(
+                { error: "Usuário não encontrado" },
+                { status: 404 }
+            );
+        }
+
+        // Verificar se o pai existe, se for uma resposta
+        if (parentId) {
+            const { data: parentExists, error: parentError } = await supabase
+                .from("comments")
+                .select("id")
+                .eq("id", parentId)
+                .single();
+
+            if (parentError || !parentExists) {
+                console.error("Erro ao verificar comentário pai:", parentError);
+                return NextResponse.json(
+                    { error: "Comentário pai não encontrado" },
+                    { status: 404 }
+                );
+            }
+        }
+
+        // Verificar se a história, série ou capítulo existe
+        if (storyId) {
+            const { data: storyExists, error: storyError } = await supabase
+                .from("stories")
+                .select("id")
+                .eq("id", storyId)
+                .single();
+
+            if (storyError || !storyExists) {
+                console.error("Erro ao verificar história:", storyError);
+                return NextResponse.json(
+                    { error: "História não encontrada" },
+                    { status: 404 }
+                );
+            }
+        } else if (seriesId) {
+            const { data: seriesExists, error: seriesError } = await supabase
+                .from("series")
+                .select("id")
+                .eq("id", seriesId)
+                .single();
+
+            if (seriesError || !seriesExists) {
+                console.error("Erro ao verificar série:", seriesError);
+                return NextResponse.json(
+                    { error: "Série não encontrada" },
+                    { status: 404 }
+                );
+            }
+        } else if (chapterId) {
+            const { data: chapterExists, error: chapterError } = await supabase
+                .from("chapters")
+                .select("id")
+                .eq("id", chapterId)
+                .single();
+
+            if (chapterError || !chapterExists) {
+                console.error("Erro ao verificar capítulo:", chapterError);
+                return NextResponse.json(
+                    { error: "Capítulo não encontrado" },
+                    { status: 404 }
+                );
+            }
+        }
+
+        // Inserir comentário
         const commentData = {
             text,
-            story_id: storyId,
             author_id: authorId,
+            parent_id: parentId || null,
             created_at: new Date().toISOString(),
         };
 
-        // Adicionar parent_id apenas se for fornecido
-        if (parentId) {
-            commentData.parent_id = parentId;
+        // Adicionar o ID apropriado
+        if (storyId) {
+            commentData.story_id = storyId;
+        } else if (seriesId) {
+            commentData.series_id = seriesId;
+        } else if (chapterId) {
+            commentData.chapter_id = chapterId;
         }
 
-        console.log("Tentando inserir:", commentData);
-
-        // Inserir comentário
-        const { data, error } = await supabase
+        const { data: newComment, error: insertError } = await supabase
             .from("comments")
             .insert(commentData)
-            .select();
+            .select()
+            .single();
 
-        if (error) {
-            console.error("Erro detalhado do Supabase:", {
-                code: error.code,
-                message: error.message,
-                details: error.details,
-                hint: error.hint,
-            });
-
+        if (insertError) {
+            console.error("Erro ao inserir comentário:", insertError);
             return NextResponse.json(
-                {
-                    error: `Falha ao adicionar comentário: ${error.message}`,
-                    details: {
-                        code: error.code,
-                        message: error.message,
-                        details: error.details,
-                        hint: error.hint,
-                    },
+                { 
+                    error: "Erro ao criar comentário", 
+                    details: insertError 
                 },
                 { status: 500 }
             );
         }
 
-        console.log("Comentário inserido com sucesso:", data);
-
         return NextResponse.json({
-            success: true,
-            comment: data[0],
-        });
-    } catch (error) {
-        console.error("Erro completo do servidor:", error);
+            message: "Comentário adicionado com sucesso",
+            comment: newComment
+        }, { status: 201 });
 
+    } catch (error) {
+        console.error("Erro interno:", error);
         return NextResponse.json(
-            {
-                error: "Erro interno do servidor",
-                details: error.toString(),
-                stack: error.stack,
-            },
+            { error: "Erro interno do servidor" },
             { status: 500 }
         );
     }

@@ -3,10 +3,12 @@ import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import Comments from "@/components/Comments";
 import StoryContent from "@/components/StoryContent";
+import { extractIdFromSlug, formatDate, calculateReadingTime } from "@/lib/utils";
 
 export async function generateMetadata({ params }) {
     try {
-        const id = await Promise.resolve(params.id);
+        const slug = await Promise.resolve(params.id);
+        const id = extractIdFromSlug(slug) || slug; // Usar o slug diretamente se não conseguir extrair o ID
         const supabase = await createServerSupabaseClient();
 
         const { data: story, error } = await supabase
@@ -31,7 +33,14 @@ export async function generateMetadata({ params }) {
 
 export default async function StoryPage({ params }) {
     try {
-        const id = await Promise.resolve(params.id);
+        const slug = await Promise.resolve(params.id);
+        const id = extractIdFromSlug(slug) || slug;
+        
+        console.log("----- DIAGNÓSTICO DE HISTÓRIA -----");
+        console.log("Slug recebido da URL:", slug);
+        console.log("ID extraído para consulta:", id);
+        console.log("Tipo do ID:", typeof id);
+        
         const supabase = await createServerSupabaseClient();
 
         // Buscar a história
@@ -54,10 +63,22 @@ export default async function StoryPage({ params }) {
             .single();
 
         // Verificar se a história existe e está publicada
-        if (error || !story || !story.is_published) {
-            console.error("Erro ao buscar história:", error);
+        if (error) {
+            console.error(`Erro ao buscar história com ID '${id}':`, error);
             notFound();
         }
+        
+        if (!story) {
+            console.error(`História não encontrada para o ID: '${id}'`);
+            notFound();
+        }
+        
+        if (!story.is_published) {
+            console.error(`História ID '${id}' não está publicada`);
+            notFound();
+        }
+        
+        console.log("História encontrada com sucesso:", story.id, story.title);
 
         // Obter a sessão atual para verificar se o usuário está logado
         const {
@@ -78,21 +99,11 @@ export default async function StoryPage({ params }) {
             // Continue mesmo se falhar ao atualizar contagem
         }
 
-        // Formatar a data de publicação de maneira mais amigável
-        const formattedDate = new Date(story.created_at).toLocaleDateString(
-            "pt-BR",
-            {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-            }
-        );
+        // Formatar a data de publicação
+        const formattedDate = formatDate(story.created_at);
 
-        // Calcular tempo estimado de leitura (média de 200 palavras por minuto)
-        const wordCount = story.content
-            .replace(/<[^>]*>/g, "")
-            .split(/\s+/).length;
-        const readingTime = Math.max(1, Math.round(wordCount / 200));
+        // Calcular tempo estimado de leitura
+        const readingTime = calculateReadingTime(story.content);
 
         return (
             <div className="medium-story">
@@ -192,7 +203,7 @@ export default async function StoryPage({ params }) {
 
                 <Comments
                     storyId={story.id}
-                    sessionId={session?.user?.id}
+                    userId={session?.user?.id}
                     authorId={story.author_id}
                 />
             </div>

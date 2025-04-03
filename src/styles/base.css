@@ -23,6 +23,11 @@ a {
 }
 
 a:hover {
+    color: var(--color-secondary);
+}
+
+/* Somente links normais de texto recebem sublinhado */
+.text-link:hover {
     text-decoration: underline;
 }
 

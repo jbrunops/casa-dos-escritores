@@ -289,6 +289,7 @@
     gap: 8px;
     margin: 0;
     padding: 0;
+    border: none;
 }
 
 .action-btn {
@@ -331,6 +332,96 @@
 
 .delete-btn:hover {
     background-color: #fee2e2;
+}
+
+/* Nova seção de link para séries */
+.series-link-section {
+    background-color: white;
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    margin-top: 32px;
+    overflow: hidden;
+}
+
+.series-link-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.series-link-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--color-text);
+}
+
+.view-all-series-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-primary);
+    font-weight: 500;
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background-color: rgba(74, 79, 188, 0.1);
+    transition: all 0.2s ease;
+}
+
+.view-all-series-link:hover {
+    background-color: rgba(74, 79, 188, 0.2);
+    text-decoration: none;
+}
+
+.series-stats-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+}
+
+.series-stats-content {
+    display: flex;
+    gap: 32px;
+}
+
+.series-stats-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.series-stats-label {
+    font-size: 14px;
+    color: var(--color-light-text);
+    font-weight: 500;
+}
+
+.series-stats-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.create-series-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.create-series-link:hover {
+    background-color: var(--color-secondary);
+    text-decoration: none;
 }
 
 /* Loading states */
