@@ -1,187 +1,112 @@
-# Casa dos Escritores 📖✍️
+# Casa dos Escritores - Plataforma de Conteúdo Literário
 
-## Descrição do Projeto
+Casa dos Escritores é uma plataforma dedicada a escritores que desejam compartilhar suas histórias, organizá-las em séries e conectar-se com leitores. O projeto oferece um ambiente amigável para a criação e consumo de conteúdo literário.
 
-Casa dos Escritores é uma plataforma web para escritores compartilharem histórias, comentarem, interagirem e desenvolverem sua comunidade literária. Construída com Next.js, Supabase e CSS puro com media queries, a aplicação oferece uma experiência completa de publicação e leitura.
+## Funcionalidades Principais
 
-## Recursos Principais
+### Gerenciamento de Usuários
+- **Registro e Autenticação**: Sistema completo de registro, login e recuperação de senha
+- **Perfis de Usuário**: Cada escritor possui um perfil público com suas informações e obras
+- **Dashboard Personalizado**: Interface centralizada para gerenciar histórias e séries
 
-### Para Escritores
+### Histórias Individuais
+- **Criação e Edição**: Editor rico com formatação de texto para escrever histórias
+- **Categorização**: Organização por gêneros e tags para melhor descoberta
+- **Visualização**: Interface de leitura otimizada para diferentes dispositivos
+- **Métricas**: Contagem de visualizações e estatísticas de texto (palavras, tempo de leitura)
 
--   📝 Criação de histórias com editor rico em recursos
-    -   Suporte a formatação avançada
-    -   Visualização prévia em tempo real
-    -   Contagem de palavras e tempo estimado de leitura
--   🏷️ Categorização de histórias
--   💾 Salvamento de rascunhos
--   📊 Estatísticas de visualização por história
--   ✏️ Edição e gerenciamento de histórias publicadas
+### Séries
+- **Organização em Capítulos**: Criação de séries com múltiplos capítulos
+- **Gerenciamento de Ordem**: Definição da sequência de leitura dos capítulos
+- **Navegação Intuitiva**: Interface para navegar entre capítulos da mesma série
+- **Status da Série**: Indicador se a série está completa ou em andamento
 
-### Interação e Comunidade
+### Social
+- **Perfis Públicos**: Páginas de perfil mostrando as obras de cada autor
+- **Destaques**: Seção na página inicial com séries e histórias populares
+- **Compartilhamento**: Links para compartilhar histórias em redes sociais
 
--   💬 Sistema de comentários avançado
-    -   Comentários aninhados
-    -   Respostas diretas
-    -   Moderação de comentários
--   👥 Perfis de usuário personalizáveis
-    -   Avatar personalizado
-    -   Biografia
-    -   Links para redes sociais
--   🔍 Sistema de busca abrangente
-    -   Busca por histórias
-    -   Busca por escritores
-    -   Filtros e categorias
-
-### Descoberta de Conteúdo
-
--   🏠 Página inicial dinâmica
-    -   Histórias recentes
-    -   Histórias mais comentadas
-    -   Top 10 escritores
--   📚 Exploração por categorias
--   🔔 Sistema de notificações
-
-### Gestão e Administração
-
--   👑 Painel administrativo completo
-    -   Gerenciamento de usuários
-    -   Moderação de conteúdo
-    -   Exclusão de histórias e comentários
-    -   Controle de permissões de usuários
-
-### Segurança e Autenticação
-
--   🔐 Sistema de registro e login seguro
--   📧 Confirmação de email
--   🛡️ Proteção de rotas
--   👮 Níveis de acesso (usuário, moderador, admin)
-
-### Experiência do Usuário
-
--   📱 Design responsivo com media queries
--   🌓 Tema claro/escuro (preparado para implementação)
--   ⚡ Carregamento rápido
--   🖼️ Suporte a imagens em histórias
-
-## Tecnologias Utilizadas
-
--   **Frontend**: Next.js 15
--   **Estilização**:
-    -   CSS Puro
-    -   Media Queries
-    -   Variáveis CSS
--   **Backend**: Supabase
--   **Autenticação**: Supabase Auth
--   **Editor de Texto**: Tiptap
--   **Bibliotecas Adicionais**:
-    -   Lucide React (ícones)
-    -   DOMPurify (sanitização de HTML)
-    -   React Hooks
-
-## Pré-requisitos
-
--   Node.js 18+
--   npm ou yarn
--   Conta no Supabase
-
-## Configuração do Projeto
-
-1. Clone o repositório
-
-```bash
-git clone https://github.com/jbrunops/casa-dos-escritores.git
-cd casa-dos-escritores
-```
-
-2. Instale as dependências
-
-```bash
-npm install
-# ou
-yarn install
-```
-
-3. Configure as variáveis de ambiente
-
--   Crie um arquivo `.env.local` na raiz do projeto
--   Adicione suas credenciais do Supabase:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=seu-url-do-supabase
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-chave-anonima
-SUPABASE_SERVICE_ROLE_KEY=sua-chave-de-servico
-```
-
-4. Rode as migrações do banco de dados (se aplicável)
-
-```bash
-npx supabase migration up
-```
-
-5. Inicie o servidor de desenvolvimento
-
-```bash
-npm run dev
-# ou
-yarn dev
-```
+### Interface
+- **Design Responsivo**: Adaptação para dispositivos móveis e desktop
+- **Modo Noturno**: Alternância entre temas claro e escuro
+- **Editor de Texto Rico**: Interface WYSIWYG para formatação de conteúdo
 
 ## Estrutura do Projeto
 
 ```
-src/
-├── app/                # Rotas e páginas
-├── components/         # Componentes reutilizáveis
-├── lib/                # Utilitários e configurações
-├── styles/             # Estilos globais e CSS
-└── utils/              # Funções utilitárias
+casa-dos-escritores/
+│
+├── public/                   # Arquivos estáticos
+│   ├── favicon.ico
+│   └── images/               # Imagens do site
+│
+├── src/
+│   ├── app/                  # Organização por rotas (Next.js App Router)
+│   │   ├── api/              # Endpoints da API
+│   │   │   ├── auth/         # Autenticação
+│   │   │   ├── profile/      # Perfis de usuário
+│   │   │   ├── series/       # API de séries
+│   │   │   └── stories/      # API de histórias
+│   │   │
+│   │   ├── chapter/[id]/     # Página de capítulo individual
+│   │   ├── dashboard/        # Área do usuário
+│   │   │   ├── edit-chapter/ # Edição de capítulos
+│   │   │   ├── edit-series/  # Edição de séries
+│   │   │   ├── edit-story/   # Edição de histórias
+│   │   │   ├── new/          # Criação de conteúdo
+│   │   │   ├── new-chapter/  # Criação de capítulos
+│   │   │   └── settings/     # Configurações do usuário
+│   │   │
+│   │   ├── login/            # Página de login
+│   │   ├── profile/[username]/ # Perfil público
+│   │   ├── register/         # Registro de usuário
+│   │   ├── reset-password/   # Recuperação de senha
+│   │   ├── series/           # Listagem de séries
+│   │   │   └── [id]/         # Página de série específica
+│   │   │
+│   │   ├── settings/         # Configurações da conta
+│   │   ├── story/[id]/       # Página de história individual
+│   │   └── layout.js         # Layout global
+│   │
+│   ├── components/           # Componentes reutilizáveis
+│   │   ├── AuthForm.js       # Formulário de autenticação
+│   │   ├── DarkModeToggle.js # Alternador de tema
+│   │   ├── NavBar.js         # Barra de navegação
+│   │   ├── Pagination.js     # Componente de paginação
+│   │   ├── SeriesActions.js  # Ações para séries
+│   │   ├── SeriesHighlights.js # Destaques de séries
+│   │   ├── StoryActions.js   # Ações para histórias
+│   │   ├── StoryCard.js      # Card de história
+│   │   ├── StoryContent.js   # Exibição do conteúdo da história
+│   │   ├── StoryHighlights.js # Destaques de histórias
+│   │   └── TipTapEditor.js   # Editor de texto rico
+│   │
+│   ├── lib/                  # Utilitários e bibliotecas
+│   │   ├── supabase-browser.js # Cliente Supabase para browser
+│   │   └── supabase-server.js  # Cliente Supabase para server
+│   │
+│   └── styles/               # Estilos CSS
+│       ├── chapters.css      # Estilos para capítulos
+│       ├── dashboard.css     # Estilos para dashboard
+│       ├── editor.css        # Estilos para o editor
+│       ├── globals.css       # Estilos globais
+│       ├── navbar.css        # Estilos para navegação
+│       ├── profile.css       # Estilos para perfil
+│       ├── series.css        # Estilos para séries
+│       └── stories.css       # Estilos para histórias
+│
+├── .env.local                # Variáveis de ambiente (não versionado)
+├── next.config.js            # Configuração do Next.js
+├── package.json              # Dependências do projeto
+└── README.md                 # Este arquivo
 ```
 
-## Deploy
+## Tecnologias Utilizadas
 
-Configurações para implantação:
+- **Frontend**: Next.js com React
+- **Backend**: Supabase (PostgreSQL, Autenticação, Armazenamento)
+- **Editor**: TipTap (baseado em ProseMirror)
+- **Estilização**: CSS com variáveis para temas
+- **Ícones**: Lucide React
 
--   **Provedor Recomendado**: Vercel
--   **Build Command**: `npm run build`
--   **Start Command**: `npm start`
-
-### Variáveis de Ambiente Necessárias
-
--   `NEXT_PUBLIC_SUPABASE_URL`
--   `NEXT_PUBLIC_SUPABASE_ANON_KEY`
--   `SUPABASE_SERVICE_ROLE_KEY`
-
-## Contribuição
-
-1. Faça um fork do projeto
-2. Crie sua feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
-## Licença
-
-Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
-
-## Contato
-
-João Brunops - [jbrunops@gmail.com](mailto:jbrunops@gmail.com)
-
-Link do Projeto: [https://github.com/jbrunops/casa-dos-escritores](https://github.com/jbrunops/casa-dos-escritores)
-
-## Considerações Finais
-
-**Nota**: Este projeto foi desenvolvido como um ambiente de escrita colaborativa, permitindo que escritores compartilhem e interajam com suas histórias de forma intuitiva e envolvente.
-
-### Melhorias Futuras
-
--   [ ] Implementação de tema escuro
--   [ ] Sistema de seguidores
--   [ ] Exportação de histórias
--   [ ] Integração com serviços de publicação
-
-## Agradecimentos
-
--   Supabase pela infraestrutura backend
--   Next.js pelo framework frontend
--   Todos os colaboradores e escritores que tornam esta plataforma possível
+A Casa dos Escritores oferece uma experiência completa tanto para escritores quanto para leitores, com foco em usabilidade, organização de conteúdo e uma interface agradável para criação e consumo de histórias.
