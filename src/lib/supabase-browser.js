@@ -13,13 +13,14 @@ export function createBrowserClient() {
         console.error('URL:', supabaseUrl ? 'Definida' : 'Não definida');
         console.error('KEY:', supabaseKey ? 'Definida' : 'Não definida');
         
-        // Fallback para valores hardcoded em caso de erro (apenas desenvolvimento)
-        if (process.env.NODE_ENV !== 'production') {
-            return createClient(
-                "https://kkykesdoqdeagnuvlxao.supabase.co",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtreWtlc2RvcWRlYWdudXZseGFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3ODc5NTYsImV4cCI6MjA1OTM2Mzk1Nn0.kS69ce8FLws_rXMvbqOhRgMsaPntbzDGgwckQHYTnyk"
-            );
-        }
+        // Valores de fallback (usado tanto para desenvolvimento quanto para produção, se necessário)
+        const fallbackUrl = "https://kkykesdoqdeagnuvlxao.supabase.co";
+        const fallbackKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtreWtlc2RvcWRlYWdudXZseGFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3ODc5NTYsImV4cCI6MjA1OTM2Mzk1Nn0.kS69ce8FLws_rXMvbqOhRgMsaPntbzDGgwckQHYTnyk";
+        
+        return createClient(
+            fallbackUrl,
+            fallbackKey
+        );
     }
     
     return createClient(
