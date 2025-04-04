@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createBrowserClient } from "@/lib/supabase-browser";
+import { UserPlus, Mail, Lock, User, Loader, AlertCircle, AlertTriangle, CheckCircle } from "lucide-react";
 
 export default function SignupPage() {
     const [email, setEmail] = useState("");
@@ -149,33 +150,38 @@ export default function SignupPage() {
     return (
         <div className="auth-page">
             <div className="auth-container">
-                <h1>Criar Conta</h1>
+                <div className="auth-header">
+                    <h1>Criar Conta</h1>
+                    <p className="auth-subheading">Junte-se à nossa comunidade de escritores</p>
+                </div>
 
-                {error && <div className="error-message">{error}</div>}
+                {error && (
+                    <div className="alert error-message">
+                        <AlertCircle size={18} />
+                        {error}
+                    </div>
+                )}
+                
                 {warning && (
-                    <div
-                        className="warning-message"
-                        style={{
-                            color: "#f59e0b",
-                            background: "#fffbeb",
-                            padding: "0.5rem",
-                            borderRadius: "4px",
-                            marginBottom: "1rem",
-                        }}
-                    >
+                    <div className="alert warning-message">
+                        <AlertTriangle size={18} />
                         {warning}
                     </div>
                 )}
+                
                 {success && (
-                    <div className="success-message">
+                    <div className="alert success-message">
+                        <CheckCircle size={18} />
                         Conta criada com sucesso!{" "}
                         {warning ? warning : "Redirecionando..."}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className="auth-form">
                     <div className="form-group">
-                        <label htmlFor="username">Nome de usuário</label>
+                        <label htmlFor="username" className="input-label">
+                            Nome de usuário
+                        </label>
                         <input
                             id="username"
                             type="text"
@@ -184,11 +190,14 @@ export default function SignupPage() {
                             placeholder="Como você quer ser chamado"
                             disabled={loading || success}
                             required
+                            className="form-input"
                         />
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="email">E-mail</label>
+                        <label htmlFor="email" className="input-label">
+                            E-mail
+                        </label>
                         <input
                             id="email"
                             type="email"
@@ -196,11 +205,15 @@ export default function SignupPage() {
                             onChange={(e) => setEmail(e.target.value)}
                             disabled={loading || success}
                             required
+                            className="form-input"
+                            placeholder="seu@email.com"
                         />
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password">Senha</label>
+                        <label htmlFor="password" className="input-label">
+                            Senha
+                        </label>
                         <input
                             id="password"
                             type="password"
@@ -209,6 +222,8 @@ export default function SignupPage() {
                             minLength="6"
                             disabled={loading || success}
                             required
+                            className="form-input"
+                            placeholder="Mínimo de 6 caracteres"
                         />
                         <small className="form-hint">
                             A senha deve ter pelo menos 6 caracteres
@@ -222,11 +237,14 @@ export default function SignupPage() {
                     >
                         {loading ? (
                             <>
-                                <span className="loader"></span>
+                                <Loader size={18} className="spinner" />
                                 <span>Criando conta...</span>
                             </>
                         ) : (
-                            "Criar conta"
+                            <>
+                                <UserPlus size={18} />
+                                <span>Criar conta</span>
+                            </>
                         )}
                     </button>
                 </form>

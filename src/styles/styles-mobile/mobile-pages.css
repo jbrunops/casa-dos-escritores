@@ -142,9 +142,19 @@
         margin-top: var(--space-sm);
     }
 
-    /* Auth pages */
+    /* Auth pages - Improved */
     .auth-container {
         padding: var(--space-lg) var(--space-md);
+        max-width: 90%;
+        margin: 0 var(--space-sm);
+    }
+
+    .auth-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .auth-button {
+        padding: 0.75rem;
     }
 
     /* Edit Profile Page */
@@ -425,5 +435,53 @@
     .save-profile-btn {
         padding: 12px;
         font-size: 0.9rem;
+    }
+
+    /* Auth pages - Further improvements */
+    .auth-page {
+        min-height: calc(100vh - 250px);
+    }
+
+    .auth-container {
+        padding: var(--space-md);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .auth-container:hover {
+        transform: none;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .auth-header h1 {
+        font-size: 1.35rem;
+    }
+
+    .auth-subheading {
+        font-size: 0.85rem;
+    }
+
+    .input-label {
+        font-size: 0.9rem;
+    }
+
+    .form-input {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    .auth-button {
+        padding: 0.65rem;
+        font-size: 0.9rem;
+        margin-top: var(--space-md);
+    }
+
+    .alert {
+        padding: var(--space-sm);
+        font-size: 0.85rem;
+    }
+
+    .auth-redirect {
+        font-size: 0.85rem;
+        margin-top: var(--space-md);
     }
 }

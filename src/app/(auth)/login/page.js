@@ -5,6 +5,7 @@ import { useState } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { LogIn, Mail, Lock, Loader, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -87,18 +88,30 @@ export default function LoginPage() {
     return (
         <div className="auth-page">
             <div className="auth-container">
-                <h1>Entrar</h1>
+                <div className="auth-header">
+                    <h1>Entrar</h1>
+                    <p className="auth-subheading">Acesse sua conta para continuar</p>
+                </div>
 
-                {error && <div className="error-message">{error}</div>}
+                {error && (
+                    <div className="alert error-message">
+                        <AlertCircle size={18} />
+                        {error}
+                    </div>
+                )}
+                
                 {success && (
-                    <div className="success-message">
+                    <div className="alert success-message">
+                        <CheckCircle size={18} />
                         Login realizado com sucesso! Redirecionando...
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className="auth-form">
                     <div className="form-group">
-                        <label htmlFor="email">E-mail</label>
+                        <label htmlFor="email" className="input-label">
+                            E-mail
+                        </label>
                         <input
                             id="email"
                             type="email"
@@ -106,11 +119,15 @@ export default function LoginPage() {
                             onChange={(e) => setEmail(e.target.value)}
                             disabled={loading}
                             required
+                            className="form-input"
+                            placeholder="seu@email.com"
                         />
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password">Senha</label>
+                        <label htmlFor="password" className="input-label">
+                            Senha
+                        </label>
                         <input
                             id="password"
                             type="password"
@@ -118,6 +135,8 @@ export default function LoginPage() {
                             onChange={(e) => setPassword(e.target.value)}
                             disabled={loading}
                             required
+                            className="form-input"
+                            placeholder="Sua senha"
                         />
                     </div>
 
@@ -128,11 +147,14 @@ export default function LoginPage() {
                     >
                         {loading ? (
                             <>
-                                <span className="loader"></span>
+                                <Loader size={18} className="spinner" />
                                 <span>Entrando...</span>
                             </>
                         ) : (
-                            "Entrar"
+                            <>
+                                <LogIn size={18} />
+                                <span>Entrar</span>
+                            </>
                         )}
                     </button>
                 </form>
