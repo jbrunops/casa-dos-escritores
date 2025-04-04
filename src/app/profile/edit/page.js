@@ -3,6 +3,18 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
+import { 
+    User, 
+    Globe, 
+    Twitter, 
+    Facebook, 
+    Instagram, 
+    Save, 
+    Upload, 
+    Info, 
+    CheckCircle, 
+    AlertCircle
+} from "lucide-react";
 
 export default function EditProfilePage() {
     const [username, setUsername] = useState("");
@@ -229,114 +241,161 @@ export default function EditProfilePage() {
 
     return (
         <div className="edit-profile-page">
-            <h1>Editar Perfil</h1>
+            <div className="edit-profile-header">
+                <h1>Editar Perfil</h1>
+                <p className="edit-profile-subheading">Atualize suas informações pessoais e links de redes sociais</p>
+            </div>
 
-            {error && <div className="error-message">{error}</div>}
+            {error && (
+                <div className="alert error-message">
+                    <AlertCircle size={20} />
+                    <span>{error}</span>
+                </div>
+            )}
+            
             {success && (
-                <div className="success-message">
-                    Perfil atualizado com sucesso!
+                <div className="alert success-message">
+                    <CheckCircle size={20} />
+                    <span>Perfil atualizado com sucesso!</span>
                 </div>
             )}
 
-            <form onSubmit={handleSubmit}>
-                <div className="avatar-section">
-                    <div className="current-avatar">
-                        {avatarPreview ? (
-                            <img
-                                src={avatarPreview}
-                                alt="Preview do avatar"
-                                className="avatar-preview"
-                            />
-                        ) : (
-                            <div className="avatar-placeholder">
-                                {username.charAt(0).toUpperCase() || "U"}
+            <form onSubmit={handleSubmit} className="edit-profile-form">
+                <div className="edit-profile-card">
+                    <div className="card-header">
+                        <h2><User size={18} /> Informações Pessoais</h2>
+                    </div>
+                    
+                    <div className="card-content">
+                        <div className="avatar-section">
+                            <div className="current-avatar">
+                                {avatarPreview ? (
+                                    <div 
+                                        className="avatar-preview" 
+                                        style={{
+                                            backgroundImage: `url(${avatarPreview})`,
+                                            backgroundSize: 'cover',
+                                            backgroundPosition: 'center'
+                                        }}
+                                    ></div>
+                                ) : (
+                                    <div className="avatar-placeholder">
+                                        {username.charAt(0).toUpperCase() || "U"}
+                                    </div>
+                                )}
                             </div>
-                        )}
+
+                            <div className="avatar-upload">
+                                <label htmlFor="avatar" className="avatar-label">
+                                    <Upload size={16} /> Foto de Perfil
+                                </label>
+                                <div className="file-input-wrapper">
+                                    <input
+                                        type="file"
+                                        id="avatar"
+                                        accept="image/jpeg, image/png, image/gif"
+                                        onChange={handleAvatarChange}
+                                        className="avatar-input"
+                                    />
+                                    <label htmlFor="avatar" className="file-input-button">
+                                        Escolher arquivo
+                                    </label>
+                                </div>
+                                <p className="avatar-hint">
+                                    <Info size={14} /> Formatos aceitos: JPG, PNG e GIF (máx. 2MB)
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="username">Nome de usuário*</label>
+                            <input
+                                id="username"
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                                className="form-input"
+                                placeholder="Seu nome de usuário único"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="bio">Biografia</label>
+                            <textarea
+                                id="bio"
+                                value={bio}
+                                onChange={(e) => setBio(e.target.value)}
+                                rows={4}
+                                className="form-input"
+                                placeholder="Conte um pouco sobre você..."
+                            />
+                        </div>
                     </div>
+                </div>
 
-                    <div className="avatar-upload">
-                        <label htmlFor="avatar" className="avatar-label">
-                            Foto de Perfil
-                        </label>
-                        <input
-                            type="file"
-                            id="avatar"
-                            accept="image/jpeg, image/png, image/gif"
-                            onChange={handleAvatarChange}
-                            className="avatar-input"
-                        />
-                        <p className="avatar-hint">
-                            Formatos aceitos: JPG, PNG e GIF (máx. 2MB)
-                        </p>
+                <div className="edit-profile-card">
+                    <div className="card-header">
+                        <h2><Globe size={18} /> Redes Sociais</h2>
                     </div>
-                </div>
+                    
+                    <div className="card-content">
+                        <div className="form-group">
+                            <label htmlFor="website" className="social-label">
+                                <Globe size={16} /> Website
+                            </label>
+                            <input
+                                id="website"
+                                type="text"
+                                value={websiteUrl}
+                                onChange={(e) => setWebsiteUrl(e.target.value)}
+                                placeholder="https://seusite.com"
+                                className="form-input"
+                            />
+                        </div>
 
-                <div className="form-group">
-                    <label htmlFor="username">Nome de usuário*</label>
-                    <input
-                        id="username"
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                    />
-                </div>
+                        <div className="form-group">
+                            <label htmlFor="twitter" className="social-label">
+                                <Twitter size={16} /> Twitter
+                            </label>
+                            <input
+                                id="twitter"
+                                type="text"
+                                value={twitterUrl}
+                                onChange={(e) => setTwitterUrl(e.target.value)}
+                                placeholder="https://twitter.com/seuperfil"
+                                className="form-input"
+                            />
+                        </div>
 
-                <div className="form-group">
-                    <label htmlFor="bio">Biografia</label>
-                    <textarea
-                        id="bio"
-                        value={bio}
-                        onChange={(e) => setBio(e.target.value)}
-                        rows={4}
-                        placeholder="Conte um pouco sobre você..."
-                    />
-                </div>
+                        <div className="form-group">
+                            <label htmlFor="facebook" className="social-label">
+                                <Facebook size={16} /> Facebook
+                            </label>
+                            <input
+                                id="facebook"
+                                type="text"
+                                value={facebookUrl}
+                                onChange={(e) => setFacebookUrl(e.target.value)}
+                                placeholder="https://facebook.com/seuperfil"
+                                className="form-input"
+                            />
+                        </div>
 
-                <h2 className="social-heading">Redes Sociais</h2>
-
-                <div className="form-group">
-                    <label htmlFor="website">Website</label>
-                    <input
-                        id="website"
-                        type="text"
-                        value={websiteUrl}
-                        onChange={(e) => setWebsiteUrl(e.target.value)}
-                        placeholder="https://seusite.com"
-                    />
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="twitter">Twitter</label>
-                    <input
-                        id="twitter"
-                        type="text"
-                        value={twitterUrl}
-                        onChange={(e) => setTwitterUrl(e.target.value)}
-                        placeholder="https://twitter.com/seuperfil"
-                    />
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="facebook">Facebook</label>
-                    <input
-                        id="facebook"
-                        type="text"
-                        value={facebookUrl}
-                        onChange={(e) => setFacebookUrl(e.target.value)}
-                        placeholder="https://facebook.com/seuperfil"
-                    />
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="instagram">Instagram</label>
-                    <input
-                        id="instagram"
-                        type="text"
-                        value={instagramUrl}
-                        onChange={(e) => setInstagramUrl(e.target.value)}
-                        placeholder="https://instagram.com/seuperfil"
-                    />
+                        <div className="form-group">
+                            <label htmlFor="instagram" className="social-label">
+                                <Instagram size={16} /> Instagram
+                            </label>
+                            <input
+                                id="instagram"
+                                type="text"
+                                value={instagramUrl}
+                                onChange={(e) => setInstagramUrl(e.target.value)}
+                                placeholder="https://instagram.com/seuperfil"
+                                className="form-input"
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 <button
@@ -350,7 +409,10 @@ export default function EditProfilePage() {
                             <span>Salvando...</span>
                         </>
                     ) : (
-                        "Salvar Perfil"
+                        <>
+                            <Save size={18} />
+                            <span>Salvar Perfil</span>
+                        </>
                     )}
                 </button>
             </form>

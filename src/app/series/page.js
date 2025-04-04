@@ -194,6 +194,10 @@ export default async function SeriesPage({ searchParams }) {
             <div className="series-browse-page">
                 <div className="series-header">
                     <h1>Séries Literárias</h1>
+                    <p className="series-subtitle">
+                        Explore histórias em capítulos criadas pelos escritores
+                        da plataforma.
+                    </p>
                 </div>
                 <div className="error-message">
                     <p>

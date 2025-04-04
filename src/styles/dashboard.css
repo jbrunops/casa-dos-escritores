@@ -47,12 +47,20 @@
     color: var(--color-text);
     cursor: pointer;
     transition: all 0.2s ease;
+    padding: 0;
+}
+
+.refresh-button svg {
+    width: 20px;
+    height: 20px;
+    display: block;
 }
 
 .refresh-button:hover {
     border-color: var(--color-primary);
     color: var(--color-primary);
     background-color: rgba(74, 79, 188, 0.05);
+    transform: translateY(-2px);
 }
 
 .new-story-button {
@@ -71,7 +79,9 @@
 
 .new-story-button:hover {
     background-color: var(--color-secondary);
+    color: white;
     text-decoration: none;
+    transform: translateY(-2px);
 }
 
 /* Stats section - tornando os seletores mais específicos para o dashboard */
@@ -303,6 +313,8 @@
     color: var(--color-text);
     margin: 0;
     padding: 0;
+    border: none;
+    cursor: pointer;
 }
 
 .view-btn {
@@ -313,6 +325,7 @@
 .view-btn:hover {
     background-color: rgba(0, 0, 0, 0.1);
     color: var(--color-primary);
+    transform: translateY(-2px);
 }
 
 .edit-btn {
@@ -322,6 +335,8 @@
 
 .edit-btn:hover {
     background-color: var(--color-secondary);
+    color: white;
+    transform: translateY(-2px);
 }
 
 .delete-btn {
@@ -332,6 +347,8 @@
 
 .delete-btn:hover {
     background-color: #fee2e2;
+    color: #ef4444;
+    transform: translateY(-2px);
 }
 
 /* Nova seção de link para séries */
@@ -421,7 +438,9 @@
 
 .create-series-link:hover {
     background-color: var(--color-secondary);
+    color: white;
     text-decoration: none;
+    transform: translateY(-2px);
 }
 
 /* Loading states */

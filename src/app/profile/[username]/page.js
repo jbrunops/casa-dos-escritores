@@ -2,6 +2,19 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { generateSlug } from "@/lib/utils";
+import { 
+    Globe, 
+    Twitter, 
+    Facebook, 
+    Instagram, 
+    Edit, 
+    Eye,
+    BookOpen, 
+    BookText,
+    Clock,
+    Award,
+    Calendar 
+} from "lucide-react";
 
 export async function generateMetadata({ params }) {
     const username = await Promise.resolve(params.username);
@@ -83,6 +96,12 @@ export default async function ProfilePage({ params }) {
             }
         );
 
+        // Calcular data de inscrição
+        const joinDate = new Date(profile.created_at).toLocaleDateString('pt-BR', {
+            year: 'numeric', 
+            month: 'long'
+        });
+
         // Função para formatar URLs
         const formatUrl = (url) => {
             if (!url) return "#";
@@ -91,19 +110,34 @@ export default async function ProfilePage({ params }) {
 
         return (
             <div className="profile-page">
-                <div className="profile-header">
+                <div className="profile-header-card">
                     {/* Avatar */}
-                    <div className="profile-avatar">
+                    <div className="profile-avatar-wrapper">
                         {profile.avatar_url ? (
-                            <img
-                                src={profile.avatar_url}
-                                alt="Avatar"
-                                className="avatar-image"
-                                width={150}
-                                height={150}
-                            />
+                            <div 
+                                className="profile-avatar" 
+                                style={{
+                                    backgroundImage: `url(${profile.avatar_url})`,
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                    width: '150px',
+                                    height: '150px',
+                                    borderRadius: '50%',
+                                    border: '4px solid var(--color-primary)',
+                                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
+                                }}
+                            ></div>
                         ) : (
-                            <div className="avatar-placeholder">
+                            <div 
+                                className="profile-avatar avatar-placeholder"
+                                style={{
+                                    width: '150px',
+                                    height: '150px',
+                                    borderRadius: '50%',
+                                    border: '4px solid var(--color-primary)',
+                                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
+                                }}
+                            >
                                 {profile.username.charAt(0).toUpperCase()}
                             </div>
                         )}
@@ -112,29 +146,11 @@ export default async function ProfilePage({ params }) {
                     {/* Info */}
                     <div className="profile-info">
                         <h1>{profile.username}</h1>
-
-                        {/* Stats */}
-                        <div className="profile-stats">
-                            <div className="stat-item">
-                                <span className="stat-value">
-                                    {stories?.length || 0}
-                                </span>
-                                <span className="stat-label">Histórias</span>
-                            </div>
-                            <div className="stat-item">
-                                <span className="stat-value">{totalViews}</span>
-                                <span className="stat-label">
-                                    Visualizações
-                                </span>
-                            </div>
-                            <div className="stat-item">
-                                <span className="stat-value">
-                                    {favoriteCategory}
-                                </span>
-                                <span className="stat-label">
-                                    Categoria Favorita
-                                </span>
-                            </div>
+                        
+                        {/* Membro desde */}
+                        <div className="join-date">
+                            <Calendar size={16} />
+                            <span>Membro desde {joinDate}</span>
                         </div>
 
                         {/* Bio */}
@@ -152,8 +168,10 @@ export default async function ProfilePage({ params }) {
                                     className="social-link website"
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    aria-label="Website"
                                 >
-                                    🌐 Website
+                                    <Globe size={18} />
+                                    <span>Website</span>
                                 </a>
                             )}
                             {profile.twitter_url && (
@@ -162,8 +180,10 @@ export default async function ProfilePage({ params }) {
                                     className="social-link twitter"
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    aria-label="Twitter"
                                 >
-                                    🐦 Twitter
+                                    <Twitter size={18} />
+                                    <span>Twitter</span>
                                 </a>
                             )}
                             {profile.facebook_url && (
@@ -172,8 +192,10 @@ export default async function ProfilePage({ params }) {
                                     className="social-link facebook"
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    aria-label="Facebook"
                                 >
-                                    📘 Facebook
+                                    <Facebook size={18} />
+                                    <span>Facebook</span>
                                 </a>
                             )}
                             {profile.instagram_url && (
@@ -182,8 +204,10 @@ export default async function ProfilePage({ params }) {
                                     className="social-link instagram"
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    aria-label="Instagram"
                                 >
-                                    📷 Instagram
+                                    <Instagram size={18} />
+                                    <span>Instagram</span>
                                 </a>
                             )}
                         </div>
@@ -195,20 +219,58 @@ export default async function ProfilePage({ params }) {
                                     href="/profile/edit"
                                     className="edit-profile-btn"
                                 >
-                                    Editar Perfil
+                                    <Edit size={18} />
+                                    <span>Editar Perfil</span>
                                 </Link>
                             </div>
                         )}
                     </div>
                 </div>
+                
+                {/* Stats Cards */}
+                <div className="profile-stats-cards">
+                    <div className="profile-stat-card">
+                        <div className="stat-card-icon">
+                            <BookText size={24} />
+                        </div>
+                        <div className="stat-card-info">
+                            <div className="stat-card-value">{stories?.length || 0}</div>
+                            <div className="stat-card-label">Histórias</div>
+                        </div>
+                    </div>
+                    
+                    <div className="profile-stat-card">
+                        <div className="stat-card-icon">
+                            <Eye size={24} />
+                        </div>
+                        <div className="stat-card-info">
+                            <div className="stat-card-value">{totalViews}</div>
+                            <div className="stat-card-label">Visualizações</div>
+                        </div>
+                    </div>
+                    
+                    <div className="profile-stat-card">
+                        <div className="stat-card-icon">
+                            <Award size={24} />
+                        </div>
+                        <div className="stat-card-info">
+                            <div className="stat-card-value">{favoriteCategory}</div>
+                            <div className="stat-card-label">Categoria Favorita</div>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Histórias organizadas por categoria */}
                 <div className="profile-content">
-                    <h2>Histórias Publicadas</h2>
+                    <div className="profile-content-header">
+                        <h2><BookOpen size={22} /> Histórias Publicadas</h2>
+                    </div>
+                    
                     {!stories || stories.length === 0 ? (
-                        <p className="no-stories">
-                            Nenhuma história publicada ainda.
-                        </p>
+                        <div className="no-stories">
+                            <div className="no-stories-icon"><BookText size={48} /></div>
+                            <p>Nenhuma história publicada ainda.</p>
+                        </div>
                     ) : (
                         <div className="stories-by-category">
                             {Object.entries(storiesByCategory).map(
@@ -230,6 +292,7 @@ export default async function ProfilePage({ params }) {
                                                     <h4>{story.title}</h4>
                                                     <div className="story-meta-row">
                                                         <span className="story-date">
+                                                            <Calendar size={14} />
                                                             {new Date(
                                                                 story.created_at
                                                             ).toLocaleDateString(
@@ -237,7 +300,7 @@ export default async function ProfilePage({ params }) {
                                                             )}
                                                         </span>
                                                         <span className="view-count">
-                                                            👁️{" "}
+                                                            <Eye size={14} />
                                                             {story.view_count ||
                                                                 0}
                                                         </span>
@@ -254,7 +317,15 @@ export default async function ProfilePage({ params }) {
             </div>
         );
     } catch (error) {
-        console.error("Erro na página de perfil:", error);
-        return notFound();
+        console.error("Erro ao carregar perfil:", error);
+        return (
+            <div className="profile-page">
+                <h1>Erro ao carregar perfil</h1>
+                <p>Não foi possível carregar os dados do perfil.</p>
+                <Link href="/" className="btn primary">
+                    Voltar para a página inicial
+                </Link>
+            </div>
+        );
     }
 }

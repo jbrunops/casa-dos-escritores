@@ -14,7 +14,7 @@ import {
     BookOpen,
     MessageSquare,
     Layers,
-    Plus, // Adicione esta linha
+    Plus,
 } from "lucide-react";
 import { generateSlug } from "@/lib/utils";
 
@@ -434,8 +434,8 @@ export default function DashboardPage() {
                     </button>
 
                     <Link href="/dashboard/new" className="new-story-button">
-                        <span className="button-text">Nova História</span>
                         <PlusCircle size={20} />
+                        <span>Nova História</span>
                     </Link>
                 </div>
             </div>
