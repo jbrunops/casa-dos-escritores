@@ -153,11 +153,28 @@
         display: flex !important;
         align-items: center !important;
         gap: 0.75rem !important;
+        position: relative !important;
     }
 
     .mobile-menu-icon {
         color: var(--color-primary) !important;
         flex-shrink: 0 !important;
+    }
+
+    /* Badge para notificações no menu */
+    .menu-notification-badge {
+        background-color: #ef4444 !important;
+        color: white !important;
+        font-size: 0.7rem !important;
+        font-weight: bold !important;
+        min-width: 18px !important;
+        height: 18px !important;
+        border-radius: 9999px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 5px !important;
+        margin-left: auto !important;
     }
 
     .mobile-menu-link:hover,
@@ -184,6 +201,7 @@
         flex-shrink: 0 !important;
         position: relative !important;
         z-index: 1 !important;
+        border: 2px solid var(--color-primary) !important;
     }
     
     /* Estilo para a imagem do avatar */
@@ -197,6 +215,39 @@
         left: 0 !important;
         right: 0 !important;
         bottom: 0 !important;
+    }
+
+    /* Badge de notificação para o avatar mobile */
+    .mobile-avatar-badge-container {
+        position: absolute !important;
+        top: 0 !important;
+        right: 0 !important;
+        width: 32px !important;
+        height: 32px !important;
+        pointer-events: none !important;
+    }
+
+    .mobile-avatar-badge {
+        position: absolute !important;
+        top: -5px !important;
+        right: -5px !important;
+        background-color: #ef4444 !important;
+        color: white !important;
+        font-size: 0.6rem !important;
+        font-weight: bold !important;
+        width: 16px !important;
+        height: 16px !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 0 0 2px white !important;
+        pointer-events: none !important;
+    }
+
+    /* Esconder o container de notificação mobile quando estiver mostrado no avatar */
+    .mobile-notification-container {
+        display: none !important;
     }
 }
 

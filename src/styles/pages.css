@@ -1882,3 +1882,292 @@ textarea.form-input {
 .feature-card:hover {
     text-decoration: none !important;
 }
+
+/* Estilos para a página de notificações */
+.notifications-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-md);
+}
+
+.notifications-container {
+    background-color: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+}
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.back-button {
+    background: none;
+    border: none;
+    color: var(--color-text);
+    cursor: pointer;
+    padding: var(--space-xs);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--transition-fast);
+}
+
+.back-button:hover {
+    background-color: var(--color-light);
+    color: var(--color-primary);
+}
+
+.notifications-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.header-actions {
+    display: flex;
+    gap: var(--space-md);
+}
+
+.mark-all-button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.mark-all-button:hover {
+    background-color: rgba(74, 79, 188, 0.1);
+}
+
+.mark-all-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.notifications-filter {
+    display: flex;
+    align-items: center;
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+    gap: var(--space-md);
+}
+
+.filter-button {
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-size: 0.9rem;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.filter-button:hover {
+    color: var(--color-primary);
+}
+
+.filter-button.active {
+    background-color: rgba(74, 79, 188, 0.1);
+    color: var(--color-primary);
+    font-weight: 500;
+}
+
+.notifications-list-container {
+    min-height: 300px;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl);
+    color: var(--color-light-text);
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(74, 79, 188, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--color-primary);
+    animation: spin 1s linear infinite;
+    margin-bottom: var(--space-md);
+}
+
+.loading-spinner-small {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(74, 79, 188, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--color-primary);
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.empty-notifications {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl);
+    color: var(--color-light-text);
+    text-align: center;
+}
+
+.empty-notifications svg {
+    color: var(--color-light-text);
+    margin-bottom: var(--space-md);
+    opacity: 0.5;
+}
+
+.notifications-list {
+    width: 100%;
+}
+
+.notification-item {
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color var(--transition-fast);
+    position: relative;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item.unread {
+    background-color: rgba(74, 79, 188, 0.05);
+}
+
+.notification-item.unread:hover {
+    background-color: rgba(74, 79, 188, 0.08);
+}
+
+.notification-content {
+    display: flex;
+    align-items: flex-start;
+    padding: var(--space-md) var(--space-lg);
+    gap: var(--space-md);
+}
+
+.notification-link {
+    flex: 1;
+    text-decoration: none;
+    color: var(--color-text);
+    display: block;
+}
+
+.notification-link:hover {
+    text-decoration: none;
+}
+
+.notification-text {
+    font-size: 0.95rem;
+    margin-bottom: var(--space-xs);
+    line-height: 1.5;
+}
+
+.notification-meta {
+    font-size: 0.8rem;
+    color: var(--color-light-text);
+}
+
+.mark-read-button {
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    cursor: pointer;
+    padding: var(--space-xs);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.mark-read-button:hover {
+    background-color: rgba(74, 79, 188, 0.1);
+}
+
+.mark-read-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.button-loading {
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(74, 79, 188, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--color-primary);
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .notifications-page {
+        padding: var(--space-sm);
+    }
+    
+    .notifications-header {
+        padding: var(--space-md);
+    }
+    
+    .notifications-filter {
+        padding: var(--space-md);
+        overflow-x: auto;
+    }
+    
+    .notification-content {
+        padding: var(--space-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .notifications-container {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+    
+    .notifications-page {
+        padding: 0;
+    }
+    
+    .header-actions {
+        flex-direction: column;
+    }
+    
+    .notifications-header h1 {
+        font-size: 1.25rem;
+    }
+}

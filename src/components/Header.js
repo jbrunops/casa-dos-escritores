@@ -4,7 +4,7 @@ import MobileSeries from "./MobileSeries";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import {
     ChevronDown,
     User,
@@ -15,7 +15,8 @@ import {
     Compass,
     BookOpen,
     LogIn,
-    UserPlus
+    UserPlus,
+    Bell
 } from "lucide-react";
 import NotificationBell from "./NotificationBell";
 
@@ -31,6 +32,7 @@ export default function Header() {
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
     const userDropdownRef = useRef(null);
     const categoryDropdownRef = useRef(null);
     const mobileMenuRef = useRef(null);
@@ -140,6 +142,34 @@ export default function Header() {
         };
     }, [isMobile]);
 
+    // Buscar notificações não lidas - Adicionado para contar notificações
+    const fetchUnreadCount = useCallback(async () => {
+        try {
+            if (!user) return;
+            
+            const { data, error } = await supabase
+                .from("notifications")
+                .select("id")
+                .eq("user_id", user.id)
+                .eq("is_read", false);
+                
+            if (error) {
+                console.error("Erro ao buscar notificações:", error);
+                return;
+            }
+            
+            setUnreadCount(data.length);
+        } catch (error) {
+            console.error("Erro ao buscar contagem de notificações:", error);
+        }
+    }, [user, supabase]);
+    
+    useEffect(() => {
+        if (user) {
+            fetchUnreadCount();
+        }
+    }, [user, fetchUnreadCount]);
+
     const handleSignOut = async () => {
         await supabase.auth.signOut();
         setShowMobileMenu(false);
@@ -196,15 +226,24 @@ export default function Header() {
                     aria-label="Menu de navegação"
                 >
                     {user ? (
-                        <div className="mobile-user-avatar">
-                            {avatarUrl ? (
-                                <img 
-                                    src={avatarUrl} 
-                                    alt={username || "Usuário"} 
-                                    className="avatar-image"
-                                />
-                            ) : (
-                                username.charAt(0).toUpperCase()
+                        <div style={{ position: "relative" }}>
+                            <div className="mobile-user-avatar" style={{ zIndex: 1 }}>
+                                {avatarUrl ? (
+                                    <img 
+                                        src={avatarUrl} 
+                                        alt={username || "Usuário"} 
+                                        className="avatar-image"
+                                    />
+                                ) : (
+                                    username.charAt(0).toUpperCase()
+                                )}
+                            </div>
+                            {unreadCount > 0 && !showMobileMenu && (
+                                <div className="mobile-avatar-badge-container" style={{ zIndex: 2 }}>
+                                    <span className="mobile-avatar-badge">
+                                        {unreadCount > 9 ? "9+" : unreadCount}
+                                    </span>
+                                </div>
                             )}
                         </div>
                     ) : (
@@ -267,6 +306,24 @@ export default function Header() {
                                         <div className="mobile-menu-link-content">
                                             <LayoutDashboard size={20} className="mobile-menu-icon" />
                                             <span>Meu Painel</span>
+                                        </div>
+                                    </Link>
+                                </li>
+                                {/* Link para notificações */}
+                                <li className="mobile-menu-item">
+                                    <Link
+                                        href="/notifications"
+                                        className="mobile-menu-link"
+                                        onClick={() => setShowMobileMenu(false)}
+                                    >
+                                        <div className="mobile-menu-link-content">
+                                            <Bell size={20} className="mobile-menu-icon" />
+                                            <span>Notificações</span>
+                                            {unreadCount > 0 && (
+                                                <span className="menu-notification-badge">
+                                                    {unreadCount > 9 ? "9+" : unreadCount}
+                                                </span>
+                                            )}
                                         </div>
                                     </Link>
                                 </li>
