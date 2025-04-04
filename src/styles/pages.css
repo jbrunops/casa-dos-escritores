@@ -1112,67 +1112,11 @@
 }
 
 .social-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: var(--space-sm) var(--space-md);
     border-radius: 20px;
-    background-color: var(--color-light);
-    color: var(--color-text);
-    font-size: 0.875rem;
-    transition: all var(--transition-fast);
-    border: 1px solid var(--color-border);
-}
-
-.social-link:hover {
-    background-color: var(--color-primary);
-    color: white;
-    text-decoration: none;
-    transform: translateY(-2px);
-}
-
-.social-link.website:hover {
-    background-color: #2563eb;
-}
-
-.social-link.twitter:hover {
-    background-color: #1DA1F2;
-}
-
-.social-link.facebook:hover {
-    background-color: #1877F2;
-}
-
-.social-link.instagram:hover {
-    background-color: #E4405F;
 }
 
 .profile-actions {
     margin-top: var(--space-lg);
-}
-
-.edit-profile-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: var(--space-sm) var(--space-lg);
-    background-color: var(--color-primary);
-    color: white;
-    border-radius: var(--radius-md);
-    font-weight: 500;
-    transition: all var(--transition-fast);
-}
-
-.edit-profile-btn:hover {
-    background-color: var(--color-secondary);
-    color: white;
-    text-decoration: none;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(74, 79, 188, 0.2);
-}
-
-.edit-profile-btn:hover svg {
-    color: white;
 }
 
 /* Stats Cards */

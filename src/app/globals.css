@@ -1,7 +1,9 @@
 /* Importações principais */
 @import "../styles/base.css";
+@import "../styles/variables.css";
 @import "../styles/layout.css";
 @import "../styles/components.css";
+@import "../styles/buttons.css"; /* Estilos padronizados de botões */
 @import "../styles/pages.css";
 @import "../styles/editor.css";
 @import "../styles/story-editor.css";
@@ -10,6 +12,7 @@
 
 /* Importação dos estilos mobile */
 @import "../styles/styles-mobile/index.css";
+@import "../styles/styles-mobile/mobile-buttons.css"; /* Estilos mobile para botões */
 
 /* Adicione esta linha ao final do arquivo */
 @import "../styles/notifications.css";

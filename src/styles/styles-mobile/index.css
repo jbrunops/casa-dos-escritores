@@ -3,6 +3,7 @@
 @import "./mobile-layout.css";
 @import "./mobile-header.css";
 @import "./mobile-components.css";
+@import "./mobile-buttons.css"; /* Estilos padronizados de botões para mobile */
 @import "./mobile-dashboard.css";
 @import "./mobile-editor.css";
 @import "./mobile-stories.css"; /* Arquivo de estilos para histórias e capítulos */

@@ -348,8 +348,15 @@
         font-size: 0.8rem;
     }
     
-    .edit-profile-btn {
+    .profile-actions {
         width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .profile-actions .btn-primary {
+        width: 233px;
+        max-width: 100%;
         justify-content: center;
     }
 

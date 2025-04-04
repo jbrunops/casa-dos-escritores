@@ -165,7 +165,7 @@ export default async function ProfilePage({ params }) {
                             {profile.website_url && (
                                 <a
                                     href={formatUrl(profile.website_url)}
-                                    className="social-link website"
+                                    className="btn-secondary"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label="Website"
@@ -177,7 +177,7 @@ export default async function ProfilePage({ params }) {
                             {profile.twitter_url && (
                                 <a
                                     href={formatUrl(profile.twitter_url)}
-                                    className="social-link twitter"
+                                    className="btn-secondary"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label="Twitter"
@@ -189,7 +189,7 @@ export default async function ProfilePage({ params }) {
                             {profile.facebook_url && (
                                 <a
                                     href={formatUrl(profile.facebook_url)}
-                                    className="social-link facebook"
+                                    className="btn-secondary"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label="Facebook"
@@ -201,7 +201,7 @@ export default async function ProfilePage({ params }) {
                             {profile.instagram_url && (
                                 <a
                                     href={formatUrl(profile.instagram_url)}
-                                    className="social-link instagram"
+                                    className="btn-secondary"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label="Instagram"
@@ -217,10 +217,15 @@ export default async function ProfilePage({ params }) {
                             <div className="profile-actions">
                                 <Link
                                     href="/profile/edit"
-                                    className="edit-profile-btn"
+                                    className="btn-primary"
+                                    style={{ 
+                                        width: '233px',
+                                        backgroundColor: '#484DB5',
+                                        color: 'white'
+                                    }}
                                 >
-                                    <Edit size={18} />
-                                    <span>Editar Perfil</span>
+                                    <Edit size={18} style={{ color: 'white' }} />
+                                    <span style={{ color: 'white' }}>Editar Perfil</span>
                                 </Link>
                             </div>
                         )}
@@ -322,7 +327,7 @@ export default async function ProfilePage({ params }) {
             <div className="profile-page">
                 <h1>Erro ao carregar perfil</h1>
                 <p>Não foi possível carregar os dados do perfil.</p>
-                <Link href="/" className="btn primary">
+                <Link href="/" className="btn-primary">
                     Voltar para a página inicial
                 </Link>
             </div>
