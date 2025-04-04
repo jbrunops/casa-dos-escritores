@@ -64,7 +64,7 @@
         padding: 0.5rem !important;
         width: 40px !important;
         height: 40px !important;
-        z-index: 10 !important;
+        z-index: 1001 !important;
     }
 
     /* Notificação no header */
@@ -104,47 +104,55 @@
     .mobile-menu-dropdown {
         display: block !important;
         position: fixed !important;
-        top: 60px !important;
+        top: 0 !important;
         right: 0 !important;
-        width: 100% !important;
+        width: 50% !important; /* Ocupar metade da tela */
+        height: 100vh !important;
         background-color: white !important;
-        box-shadow: var(--shadow-md) !important;
-        z-index: 100 !important;
-        border-top: 1px solid var(--color-border) !important;
-        max-height: 0 !important;
-        overflow: hidden !important;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1) !important;
+        z-index: 1000 !important;
+        transform: translateX(100%) !important;
         opacity: 0 !important;
-        transition: max-height 0.3s ease, opacity 0.3s ease !important;
+        transition: transform 0.3s ease, opacity 0.2s ease !important;
+        padding-top: 70px !important; /* Espaço para o header */
+        border-left: 1px solid var(--color-border) !important;
+        overflow-y: auto !important;
     }
 
     .mobile-menu-dropdown.is-active {
-        max-height: 300px !important;
+        transform: translateX(0) !important;
         opacity: 1 !important;
+        pointer-events: auto !important;
     }
 
     .mobile-menu-list {
         padding: 0 !important;
         margin: 0 !important;
         list-style: none !important;
+        pointer-events: auto !important;
     }
 
     .mobile-menu-item {
         border-bottom: 1px solid var(--color-border) !important;
+        pointer-events: auto !important;
     }
 
     .mobile-menu-link {
         display: block !important;
-        padding: 0.85rem !important;
+        padding: 1rem 1.25rem !important;
         color: var(--color-text) !important;
         text-decoration: none !important;
         font-weight: 500 !important;
+        cursor: pointer !important;
+        pointer-events: auto !important;
+        -webkit-tap-highlight-color: transparent !important;
     }
 
     /* Estilo para alinhar corretamente o ícone e o texto no menu mobile */
     .mobile-menu-link-content {
         display: flex !important;
         align-items: center !important;
-        gap: 0.5rem !important;
+        gap: 0.75rem !important;
     }
 
     .mobile-menu-icon {
@@ -154,7 +162,7 @@
 
     .mobile-menu-link:hover,
     .mobile-menu-link:active {
-        background-color: var(--color-light) !important;
+        background-color: rgba(74, 79, 188, 0.05) !important;
         color: var(--color-primary) !important;
     }
 
@@ -175,6 +183,7 @@
         text-align: center !important;
         flex-shrink: 0 !important;
         position: relative !important;
+        z-index: 1 !important;
     }
     
     /* Estilo para a imagem do avatar */
@@ -188,5 +197,36 @@
         left: 0 !important;
         right: 0 !important;
         bottom: 0 !important;
+    }
+}
+
+/* Overlay escuro quando o menu está aberto */
+.mobile-menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none; /* Impedir interação quando não está ativo */
+}
+
+@media (max-width: 480px) {
+    .mobile-menu-overlay {
+        display: block !important;
+    }
+    
+    .mobile-menu-overlay.is-active {
+        opacity: 1 !important;
+        pointer-events: auto !important; /* Permitir interação apenas quando ativo */
+    }
+    
+    /* Ajuste no botão de menu para garantir que esteja clicável */
+    .mobile-menu-btn {
+        z-index: 1001 !important;
     }
 }

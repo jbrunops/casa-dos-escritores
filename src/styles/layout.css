@@ -73,11 +73,13 @@
     justify-content: center;
     vertical-align: middle;
     margin-right: 6px;
+    color: var(--color-primary);
 }
 
 .dropdown-icon-container {
     margin-left: 4px;
     margin-right: 0;
+    color: var(--color-primary);
 }
 
 /* Navbar links e botões */
@@ -346,14 +348,14 @@
 }
 
 .auth-link.login {
-    color: var(--color-primary);
-    border: 1px solid var(--color-border);
-}
-
-.auth-link.signup {
     background-color: var(--color-primary);
     color: white;
     border: 1px solid var(--color-primary);
+}
+
+.auth-link.signup {
+    color: var(--color-primary);
+    border: none;
 }
 
 .auth-link:hover {
@@ -363,12 +365,14 @@
 }
 
 .auth-link.login:hover {
-    border-color: var(--color-primary);
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
 }
 
 .auth-link.signup:hover {
-    background-color: var(--color-secondary);
-    border-color: var(--color-secondary);
+    text-decoration: underline;
+    transform: none;
+    box-shadow: none;
 }
 
 /* Footer */

@@ -14,6 +14,8 @@ import {
     Menu,
     Compass,
     BookOpen,
+    LogIn,
+    UserPlus
 } from "lucide-react";
 import NotificationBell from "./NotificationBell";
 
@@ -128,15 +130,6 @@ export default function Header() {
             ) {
                 setShowCategoryDropdown(false);
             }
-            if (
-                isMobile &&
-                mobileMenuRef.current &&
-                !mobileMenuRef.current.contains(event.target) &&
-                event.target.className !== "mobile-menu-btn" &&
-                !event.target.closest(".mobile-menu-btn")
-            ) {
-                setShowMobileMenu(false);
-            }
         };
 
         document.addEventListener("mousedown", handleClickOutside);
@@ -219,12 +212,13 @@ export default function Header() {
                     )}
                 </button>
 
-                {/* Menu mobile dropdown */}
+                {/* Menu mobile dropdown - Ajustado para garantir que seja clicável */}
                 <div
                     className={`mobile-menu-dropdown ${
                         showMobileMenu ? "is-active" : ""
                     }`}
                     ref={mobileMenuRef}
+                    style={{ pointerEvents: 'auto' }} // Garantir que eventos de clique sejam capturados
                 >
                     <ul className="mobile-menu-list">
                         {!user ? (
@@ -234,9 +228,14 @@ export default function Header() {
                                     <Link
                                         href="/login"
                                         className="mobile-menu-link"
-                                        onClick={() => setShowMobileMenu(false)}
+                                        onClick={() => {
+                                            setShowMobileMenu(false);
+                                        }}
                                     >
-                                        Entrar
+                                        <div className="mobile-menu-link-content">
+                                            <LogIn size={20} className="mobile-menu-icon" />
+                                            <span>Entrar</span>
+                                        </div>
                                     </Link>
                                 </li>
                                 <li className="mobile-menu-item">
@@ -245,7 +244,10 @@ export default function Header() {
                                         className="mobile-menu-link"
                                         onClick={() => setShowMobileMenu(false)}
                                     >
-                                        Cadastrar
+                                        <div className="mobile-menu-link-content">
+                                            <UserPlus size={20} className="mobile-menu-icon" />
+                                            <span>Cadastrar</span>
+                                        </div>
                                     </Link>
                                 </li>
                                 {/* Adicione esta linha */}
@@ -262,7 +264,10 @@ export default function Header() {
                                         className="mobile-menu-link"
                                         onClick={() => setShowMobileMenu(false)}
                                     >
-                                        Meu Painel
+                                        <div className="mobile-menu-link-content">
+                                            <LayoutDashboard size={20} className="mobile-menu-icon" />
+                                            <span>Meu Painel</span>
+                                        </div>
                                     </Link>
                                 </li>
                                 {/* Adicione esta linha */}
@@ -277,7 +282,10 @@ export default function Header() {
                                         className="mobile-menu-link"
                                         onClick={() => setShowMobileMenu(false)}
                                     >
-                                        Meu Perfil
+                                        <div className="mobile-menu-link-content">
+                                            <User size={20} className="mobile-menu-icon" />
+                                            <span>Meu Perfil</span>
+                                        </div>
                                     </Link>
                                 </li>
                                 {isAdmin && (
@@ -289,7 +297,10 @@ export default function Header() {
                                                 setShowMobileMenu(false)
                                             }
                                         >
-                                            Administração
+                                            <div className="mobile-menu-link-content">
+                                                <Settings size={20} className="mobile-menu-icon" />
+                                                <span>Administração</span>
+                                            </div>
                                         </Link>
                                     </li>
                                 )}
@@ -304,7 +315,10 @@ export default function Header() {
                                             border: "none",
                                         }}
                                     >
-                                        Sair
+                                        <div className="mobile-menu-link-content">
+                                            <LogOut size={20} className="mobile-menu-icon" />
+                                            <span>Sair</span>
+                                        </div>
                                     </button>
                                 </li>
                             </>
@@ -312,24 +326,16 @@ export default function Header() {
                     </ul>
                 </div>
 
+                {/* Overlay para fechar o menu ao clicar fora */}
+                <div 
+                    className={`mobile-menu-overlay ${showMobileMenu ? "is-active" : ""}`}
+                    onClick={() => showMobileMenu ? setShowMobileMenu(false) : null}
+                    style={{ pointerEvents: showMobileMenu ? 'auto' : 'none' }}
+                ></div>
+
                 {/* ELEMENTOS DESKTOP */}
                 <nav className="main-navigation">
                     <ul className="nav-menu">
-                        <li className="nav-item">
-                            <Link
-                                href="/"
-                                className={
-                                    pathname === "/"
-                                        ? "nav-link active"
-                                        : "nav-link"
-                                }
-                            >
-                                <span className="nav-icon-container">
-                                    <User size={16} />
-                                </span>
-                                <span>Início</span>
-                            </Link>
-                        </li>
                         <li
                             className="nav-item has-dropdown"
                             ref={categoryDropdownRef}
@@ -516,20 +522,20 @@ export default function Header() {
                     ) : (
                         <div className="auth-actions">
                             <Link
-                                href="/login"
-                                className={`auth-link login ${
-                                    pathname === "/login" ? "active" : ""
-                                }`}
-                            >
-                                Entrar
-                            </Link>
-                            <Link
                                 href="/signup"
                                 className={`auth-link signup ${
                                     pathname === "/signup" ? "active" : ""
                                 }`}
                             >
                                 Cadastrar
+                            </Link>
+                            <Link
+                                href="/login"
+                                className={`auth-link login ${
+                                    pathname === "/login" ? "active" : ""
+                                }`}
+                            >
+                                Entrar
                             </Link>
                         </div>
                     )}
