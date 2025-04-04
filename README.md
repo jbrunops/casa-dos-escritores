@@ -47,7 +47,7 @@ Casa dos Escritores é uma plataforma dedicada a escritores que desejam comparti
 - **Elementos Touch-Friendly**: Botões e controles maiores para facilitar interação em telas de toque
 - **Performance Otimizada**: Carregamento rápido mesmo em conexões móveis
 
-## Estrutura do Projeto
+## Estrutura do ProjetO
 
 ```
 casa-dos-escritores/
