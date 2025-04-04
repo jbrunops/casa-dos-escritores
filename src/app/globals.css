@@ -6,6 +6,7 @@
 @import "../styles/editor.css";
 @import "../styles/story-editor.css";
 @import "../styles/dashboard.css";
+@import "../styles/admin.css"; /* Estilos do painel administrativo */
 
 /* Importação dos estilos mobile */
 @import "../styles/styles-mobile/index.css";

@@ -5,6 +5,22 @@ import { createBrowserClient } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { hasRole, ROLES } from "@/utils/userRoles";
+import {
+    Users,
+    BookOpen,
+    MessageSquare,
+    RefreshCw,
+    Eye,
+    Edit,
+    Trash2,
+    ArrowLeft,
+    Shield,
+    Calendar,
+    Mail,
+    AlertTriangle,
+    CheckCircle2,
+    ChevronRight
+} from "lucide-react";
 
 export default function AdminDashboard() {
     const [users, setUsers] = useState([]);
@@ -17,8 +33,19 @@ export default function AdminDashboard() {
         type: "",
         message: "",
     });
+    const [isMobile, setIsMobile] = useState(false);
     const router = useRouter();
     const supabase = createBrowserClient();
+
+    // Detectar dispositivo móvel
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
 
     useEffect(() => {
         async function checkAccess() {
@@ -268,10 +295,175 @@ export default function AdminDashboard() {
         }
     }
 
+    // Formatar data de maneira amigável
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const options = { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        };
+        return date.toLocaleDateString('pt-BR', options);
+    };
+
+    // Componente de card para mobile
+    const renderUserCard = (user) => {
+        return (
+            <div className="admin-card" key={user.id}>
+                <div className="admin-card-header">
+                    <h3 className="admin-card-title">{user.username}</h3>
+                    <div className={`role-badge ${user.role || 'user'}`}>
+                        {user.role === 'admin' ? 'Administrador' : 
+                         user.role === 'moderator' ? 'Moderador' : 'Usuário'}
+                    </div>
+                </div>
+                
+                <div className="admin-card-content">
+                    <div className="admin-card-field">
+                        <Mail size={16} className="admin-card-icon" />
+                        <span>{user.email}</span>
+                    </div>
+                    <div className="admin-card-field">
+                        <Calendar size={16} className="admin-card-icon" />
+                        <span>{formatDate(user.created_at)}</span>
+                    </div>
+                </div>
+                
+                <div className="admin-card-actions">
+                    <div className="admin-card-select">
+                        <label htmlFor={`role-${user.id}`}>Função:</label>
+                        <select
+                            id={`role-${user.id}`}
+                            value={user.role || "user"}
+                            onChange={(e) => setUserRole(user.id, e.target.value)}
+                            disabled={actionLoading}
+                            className="role-select"
+                        >
+                            <option value="user">Usuário</option>
+                            <option value="moderator">Moderador</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                    
+                    <div className="admin-action-buttons">
+                        <Link
+                            href={`/profile/${encodeURIComponent(user.username)}`}
+                            className="view-btn"
+                        >
+                            <Eye size={16} />
+                            <span>Ver</span>
+                        </Link>
+                        
+                        <button
+                            onClick={() => deleteUser(user.id, user.username)}
+                            className="delete-btn"
+                            disabled={actionLoading || user.role === "admin"}
+                            title={user.role === "admin" ? "Não é possível excluir um administrador" : "Excluir usuário"}
+                        >
+                            <Trash2 size={16} />
+                            <span>Excluir</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const renderStoryCard = (story) => {
+        return (
+            <div className="admin-card" key={story.id}>
+                <div className="admin-card-header">
+                    <h3 className="admin-card-title">{story.title}</h3>
+                    <div className={`status-badge ${story.is_published ? "published" : "draft"}`}>
+                        {story.is_published ? "Publicado" : "Rascunho"}
+                    </div>
+                </div>
+                
+                <div className="admin-card-content">
+                    <div className="admin-card-field">
+                        <Users size={16} className="admin-card-icon" />
+                        <span>Autor: {story.profiles.username}</span>
+                    </div>
+                    <div className="admin-card-field">
+                        <Calendar size={16} className="admin-card-icon" />
+                        <span>{formatDate(story.created_at)}</span>
+                    </div>
+                </div>
+                
+                <div className="admin-card-actions">
+                    <Link
+                        href={`/story/${story.id}`}
+                        className="view-btn"
+                    >
+                        <Eye size={16} />
+                        <span>Ver</span>
+                    </Link>
+                    
+                    <Link
+                        href={`/dashboard/edit/${story.id}`}
+                        className="edit-btn"
+                    >
+                        <Edit size={16} />
+                        <span>Editar</span>
+                    </Link>
+                    
+                    <button
+                        onClick={() => deleteContent("stories", story.id)}
+                        className="delete-btn"
+                        disabled={actionLoading}
+                    >
+                        <Trash2 size={16} />
+                        <span>Excluir</span>
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
+    const renderCommentCard = (comment) => {
+        return (
+            <div className="admin-card" key={comment.id}>
+                <div className="admin-card-header">
+                    <div className="admin-card-comment">
+                        {comment.text.length > 100 ? comment.text.substring(0, 100) + "..." : comment.text}
+                    </div>
+                </div>
+                
+                <div className="admin-card-content">
+                    <div className="admin-card-field">
+                        <Users size={16} className="admin-card-icon" />
+                        <span>Autor: {comment.profiles.username}</span>
+                    </div>
+                    <div className="admin-card-field">
+                        <BookOpen size={16} className="admin-card-icon" />
+                        <span>História: {comment.stories?.title || "História removida"}</span>
+                    </div>
+                    <div className="admin-card-field">
+                        <Calendar size={16} className="admin-card-icon" />
+                        <span>{formatDate(comment.created_at)}</span>
+                    </div>
+                </div>
+                
+                <div className="admin-card-actions">
+                    <button
+                        onClick={() => deleteContent("comments", comment.id)}
+                        className="delete-btn"
+                        disabled={actionLoading}
+                    >
+                        <Trash2 size={16} />
+                        <span>Excluir</span>
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
     if (loading) {
         return (
-            <div className="loading-container">
-                <div className="loader-large"></div>
+            <div className="admin-loading">
+                <RefreshCw size={40} className="admin-loading-icon" />
                 <p>Carregando painel administrativo...</p>
             </div>
         );
@@ -279,293 +471,302 @@ export default function AdminDashboard() {
 
     return (
         <div className="admin-dashboard">
-            <h1>Painel Administrativo</h1>
-
-            {statusMessage.message && (
-                <div className={`message-banner ${statusMessage.type}`}>
-                    {statusMessage.message}
+            <div className="admin-header">
+                <div className="admin-header-left">
+                    <button 
+                        onClick={() => router.back()} 
+                        className="admin-back-button" 
+                        aria-label="Voltar para página anterior"
+                    >
+                        <ArrowLeft size={20} />
+                    </button>
+                    <h1 className="admin-title">Painel Administrativo</h1>
                 </div>
-            )}
-
-            <div className="admin-actions-bar">
-                <button
-                    onClick={loadData}
-                    className="refresh-button"
+                
+                <button 
+                    onClick={loadData} 
+                    className="admin-refresh-button" 
                     disabled={actionLoading || loading}
                 >
-                    {actionLoading || loading
-                        ? "Carregando..."
-                        : "🔄 Atualizar Dados"}
+                    <RefreshCw size={18} className={actionLoading ? "spin" : ""} />
+                    {!isMobile && <span>Atualizar</span>}
                 </button>
             </div>
+
+            {statusMessage.type && (
+                <div className={`admin-message ${statusMessage.type}`}>
+                    {statusMessage.type === "success" ? (
+                        <CheckCircle2 size={20} className="admin-message-icon" />
+                    ) : (
+                        <AlertTriangle size={20} className="admin-message-icon" />
+                    )}
+                    <span>{statusMessage.message}</span>
+                </div>
+            )}
 
             <div className="admin-tabs">
                 <button
-                    className={`admin-tab ${
-                        activeTab === "users" ? "active" : ""
-                    }`}
+                    className={`admin-tab ${activeTab === "users" ? "active" : ""}`}
                     onClick={() => setActiveTab("users")}
                 >
-                    Usuários ({users.length})
+                    <Users size={18} className="admin-tab-icon" />
+                    <span>Usuários</span>
+                    <span className="admin-tab-count">{users.length}</span>
                 </button>
+                
                 <button
-                    className={`admin-tab ${
-                        activeTab === "stories" ? "active" : ""
-                    }`}
+                    className={`admin-tab ${activeTab === "stories" ? "active" : ""}`}
                     onClick={() => setActiveTab("stories")}
                 >
-                    Histórias ({stories.length})
+                    <BookOpen size={18} className="admin-tab-icon" />
+                    <span>Histórias</span>
+                    <span className="admin-tab-count">{stories.length}</span>
                 </button>
+                
                 <button
-                    className={`admin-tab ${
-                        activeTab === "comments" ? "active" : ""
-                    }`}
+                    className={`admin-tab ${activeTab === "comments" ? "active" : ""}`}
                     onClick={() => setActiveTab("comments")}
                 >
-                    Comentários ({comments.length})
+                    <MessageSquare size={18} className="admin-tab-icon" />
+                    <span>Comentários</span>
+                    <span className="admin-tab-count">{comments.length}</span>
                 </button>
             </div>
 
-            {/* Tabela de usuários */}
-            {activeTab === "users" && (
-                <div className="admin-table-container">
-                    {users.length === 0 ? (
-                        <div className="empty-state">
-                            <p>Nenhum usuário encontrado</p>
-                        </div>
-                    ) : (
-                        <table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Usuário</th>
-                                    <th>E-mail</th>
-                                    <th>Criado em</th>
-                                    <th>Função</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users.map((user) => (
-                                    <tr key={user.id}>
-                                        <td data-label="Usuário">
-                                            {user.username}
-                                        </td>
-                                        <td data-label="E-mail">
-                                            {user.email}
-                                        </td>
-                                        <td data-label="Criado em">
-                                            {new Date(
-                                                user.created_at
-                                            ).toLocaleDateString("pt-BR")}
-                                        </td>
-                                        <td data-label="Função">
-                                            <select
-                                                value={user.role || "user"}
-                                                onChange={(e) =>
-                                                    setUserRole(
-                                                        user.id,
-                                                        e.target.value
-                                                    )
-                                                }
-                                                disabled={actionLoading}
-                                                className="role-select"
-                                            >
-                                                <option value="user">
-                                                    Usuário
-                                                </option>
-                                                <option value="moderator">
-                                                    Moderador
-                                                </option>
-                                                <option value="admin">
-                                                    Administrador
-                                                </option>
-                                            </select>
-                                        </td>
-                                        <td data-label="Ações">
-                                            <div className="admin-actions">
-                                                <Link
-                                                    href={`/profile/${encodeURIComponent(
-                                                        user.username
-                                                    )}`}
-                                                    className="view-btn"
-                                                >
-                                                    Ver
-                                                </Link>
-                                                <button
-                                                    onClick={() =>
-                                                        deleteUser(
-                                                            user.id,
-                                                            user.username
-                                                        )
-                                                    }
-                                                    className="delete-btn"
-                                                    disabled={
-                                                        actionLoading ||
-                                                        user.role === "admin"
-                                                    }
-                                                    title={
-                                                        user.role === "admin"
-                                                            ? "Não é possível excluir um administrador"
-                                                            : "Excluir usuário"
-                                                    }
-                                                >
-                                                    Excluir
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    )}
-                </div>
-            )}
+            <div className="admin-content">
+                {/* Conteúdo de usuários */}
+                {activeTab === "users" && (
+                    <div className="admin-section">
+                        {users.length === 0 ? (
+                            <div className="admin-empty">
+                                <Shield size={40} />
+                                <p>Nenhum usuário encontrado</p>
+                            </div>
+                        ) : (
+                            <>
+                                {/* Versão mobile - exibe cards */}
+                                <div className="admin-cards">
+                                    {users.map(user => renderUserCard(user))}
+                                </div>
+                                
+                                {/* Versão desktop - exibe tabela */}
+                                <div className="admin-table-container">
+                                    <table className="admin-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Usuário</th>
+                                                <th>E-mail</th>
+                                                <th>Criado em</th>
+                                                <th>Função</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {users.map((user) => (
+                                                <tr key={user.id}>
+                                                    <td data-label="Usuário">
+                                                        {user.username}
+                                                    </td>
+                                                    <td data-label="E-mail">
+                                                        {user.email}
+                                                    </td>
+                                                    <td data-label="Criado em">
+                                                        {formatDate(user.created_at)}
+                                                    </td>
+                                                    <td data-label="Função">
+                                                        <div className="role-selector">
+                                                            <select
+                                                                value={user.role || "user"}
+                                                                onChange={(e) => setUserRole(user.id, e.target.value)}
+                                                                disabled={actionLoading}
+                                                                className="role-select"
+                                                            >
+                                                                <option value="user">Usuário</option>
+                                                                <option value="moderator">Moderador</option>
+                                                                <option value="admin">Administrador</option>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                    <td data-label="Ações">
+                                                        <div className="admin-actions">
+                                                            <Link
+                                                                href={`/profile/${encodeURIComponent(user.username)}`}
+                                                                className="view-btn"
+                                                            >
+                                                                <Eye size={16} />
+                                                                <span>Ver</span>
+                                                            </Link>
+                                                            <button
+                                                                onClick={() => deleteUser(user.id, user.username)}
+                                                                className="delete-btn"
+                                                                disabled={actionLoading || user.role === "admin"}
+                                                                title={
+                                                                    user.role === "admin"
+                                                                        ? "Não é possível excluir um administrador"
+                                                                        : "Excluir usuário"
+                                                                }
+                                                            >
+                                                                <Trash2 size={16} />
+                                                                <span>Excluir</span>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
 
-            {/* Tabela de histórias */}
-            {activeTab === "stories" && (
-                <div className="admin-table-container">
-                    {stories.length === 0 ? (
-                        <div className="empty-state">
-                            <p>Nenhuma história encontrada</p>
-                        </div>
-                    ) : (
-                        <table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Título</th>
-                                    <th>Autor</th>
-                                    <th>Status</th>
-                                    <th>Criado em</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {stories.map((story) => (
-                                    <tr key={story.id}>
-                                        <td data-label="Título">
-                                            {story.title}
-                                        </td>
-                                        <td data-label="Autor">
-                                            {story.profiles.username}
-                                        </td>
-                                        <td data-label="Status">
-                                            <span
-                                                className={`status-badge ${
-                                                    story.is_published
-                                                        ? "published"
-                                                        : "draft"
-                                                }`}
-                                            >
-                                                {story.is_published
-                                                    ? "Publicado"
-                                                    : "Rascunho"}
-                                            </span>
-                                        </td>
-                                        <td data-label="Criado em">
-                                            {new Date(
-                                                story.created_at
-                                            ).toLocaleDateString("pt-BR")}
-                                        </td>
-                                        <td data-label="Ações">
-                                            <div className="admin-actions">
-                                                <Link
-                                                    href={`/story/${story.id}`}
-                                                    className="view-btn"
-                                                >
-                                                    Ver
-                                                </Link>
-                                                <Link
-                                                    href={`/dashboard/edit/${story.id}`}
-                                                    className="edit-btn"
-                                                >
-                                                    Editar
-                                                </Link>
-                                                <button
-                                                    onClick={() =>
-                                                        deleteContent(
-                                                            "stories",
-                                                            story.id
-                                                        )
-                                                    }
-                                                    className="delete-btn"
-                                                    disabled={actionLoading}
-                                                >
-                                                    Excluir
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    )}
-                </div>
-            )}
+                {/* Conteúdo de histórias */}
+                {activeTab === "stories" && (
+                    <div className="admin-section">
+                        {stories.length === 0 ? (
+                            <div className="admin-empty">
+                                <BookOpen size={40} />
+                                <p>Nenhuma história encontrada</p>
+                            </div>
+                        ) : (
+                            <>
+                                {/* Versão mobile - exibe cards */}
+                                <div className="admin-cards">
+                                    {stories.map(story => renderStoryCard(story))}
+                                </div>
+                                
+                                {/* Versão desktop - exibe tabela */}
+                                <div className="admin-table-container">
+                                    <table className="admin-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Título</th>
+                                                <th>Autor</th>
+                                                <th>Status</th>
+                                                <th>Criado em</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {stories.map((story) => (
+                                                <tr key={story.id}>
+                                                    <td data-label="Título">
+                                                        {story.title}
+                                                    </td>
+                                                    <td data-label="Autor">
+                                                        {story.profiles.username}
+                                                    </td>
+                                                    <td data-label="Status">
+                                                        <span className={`status-badge ${story.is_published ? "published" : "draft"}`}>
+                                                            {story.is_published ? "Publicado" : "Rascunho"}
+                                                        </span>
+                                                    </td>
+                                                    <td data-label="Criado em">
+                                                        {formatDate(story.created_at)}
+                                                    </td>
+                                                    <td data-label="Ações">
+                                                        <div className="admin-actions">
+                                                            <Link
+                                                                href={`/story/${story.id}`}
+                                                                className="view-btn"
+                                                            >
+                                                                <Eye size={16} />
+                                                                <span>Ver</span>
+                                                            </Link>
+                                                            <Link
+                                                                href={`/dashboard/edit/${story.id}`}
+                                                                className="edit-btn"
+                                                            >
+                                                                <Edit size={16} />
+                                                                <span>Editar</span>
+                                                            </Link>
+                                                            <button
+                                                                onClick={() => deleteContent("stories", story.id)}
+                                                                className="delete-btn"
+                                                                disabled={actionLoading}
+                                                            >
+                                                                <Trash2 size={16} />
+                                                                <span>Excluir</span>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
 
-            {/* Tabela de comentários */}
-            {activeTab === "comments" && (
-                <div className="admin-table-container">
-                    {comments.length === 0 ? (
-                        <div className="empty-state">
-                            <p>Nenhum comentário encontrado</p>
-                        </div>
-                    ) : (
-                        <table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Comentário</th>
-                                    <th>Autor</th>
-                                    <th>História</th>
-                                    <th>Criado em</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {comments.map((comment) => (
-                                    <tr key={comment.id}>
-                                        <td data-label="Comentário">
-                                            <div className="comment-preview">
-                                                {comment.text.length > 100
-                                                    ? comment.text.substring(
-                                                          0,
-                                                          100
-                                                      ) + "..."
-                                                    : comment.text}
-                                            </div>
-                                        </td>
-                                        <td data-label="Autor">
-                                            {comment.profiles.username}
-                                        </td>
-                                        <td data-label="História">
-                                            {comment.stories?.title ||
-                                                "História removida"}
-                                        </td>
-                                        <td data-label="Criado em">
-                                            {new Date(
-                                                comment.created_at
-                                            ).toLocaleDateString("pt-BR")}
-                                        </td>
-                                        <td data-label="Ações">
-                                            <button
-                                                onClick={() =>
-                                                    deleteContent(
-                                                        "comments",
-                                                        comment.id
-                                                    )
-                                                }
-                                                className="delete-btn"
-                                                disabled={actionLoading}
-                                            >
-                                                Excluir
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    )}
-                </div>
-            )}
+                {/* Conteúdo de comentários */}
+                {activeTab === "comments" && (
+                    <div className="admin-section">
+                        {comments.length === 0 ? (
+                            <div className="admin-empty">
+                                <MessageSquare size={40} />
+                                <p>Nenhum comentário encontrado</p>
+                            </div>
+                        ) : (
+                            <>
+                                {/* Versão mobile - exibe cards */}
+                                <div className="admin-cards">
+                                    {comments.map(comment => renderCommentCard(comment))}
+                                </div>
+                                
+                                {/* Versão desktop - exibe tabela */}
+                                <div className="admin-table-container">
+                                    <table className="admin-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Comentário</th>
+                                                <th>Autor</th>
+                                                <th>História</th>
+                                                <th>Criado em</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {comments.map((comment) => (
+                                                <tr key={comment.id}>
+                                                    <td data-label="Comentário">
+                                                        <div className="comment-preview">
+                                                            {comment.text.length > 100
+                                                                ? comment.text.substring(0, 100) + "..."
+                                                                : comment.text}
+                                                        </div>
+                                                    </td>
+                                                    <td data-label="Autor">
+                                                        {comment.profiles.username}
+                                                    </td>
+                                                    <td data-label="História">
+                                                        {comment.stories?.title || "História removida"}
+                                                    </td>
+                                                    <td data-label="Criado em">
+                                                        {formatDate(comment.created_at)}
+                                                    </td>
+                                                    <td data-label="Ações">
+                                                        <button
+                                                            onClick={() => deleteContent("comments", comment.id)}
+                                                            className="delete-btn"
+                                                            disabled={actionLoading}
+                                                        >
+                                                            <Trash2 size={16} />
+                                                            <span>Excluir</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

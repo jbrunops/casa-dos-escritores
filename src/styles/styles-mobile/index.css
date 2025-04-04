@@ -8,3 +8,4 @@
 @import "./mobile-stories.css"; /* Arquivo de estilos para histórias e capítulos */
 @import "./mobile-pages.css";
 @import "./mobile-notifications.css"; /* Adicione esta linha */
+@import "./mobile-admin.css"; /* Estilos para o painel administrativo mobile */

@@ -14,9 +14,13 @@ import { Eye, Edit2, Columns } from "lucide-react";
 
 export default function TipTapEditor({
     value,
+    content,
     onChange,
     placeholder = "Comece a escrever sua história aqui...",
 }) {
+    // Usar qualquer um dos valores fornecidos (content tem precedência sobre value para compatibilidade)
+    const initialContent = content || value || "";
+    
     const [linkUrl, setLinkUrl] = useState("");
     const [showLinkMenu, setShowLinkMenu] = useState(false);
     const [imageUrl, setImageUrl] = useState("");
@@ -76,7 +80,7 @@ export default function TipTapEditor({
                 },
             }),
         ],
-        content: value || "",
+        content: initialContent,
         onUpdate: ({ editor }) => {
             const html = editor.getHTML();
             onChange(html);
@@ -88,15 +92,31 @@ export default function TipTapEditor({
         },
     });
 
+    // Atualizar o conteúdo do editor quando ele mudar externamente
     useEffect(() => {
-        if (editor && value !== editor.getHTML()) {
-            if (value === "") {
-                editor.commands.clearContent();
-            } else if (value !== undefined) {
-                editor.commands.setContent(value);
-            }
+        if (!editor) return;
+        
+        // Use o conteúdo atualizado a partir das props
+        const newContent = content || value || "";
+        
+        // Apenas atualizar se o conteúdo realmente mudou e o editor já estiver pronto
+        const currentContent = editor.getHTML();
+        
+        // Compara se o conteúdo é diferente, mas evita ciclos infinitos
+        if (newContent && newContent !== currentContent) {
+            // Defina o cursor para o início do documento e atualize o conteúdo
+            editor.commands.setContent(newContent, false);
         }
-    }, [value, editor]);
+    }, [editor, content, value]);
+
+    // Desfazer o editor quando o componente for desmontado
+    useEffect(() => {
+        return () => {
+            if (editor) {
+                editor.destroy();
+            }
+        };
+    }, [editor]);
 
     const addLink = useCallback(() => {
         if (!linkUrl) return;
