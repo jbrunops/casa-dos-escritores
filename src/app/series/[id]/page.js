@@ -3,14 +3,12 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
-import SeriesActions from "@/components/SeriesActions";
-import Comments from "@/components/Comments";
-import { Eye, BookOpen, Calendar, User, Edit, Trash2 } from "lucide-react";
+import { BookOpen, Calendar, User, Edit, Trash2, Plus } from "lucide-react";
 import { useParams } from "next/navigation";
 import { extractIdFromSlug, generateSlug } from "@/lib/utils";
+import Comments from "@/components/Comments";
 
 export default function SeriesPage() {
-    // Usar useParams diretamente
     const params = useParams();
     const slug = params.id;
     const id = extractIdFromSlug(slug) || slug;
@@ -21,14 +19,11 @@ export default function SeriesPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentUserId, setCurrentUserId] = useState(null);
+    const [deleting, setDeleting] = useState(false);
     const supabase = createBrowserClient();
 
     useEffect(() => {
         async function loadSeriesData() {
-            console.log("----- DIAGNÓSTICO DE SÉRIE -----");
-            console.log("Slug recebido da URL:", slug);
-            console.log("ID extraído para consulta:", id);
-            console.log("Tipo do ID:", typeof id);
             setLoading(true);
             setError(null);
 
@@ -50,7 +45,6 @@ export default function SeriesPage() {
                     throw new Error("Série não encontrada");
                 }
 
-                console.log("Série encontrada com sucesso:", seriesData.id, seriesData.title);
                 setSeries(seriesData);
 
                 // Buscar o autor separadamente
@@ -70,17 +64,6 @@ export default function SeriesPage() {
                     .order("chapter_number", { ascending: true });
 
                 setChapters(chaptersData || []);
-                
-                // Encontrar o ID do primeiro capítulo para o botão "Ler Primeiro Capítulo"
-                const firstChapterId = chaptersData && chaptersData.length > 0 
-                    ? chaptersData[0].id
-                    : null;
-                
-                // Adicionar o ID do primeiro capítulo ao objeto da série
-                setSeries({
-                    ...seriesData,
-                    first_chapter: firstChapterId
-                });
 
                 // Verificar se o usuário atual é o autor
                 const {
@@ -94,15 +77,11 @@ export default function SeriesPage() {
 
                 // Atualizar contador de visualizações
                 try {
-                    // Use API route instead of direct supabase call to avoid cookie issues
                     await fetch(`/api/series/view?id=${id}`, {
                         method: 'POST',
                     });
                 } catch (viewError) {
-                    console.error(
-                        "Erro ao atualizar visualizações:",
-                        viewError
-                    );
+                    console.error("Erro ao atualizar visualizações:", viewError);
                 }
             } catch (err) {
                 console.error("Erro ao carregar dados da série:", err);
@@ -118,6 +97,42 @@ export default function SeriesPage() {
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString("pt-BR");
+    };
+
+    const handleDeleteSeries = async () => {
+        if (!confirm(`Tem certeza que deseja excluir a série "${series.title}"? Todos os capítulos também serão excluídos.`)) {
+            return;
+        }
+
+        setDeleting(true);
+
+        try {
+            // Excluir todos os capítulos associados primeiro
+            const { error: chaptersError } = await supabase
+                .from("chapters")
+                .delete()
+                .eq("series_id", id);
+
+            if (chaptersError) {
+                console.error("Erro ao excluir capítulos:", chaptersError);
+            }
+
+            // Excluir a série
+            const { error: seriesError } = await supabase
+                .from("series")
+                .delete()
+                .eq("id", id);
+
+            if (seriesError) throw seriesError;
+
+            // Redirecionar para o dashboard após sucesso
+            window.location.href = "/dashboard";
+        } catch (err) {
+            console.error("Erro ao excluir série:", err);
+            alert("Não foi possível excluir a série. Por favor, tente novamente.");
+        } finally {
+            setDeleting(false);
+        }
     };
 
     const handleDeleteChapter = async (chapterId) => {
@@ -186,6 +201,13 @@ export default function SeriesPage() {
 
                     <div className="series-detail-info">
                         <h1 className="series-detail-title">{series.title}</h1>
+                        
+                        {/* Gênero destacado */}
+                        {series.genre && (
+                            <div className="series-detail-genre">
+                                {series.genre}
+                            </div>
+                        )}
 
                         {/* Metadados da série */}
                         <div className="series-detail-meta">
@@ -222,66 +244,81 @@ export default function SeriesPage() {
                             </div>
                         )}
 
-                        {/* Tags e gênero */}
-                        <div className="series-detail-tags-container">
-                            {series.genre && (
-                                <span className="series-detail-tag genre-tag">
-                                    {series.genre}
-                                </span>
-                            )}
-
-                            {series.tags && series.tags.length > 0 &&
-                                series.tags.map((tag) => (
+                        {/* Tags */}
+                        {series.tags && series.tags.length > 0 && (
+                            <div className="series-detail-tags-container">
+                                {series.tags.map((tag) => (
                                     <span key={tag} className="series-detail-tag">
                                         {tag}
                                     </span>
-                                ))
-                            }
-                        </div>
+                                ))}
+                            </div>
+                        )}
 
-                        {/* Botões de ações */}
-                        <SeriesActions series={series} isAuthor={isAuthor} />
-
-                        {/* Ações da série */}
-                        {series.first_chapter ? (
-                            <div className="series-primary-actions">
+                        {/* Botões de ação */}
+                        <div className="series-detail-actions">
+                            {chapters.length > 0 && (
                                 <Link
                                     href={`/chapter/${generateSlug(
                                         chapters[0].title,
-                                        series.first_chapter
+                                        chapters[0].id
                                     )}`}
-                                    className="btn primary"
+                                    className="series-action-btn series-action-primary"
+                                    style={{color: 'white'}}
                                 >
-                                    <BookOpen size={18} />
-                                    <span>Ler Primeiro Capítulo</span>
+                                    <BookOpen size={18} style={{color: 'white'}} />
+                                    <span style={{color: 'white'}}>Ver Série</span>
                                 </Link>
-                            </div>
-                        ) : null}
+                            )}
+
+                            {isAuthor && (
+                                <>
+                                    <Link
+                                        href={`/dashboard/edit-series/${series.id}`}
+                                        className="series-action-btn series-action-secondary"
+                                    >
+                                        <Edit size={18} />
+                                        <span>Editar Série</span>
+                                    </Link>
+
+                                    <button
+                                        onClick={handleDeleteSeries}
+                                        disabled={deleting}
+                                        className="series-action-btn series-action-danger"
+                                    >
+                                        <Trash2 size={18} />
+                                        <span>{deleting ? "Excluindo..." : "Excluir Série"}</span>
+                                    </button>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 {/* Seção de capítulos */}
-                <div className="series-chapters">
-                    <h2 className="series-chapters-title">
-                        Capítulos ({chapters.length})
-                    </h2>
+                <div className="series-chapters-section">
+                    <div className="series-chapters-header">
+                        <h2 className="series-chapters-title">Capítulos</h2>
+                        
+                        {isAuthor && (
+                            <Link
+                                href={`/dashboard/new-chapter/${series.id}`}
+                                className="add-chapter-btn"
+                                style={{color: 'white'}}
+                            >
+                                <Plus size={16} style={{color: 'white'}} />
+                                <span style={{color: 'white'}}>Adicionar Capítulo</span>
+                            </Link>
+                        )}
+                    </div>
 
                     {chapters.length === 0 ? (
                         <div className="empty-chapters-message">
                             <p>Nenhum capítulo disponível nesta série ainda.</p>
-                            {isAuthor && (
-                                <Link
-                                    href={`/dashboard/new-chapter/${series.id}`}
-                                    className="btn primary"
-                                >
-                                    <Edit size={16} />
-                                    <span>Escrever Primeiro Capítulo</span>
-                                </Link>
-                            )}
                         </div>
                     ) : (
-                        <div className="chapter-list">
-                            {chapters.map((chapter, index) => (
+                        <div className="chapters-list">
+                            {chapters.map((chapter) => (
                                 <div
                                     key={chapter.id}
                                     className="chapter-item"
@@ -298,10 +335,8 @@ export default function SeriesPage() {
                                                 {chapter.title}
                                             </Link>
                                         </h3>
-                                        <div className="chapter-meta">
-                                            <span className="chapter-date">
-                                                {formatDate(chapter.created_at)}
-                                            </span>
+                                        <div className="chapter-date">
+                                            {formatDate(chapter.created_at)}
                                         </div>
                                     </div>
 
@@ -311,17 +346,17 @@ export default function SeriesPage() {
                                                 href={`/dashboard/edit-chapter/${chapter.id}`}
                                                 className="chapter-action-btn edit"
                                                 title="Editar Capítulo"
+                                                style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
                                             >
-                                                <Edit size={16} />
+                                                <Edit size={20} />
                                             </Link>
                                             <button
-                                                onClick={() =>
-                                                    handleDeleteChapter(chapter.id)
-                                                }
+                                                onClick={() => handleDeleteChapter(chapter.id)}
                                                 className="chapter-action-btn delete"
                                                 title="Excluir Capítulo"
+                                                style={{ backgroundColor: 'var(--color-error-light)', color: 'var(--color-error)' }}
                                             >
-                                                <Trash2 size={16} />
+                                                <Trash2 size={20} />
                                             </button>
                                         </div>
                                     )}
