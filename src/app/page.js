@@ -249,17 +249,21 @@ export default async function HomePage() {
                                             className="story-card"
                                         >
                                             <h3>{content.title}</h3>
+                                            <div className="chapter-series-info">
+                                                <BookOpen size={16} className="text-[#484DB5]" />
+                                                <span>Conto Único</span>
+                                            </div>
+                                            <p className="story-summary">
+                                                {createSummary(content.content)}
+                                            </p>
                                             <div className="story-meta-line">
                                                 <span className="author-name">
-                                                    {content.type === 'chapter' ? content.author.username : content.profiles.username}
+                                                    {content.profiles?.username || "Autor"}
                                                 </span>
                                                 <span className="story-date">
                                                     {formatDate(content.created_at)}
                                                 </span>
                                             </div>
-                                            <p className="story-summary">
-                                                {createSummary(content.content)}
-                                            </p>
                                         </Link>
                                     ) : (
                                         <Link
@@ -273,25 +277,22 @@ export default async function HomePage() {
                                             <h3>{content.title}</h3>
                                             
                                             <div className="chapter-series-info">
-                                                <BookText size={15} />
+                                                <BookText size={16} className="text-[#484DB5]" />
                                                 <span>Série: {content.series?.title}</span>
-                                                <span className="chapter-number">
-                                                    Cap. {content.chapter_number}
-                                                </span>
-                                            </div>
-                                            
-                                            <div className="chapter-meta-line">
-                                                <span className="author-name">
-                                                    {content.type === 'chapter' ? content.author?.username : content.profiles.username}
-                                                </span>
-                                                <span className="story-date">
-                                                    {formatDate(content.created_at)}
-                                                </span>
                                             </div>
                                             
                                             <p className="chapter-summary">
                                                 {createSummary(content.content)}
                                             </p>
+                                            
+                                            <div className="chapter-meta-line">
+                                                <span className="author-name">
+                                                    {content.author?.username || "Autor"}
+                                                </span>
+                                                <span className="story-date">
+                                                    {formatDate(content.created_at)}
+                                                </span>
+                                            </div>
                                         </Link>
                                     )
                                 )
@@ -317,31 +318,27 @@ export default async function HomePage() {
                                             className="story-card"
                                         >
                                             <h3>{content.title}</h3>
-                                            <div className="story-meta-line">
-                                                <span className="author-name">
-                                                    {content.type === 'chapter' ? content.author.username : content.profiles.username}
-                                                </span>
-                                                <div className="meta-right">
-                                                    <span className="story-date">
-                                                        {formatDate(
-                                                            content.created_at
-                                                        )}
-                                                    </span>
-                                                    <span className="comment-badge">
-                                                        <span className="comment-icon-container">
-                                                            <MessageSquare
-                                                                size={14}
-                                                            />
-                                                        </span>
-                                                        <span>
-                                                            {content.comment_count}
-                                                        </span>
-                                                    </span>
-                                                </div>
+                                            <div className="chapter-series-info">
+                                                <BookOpen size={16} className="text-[#484DB5]" />
+                                                <span>Conto Único</span>
                                             </div>
                                             <p className="story-summary">
                                                 {createSummary(content.content)}
                                             </p>
+                                            <div className="story-meta-line">
+                                                <span className="author-name">
+                                                    {content.profiles?.username || "Autor"}
+                                                </span>
+                                                <div className="meta-right">
+                                                    <span className="story-date">
+                                                        {formatDate(content.created_at)}
+                                                    </span>
+                                                    <span className="comment-badge">
+                                                        <MessageSquare size={12} />
+                                                        <span>{content.comment_count}</span>
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </Link>
                                     ) : (
                                         <Link
@@ -355,39 +352,28 @@ export default async function HomePage() {
                                             <h3>{content.title}</h3>
                                             
                                             <div className="chapter-series-info">
-                                                <BookText size={15} />
+                                                <BookText size={16} className="text-[#484DB5]" />
                                                 <span>Série: {content.series?.title}</span>
-                                                <span className="chapter-number">
-                                                    Cap. {content.chapter_number}
-                                                </span>
-                                            </div>
-                                            
-                                            <div className="chapter-meta-line">
-                                                <span className="author-name">
-                                                    {content.type === 'chapter' ? content.author?.username : content.profiles.username}
-                                                </span>
-                                                <div className="meta-right">
-                                                    <span className="story-date">
-                                                        {formatDate(
-                                                            content.created_at
-                                                        )}
-                                                    </span>
-                                                    <span className="comment-badge">
-                                                        <span className="comment-icon-container">
-                                                            <MessageSquare
-                                                                size={14}
-                                                            />
-                                                        </span>
-                                                        <span>
-                                                            {content.comment_count}
-                                                        </span>
-                                                    </span>
-                                                </div>
                                             </div>
                                             
                                             <p className="chapter-summary">
                                                 {createSummary(content.content)}
                                             </p>
+                                            
+                                            <div className="chapter-meta-line">
+                                                <span className="author-name">
+                                                    {content.author?.username || "Autor"}
+                                                </span>
+                                                <div className="meta-right">
+                                                    <span className="story-date">
+                                                        {formatDate(content.created_at)}
+                                                    </span>
+                                                    <span className="comment-badge">
+                                                        <MessageSquare size={12} />
+                                                        <span>{content.comment_count}</span>
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </Link>
                                     )
                                 )

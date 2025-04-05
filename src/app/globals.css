@@ -9,6 +9,128 @@
   }
 }
 
+/* Estilos dos cards de histórias */
+.story-card, .chapter-card {
+  display: block;
+  width: 25.1rem;
+  max-width: 100%;
+  height: 13.5rem;
+  padding: 1.25rem;
+  border: 1px solid #C4C4C4;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  position: relative;
+  background-color: white;
+  transition: transform 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.story-card:hover, .chapter-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.story-card h3, .chapter-card h3 {
+  font-size: 1.1rem;
+  color: black;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  line-height: 1.5rem;
+}
+
+.story-meta-line, .chapter-meta-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #878585;
+  margin-top: auto;
+}
+
+.chapter-series-info {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #484DB5;
+  margin-bottom: 0.6rem;
+  gap: 0.4rem;
+}
+
+.chapter-series-info span {
+  margin-right: 0.5rem;
+}
+
+.author-name {
+  font-size: 0.8rem;
+  color: #878585;
+}
+
+.story-date {
+  font-size: 0.8rem;
+  color: #878585;
+}
+
+.story-summary, .chapter-summary {
+  font-size: 0.8rem;
+  color: black;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+  margin-bottom: 0.6rem;
+  flex: 1;
+}
+
+.chapter-card-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 2.25rem;
+  background-color: #484DB5;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 5px 0 5px;
+  min-width: 6rem;
+}
+
+.meta-right {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.comment-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  background-color: #484DB5;
+  color: white;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.comment-icon-container {
+  display: flex;
+  align-items: center;
+}
+
+.chapter-number {
+  background-color: rgba(72, 77, 181, 0.1);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
 /* Animação para a linha decorativa dos títulos */
 @keyframes shimmer {
   0% {
@@ -73,6 +195,17 @@
   
   .prose img {
     @apply max-w-full h-auto rounded-md my-4;
+  }
+}
+
+/* Estilos responsivos para dispositivos móveis */
+@media (max-width: 768px) {
+  .story-card, .chapter-card {
+    width: 100%;
+  }
+  
+  .columns-section .column {
+    margin-bottom: 2rem;
   }
 }
 
