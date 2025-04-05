@@ -74,7 +74,7 @@ export default function Header() {
                     <div className="flex items-center">
                         <Link 
                             href="/" 
-                            className="text-[#484DB5] hover:text-[#7A80FB] text-[1.25rem] font-medium"
+                            className="text-[#484DB5] hover:text-[#7A80FB] text-[1.25rem] font-bold"
                         >
                             Casa Dos Escritores
                         </Link>
@@ -161,7 +161,7 @@ export default function Header() {
                     <div className="hidden md:flex items-center space-x-4">
                         <Link 
                             href="/signup"
-                            className="text-[#484DB5] hover:text-[#7A80FB] text-[1rem]"
+                            className="text-[#484DB5] hover:text-[#7A80FB] text-[1rem] font-bold"
                         >
                             Cadastre-se
                         </Link>
