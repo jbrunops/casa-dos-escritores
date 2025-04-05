@@ -18,7 +18,7 @@ export default function RootLayout({ children }) {
             </head>
             <body className="flex flex-col min-h-screen bg-white font-sans" suppressHydrationWarning>
                 <Header />
-                <main className="flex-grow max-w-[75rem] mx-auto px-4 py-8 w-full">
+                <main className="flex-grow w-full">
                     {children}
                 </main>
                 <Footer />

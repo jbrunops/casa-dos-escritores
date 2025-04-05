@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createBrowserClient } from "@/lib/supabase-browser";
-import { UserPlus, Mail, Lock, User, Loader, AlertCircle, AlertTriangle, CheckCircle } from "lucide-react";
+import { UserPlus, Mail, Lock, User, Loader, AlertCircle, AlertTriangle, CheckCircle, BookOpen } from "lucide-react";
 
 export default function SignupPage() {
     const [email, setEmail] = useState("");
@@ -203,10 +203,10 @@ export default function SignupPage() {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            placeholder="seu@email.com"
                             disabled={loading || success}
                             required
                             className="form-input"
-                            placeholder="seu@email.com"
                         />
                     </div>
 
@@ -219,21 +219,17 @@ export default function SignupPage() {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            minLength="6"
+                            placeholder="Mínimo de 6 caracteres"
                             disabled={loading || success}
                             required
                             className="form-input"
-                            placeholder="Mínimo de 6 caracteres"
                         />
-                        <small className="form-hint">
-                            A senha deve ter pelo menos 6 caracteres
-                        </small>
                     </div>
 
                     <button
                         type="submit"
                         disabled={loading || success}
-                        className="auth-button"
+                        className="btn-primary btn-full"
                     >
                         {loading ? (
                             <>
@@ -250,7 +246,8 @@ export default function SignupPage() {
                 </form>
 
                 <p className="auth-redirect">
-                    Já tem uma conta? <Link href="/login">Entrar</Link>
+                    Já tem uma conta?{" "}
+                    <Link href="/login">Entrar</Link>
                 </p>
             </div>
         </div>
