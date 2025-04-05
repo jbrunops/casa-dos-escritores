@@ -450,42 +450,42 @@ export default async function HomePage() {
             </section>
 
             <section className="features-section">
-                <h2 className="text-[1.8rem] font-bold mb-4 text-center relative">
+                <h2 className="text-[1.8rem] font-bold mb-4 relative">
                     Como funciona
-                    <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 mx-auto title-line"></div>
+                    <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
                 </h2>
 
                 <div className="features-grid">
                     <div className="feature-card">
                         <div className="feature-icon">
-                            <Edit size={32} color="#4a4fbc" />
+                            <Edit size={28} />
                         </div>
-                        <h3>1. Crie uma conta</h3>
-                        <p>
-                            Registre-se gratuitamente para começar a
-                            compartilhar suas histórias com outros leitores.
+                        <h3 className="feature-title">Crie uma conta</h3>
+                        <p className="feature-description">
+                            Registre-se gratuitamente para começar a compartilhar suas histórias com outros leitores. 
+                            O processo é simples e rápido.
                         </p>
                     </div>
 
                     <div className="feature-card">
                         <div className="feature-icon">
-                            <BookOpen size={32} color="#4a4fbc" />
+                            <BookOpen size={28} />
                         </div>
-                        <h3>2. Escreva suas histórias</h3>
-                        <p>
-                            Use nosso editor intuitivo para criar suas obras com
-                            formatação profissional.
+                        <h3 className="feature-title">Escreva suas histórias</h3>
+                        <p className="feature-description">
+                            Use nosso editor intuitivo para criar suas obras. Crie contos únicos ou desenvolva séries com 
+                            múltiplos capítulos.
                         </p>
                     </div>
 
                     <div className="feature-card">
                         <div className="feature-icon">
-                            <Share2 size={32} color="#4a4fbc" />
+                            <Share2 size={28} />
                         </div>
-                        <h3>3. Compartilhe com o mundo</h3>
-                        <p>
-                            Publique suas histórias e receba feedback valioso da
-                            comunidade de leitores.
+                        <h3 className="feature-title">Compartilhe com o mundo</h3>
+                        <p className="feature-description">
+                            Publique suas histórias e receba feedback da comunidade. Acompanhe visualizações e comentários 
+                            em suas obras.
                         </p>
                     </div>
                 </div>
