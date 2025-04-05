@@ -12,7 +12,7 @@
 /* Estilos dos cards de histórias */
 .story-card, .chapter-card {
   display: block;
-  width: 25.1rem;
+  width: 23rem;
   max-width: 100%;
   height: 13.5rem;
   padding: 1.25rem;
@@ -214,4 +214,87 @@
   * {
     @apply focus:outline-none;
   }
+}
+
+/* Estilos para os cards de Top 10 Escritores */
+.writer-card {
+  display: flex;
+  align-items: center;
+  width: 23rem;
+  height: 7.375rem;
+  padding: 1.25rem;
+  background-color: #F3F3F3;
+  border: 1px solid #C4C4C4;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.writer-rank {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #484DB5;
+}
+
+.writer-avatar {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  border: 3px solid #484DB5;
+  object-fit: cover;
+  margin-right: 1.25rem;
+}
+
+.writer-avatar-placeholder {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  border: 3px solid #484DB5;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #484DB5;
+  margin-right: 1.25rem;
+}
+
+.writer-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.writer-info h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: black;
+  margin-bottom: 0.2rem;
+}
+
+.writer-username {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #969696;
+  margin-bottom: 0.3rem;
+}
+
+.writer-stats-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.writer-stat-badge {
+  height: 1.125rem;
+  background-color: #969696;
+  color: white;
+  font-size: 0.75rem;
+  padding: 0 0.5rem;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
 }

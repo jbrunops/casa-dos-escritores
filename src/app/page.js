@@ -230,7 +230,7 @@ export default async function HomePage() {
             </section>
 
             <section className="columns-section my-10">
-                <div className="columns-grid grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="columns-grid grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[75rem] mx-auto">
                     {/* Coluna 1: Histórias Recentes */}
                     <div className="column">
                         <h2 className="text-[1.8rem] font-bold mb-4 relative">
@@ -424,12 +424,17 @@ export default async function HomePage() {
                                                     {writer.username}
                                                 </Link>
                                             </h3>
-                                            <p className="writer-stats">
-                                                {writer.count}{" "}
-                                                {writer.count === 1
-                                                    ? "história"
-                                                    : "histórias"}
-                                            </p>
+                                            <div className="writer-username">
+                                                @{writer.username.toLowerCase()}
+                                            </div>
+                                            <div className="writer-stats-container">
+                                                <div className="writer-stat-badge">
+                                                    {writer.count} publicações
+                                                </div>
+                                                <div className="writer-stat-badge">
+                                                    {writer.views || 0} visualizações
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 ))
