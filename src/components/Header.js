@@ -1,43 +1,34 @@
 "use client";
 
-import MobileSeries from "./MobileSeries";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { createBrowserClient } from "@/lib/supabase-browser";
-import { useEffect, useState, useRef, useCallback } from "react";
-import {
-    ChevronDown,
-    User,
-    LogOut,
-    Settings,
-    LayoutDashboard,
-    Menu,
-    Compass,
-    BookOpen,
-    LogIn,
-    UserPlus,
-    Bell
-} from "lucide-react";
-import NotificationBell from "./NotificationBell";
+import { useState, useRef, useEffect } from "react";
+import { ChevronDown, Compass, BookOpen, Search, Menu } from "lucide-react";
+import MobileMenu from "./MobileMenu";
 
 export default function Header() {
     const pathname = usePathname();
     const router = useRouter();
-    const [user, setUser] = useState(null);
-    const [username, setUsername] = useState("");
-    const [avatarUrl, setAvatarUrl] = useState("");
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-    const [showUserDropdown, setShowUserDropdown] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
-    const [unreadCount, setUnreadCount] = useState(0);
-    const userDropdownRef = useRef(null);
+    const [searchQuery, setSearchQuery] = useState("");
     const categoryDropdownRef = useRef(null);
-    const mobileMenuRef = useRef(null);
-    const supabase = createBrowserClient();
-
+    const searchInputRef = useRef(null);
+    
+    // Fechar dropdown ao clicar fora
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target)) {
+                setShowCategoryDropdown(false);
+            }
+        }
+        
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+    
     // Lista de categorias
     const categories = [
         "Fantasia",
@@ -50,554 +41,157 @@ export default function Header() {
         "Brasileiro",
         "Outros",
     ];
-
-    // Verificar se é dispositivo móvel (480px ou menos)
+    
+    // Lidar com o envio do formulário de pesquisa
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+            setSearchQuery(""); // Limpar o campo após pesquisa
+        }
+    };
+    
+    // Lidar com atalho de teclado para pesquisa
     useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth <= 480);
+        const handleKeyDown = (e) => {
+            // Detectar Ctrl+K ou Cmd+K
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInputRef.current?.focus();
+            }
         };
-
-        // Verificar no carregamento inicial
-        checkMobile();
-
-        // Adicionar listener para redimensionamento
-        window.addEventListener("resize", checkMobile);
-
-        // Limpar listener
-        return () => window.removeEventListener("resize", checkMobile);
+        
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
     }, []);
 
-    useEffect(() => {
-        async function getUser() {
-            try {
-                setLoading(true);
-                const {
-                    data: { session },
-                } = await supabase.auth.getSession();
-
-                if (session?.user) {
-                    setUser(session.user);
-
-                    // Buscar perfil do usuário com tratamento de erro
-                    const { data, error } = await supabase
-                        .from("profiles")
-                        .select("username, role, avatar_url")
-                        .eq("id", session.user.id)
-                        .single();
-
-                    if (error) {
-                        console.error("Erro ao buscar perfil:", error);
-                        return;
-                    }
-
-                    if (data) {
-                        setUsername(data.username);
-                        setIsAdmin(data.role === "admin");
-                        setAvatarUrl(data.avatar_url);
-                    }
-                }
-            } catch (error) {
-                console.error("Erro ao buscar usuário:", error);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        getUser();
-
-        const {
-            data: { subscription },
-        } = supabase.auth.onAuthStateChange((event, session) => {
-            if (event === "SIGNED_IN") {
-                getUser();
-            } else if (event === "SIGNED_OUT") {
-                setUser(null);
-                setUsername("");
-                setIsAdmin(false);
-                setAvatarUrl("");
-            }
-        });
-
-        // Fechar dropdowns quando clicar fora deles
-        const handleClickOutside = (event) => {
-            if (
-                userDropdownRef.current &&
-                !userDropdownRef.current.contains(event.target)
-            ) {
-                setShowUserDropdown(false);
-            }
-            if (
-                categoryDropdownRef.current &&
-                !categoryDropdownRef.current.contains(event.target)
-            ) {
-                setShowCategoryDropdown(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-
-        return () => {
-            subscription.unsubscribe();
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isMobile]);
-
-    // Buscar notificações não lidas - Adicionado para contar notificações
-    const fetchUnreadCount = useCallback(async () => {
-        try {
-            if (!user) return;
-            
-            const { data, error } = await supabase
-                .from("notifications")
-                .select("id")
-                .eq("user_id", user.id)
-                .eq("is_read", false);
-                
-            if (error) {
-                console.error("Erro ao buscar notificações:", error);
-                return;
-            }
-            
-            setUnreadCount(data.length);
-        } catch (error) {
-            console.error("Erro ao buscar contagem de notificações:", error);
-        }
-    }, [user, supabase]);
-    
-    useEffect(() => {
-        if (user) {
-            fetchUnreadCount();
-        }
-    }, [user, fetchUnreadCount]);
-
-    const handleSignOut = async () => {
-        await supabase.auth.signOut();
-        setShowMobileMenu(false);
-        router.push("/");
-    };
-
-    // Ir para categorias (versão mobile)
-    const navigateToExplore = () => {
-        router.push("/categories");
-    };
-
-    // Toggle menu mobile
-    const toggleMobileMenu = () => {
-        setShowMobileMenu(!showMobileMenu);
-    };
-
     return (
-        <header className="site-header">
-            <div className="header-container">
-                {/* ELEMENTOS MOBILE - só serão exibidos quando a tela for 480px ou menos */}
-                <button
-                    className="mobile-explore-btn"
-                    onClick={navigateToExplore}
-                    aria-label="Explorar categorias"
-                >
-                    <Compass size={28} />
-                </button>
-
-                {/* ELEMENTOS DESKTOP E MOBILE */}
-                <div className="site-logo">
-                    <Link href="/">Casa Dos Escritores</Link>
-                </div>
-
-                {/* Elemento de notificação mobile - posicionado entre explorar e avatar */}
-                {user && isMobile && (
-                    <div
-                        style={{
-                            position: "absolute",
-                            right: "45px",
-                            top: "50%",
-                            transform: "translateY(-50%)",
-                            zIndex: 20,
-                        }}
-                        className="mobile-notification-container"
-                    >
-                        <NotificationBell />
-                    </div>
-                )}
-
-                {/* Elementos apenas para mobile */}
-                <button
-                    className="mobile-menu-btn"
-                    onClick={toggleMobileMenu}
-                    aria-label="Menu de navegação"
-                >
-                    {user ? (
-                        <div style={{ position: "relative" }}>
-                            <div className="mobile-user-avatar" style={{ zIndex: 1 }}>
-                                {avatarUrl ? (
-                                    <img 
-                                        src={avatarUrl} 
-                                        alt={username || "Usuário"} 
-                                        className="avatar-image"
-                                    />
-                                ) : (
-                                    username.charAt(0).toUpperCase()
-                                )}
-                            </div>
-                            {unreadCount > 0 && !showMobileMenu && (
-                                <div className="mobile-avatar-badge-container" style={{ zIndex: 2 }}>
-                                    <span className="mobile-avatar-badge">
-                                        {unreadCount > 9 ? "9+" : unreadCount}
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <Menu size={28} />
-                    )}
-                </button>
-
-                {/* Menu mobile dropdown - Ajustado para garantir que seja clicável */}
-                <div
-                    className={`mobile-menu-dropdown ${
-                        showMobileMenu ? "is-active" : ""
-                    }`}
-                    ref={mobileMenuRef}
-                    style={{ pointerEvents: 'auto' }} // Garantir que eventos de clique sejam capturados
-                >
-                    <ul className="mobile-menu-list">
-                        {!user ? (
-                            /* Usuário não logado */
-                            <>
-                                <li className="mobile-menu-item">
-                                    <Link
-                                        href="/login"
-                                        className="mobile-menu-link"
-                                        onClick={() => {
-                                            setShowMobileMenu(false);
-                                        }}
-                                    >
-                                        <div className="mobile-menu-link-content">
-                                            <LogIn size={20} className="mobile-menu-icon" />
-                                            <span>Entrar</span>
-                                        </div>
-                                    </Link>
-                                </li>
-                                <li className="mobile-menu-item">
-                                    <Link
-                                        href="/signup"
-                                        className="mobile-menu-link"
-                                        onClick={() => setShowMobileMenu(false)}
-                                    >
-                                        <div className="mobile-menu-link-content">
-                                            <UserPlus size={20} className="mobile-menu-icon" />
-                                            <span>Cadastrar</span>
-                                        </div>
-                                    </Link>
-                                </li>
-                                {/* Adicione esta linha */}
-                                <MobileSeries
-                                    onClick={() => setShowMobileMenu(false)}
-                                />
-                            </>
-                        ) : (
-                            /* Usuário logado */
-                            <>
-                                <li className="mobile-menu-item">
-                                    <Link
-                                        href="/dashboard"
-                                        className="mobile-menu-link"
-                                        onClick={() => setShowMobileMenu(false)}
-                                    >
-                                        <div className="mobile-menu-link-content">
-                                            <LayoutDashboard size={20} className="mobile-menu-icon" />
-                                            <span>Meu Painel</span>
-                                        </div>
-                                    </Link>
-                                </li>
-                                {/* Link para notificações */}
-                                <li className="mobile-menu-item">
-                                    <Link
-                                        href="/notifications"
-                                        className="mobile-menu-link"
-                                        onClick={() => setShowMobileMenu(false)}
-                                    >
-                                        <div className="mobile-menu-link-content">
-                                            <Bell size={20} className="mobile-menu-icon" />
-                                            <span>Notificações</span>
-                                            {unreadCount > 0 && (
-                                                <span className="menu-notification-badge">
-                                                    {unreadCount > 9 ? "9+" : unreadCount}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </Link>
-                                </li>
-                                {/* Adicione esta linha */}
-                                <MobileSeries
-                                    onClick={() => setShowMobileMenu(false)}
-                                />
-                                <li className="mobile-menu-item">
-                                    <Link
-                                        href={`/profile/${encodeURIComponent(
-                                            username
-                                        )}`}
-                                        className="mobile-menu-link"
-                                        onClick={() => setShowMobileMenu(false)}
-                                    >
-                                        <div className="mobile-menu-link-content">
-                                            <User size={20} className="mobile-menu-icon" />
-                                            <span>Meu Perfil</span>
-                                        </div>
-                                    </Link>
-                                </li>
-                                {isAdmin && (
-                                    <li className="mobile-menu-item">
-                                        <Link
-                                            href="/admin"
-                                            className="mobile-menu-link"
-                                            onClick={() =>
-                                                setShowMobileMenu(false)
-                                            }
-                                        >
-                                            <div className="mobile-menu-link-content">
-                                                <Settings size={20} className="mobile-menu-icon" />
-                                                <span>Administração</span>
-                                            </div>
-                                        </Link>
-                                    </li>
-                                )}
-                                <li className="mobile-menu-item">
-                                    <button
-                                        className="mobile-menu-link"
-                                        onClick={handleSignOut}
-                                        style={{
-                                            width: "100%",
-                                            textAlign: "left",
-                                            background: "none",
-                                            border: "none",
-                                        }}
-                                    >
-                                        <div className="mobile-menu-link-content">
-                                            <LogOut size={20} className="mobile-menu-icon" />
-                                            <span>Sair</span>
-                                        </div>
-                                    </button>
-                                </li>
-                            </>
-                        )}
-                    </ul>
-                </div>
-
-                {/* Overlay para fechar o menu ao clicar fora */}
-                <div 
-                    className={`mobile-menu-overlay ${showMobileMenu ? "is-active" : ""}`}
-                    onClick={() => showMobileMenu ? setShowMobileMenu(false) : null}
-                    style={{ pointerEvents: showMobileMenu ? 'auto' : 'none' }}
-                ></div>
-
-                {/* ELEMENTOS DESKTOP */}
-                <nav className="main-navigation">
-                    <ul className="nav-menu">
-                        <li
-                            className="nav-item has-dropdown"
-                            ref={categoryDropdownRef}
+        <>
+            <header className="w-full border-b border-gray-200 bg-white">
+                <div className="mx-auto max-w-[75rem] px-4 flex items-center justify-between h-16">
+                    <div className="flex items-center">
+                        <Link 
+                            href="/" 
+                            className="text-[#484DB5] hover:text-[#7A80FB] text-[1.25rem] font-medium"
                         >
-                            <button
-                                className="nav-link dropdown-toggle"
-                                onClick={() =>
-                                    setShowCategoryDropdown(
-                                        !showCategoryDropdown
-                                    )
-                                }
-                            >
-                                <span className="nav-icon-container">
-                                    <Compass size={16} />
-                                </span>
-                                <span>Explorar</span>
-                                <span className="dropdown-icon-container">
-                                    <ChevronDown
-                                        size={16}
-                                        className="dropdown-icon"
-                                    />
-                                </span>
-                            </button>
+                            Casa Dos Escritores
+                        </Link>
+                    </div>
 
-                            {showCategoryDropdown && (
-                                <div className="dropdown-menu">
-                                    <div className="dropdown-grid">
-                                        {categories.map((category) => (
+                    <nav className="hidden md:block ml-10">
+                        <ul className="flex items-center space-x-6">
+                            <li ref={categoryDropdownRef} className="relative">
+                                <button
+                                    onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                                    className="flex items-center text-[#484DB5] hover:text-[#7A80FB] text-[1rem]"
+                                >
+                                    <span className="mr-1">
+                                        <Compass size={16} className="max-h-[1rem]" />
+                                    </span>
+                                    <span>Explorar</span>
+                                    <ChevronDown size={16} className="ml-1 max-h-[1rem]" />
+                                </button>
+
+                                {showCategoryDropdown && (
+                                    <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-md shadow-lg z-10">
+                                        <div className="py-1">
+                                            {categories.map((category) => (
+                                                <Link
+                                                    key={category}
+                                                    href={`/categories/${category
+                                                        .toLowerCase()
+                                                        .replace(/\s+/g, "-")}`}
+                                                    onClick={() => setShowCategoryDropdown(false)}
+                                                    className="block px-4 py-2 text-[#484DB5] hover:text-[#7A80FB] hover:bg-gray-50"
+                                                >
+                                                    {category}
+                                                </Link>
+                                            ))}
                                             <Link
-                                                key={category}
-                                                href={`/categories/${category
-                                                    .toLowerCase()
-                                                    .replace(/\s+/g, "-")}`}
-                                                className="dropdown-item"
-                                                onClick={() => {
-                                                    setShowCategoryDropdown(
-                                                        false
-                                                    );
-                                                }}
+                                                href="/categories"
+                                                onClick={() => setShowCategoryDropdown(false)}
+                                                className="block px-4 py-2 text-[#484DB5] hover:text-[#7A80FB] hover:bg-gray-50 font-medium"
                                             >
-                                                {category}
+                                                Ver Todas
                                             </Link>
-                                        ))}
-                                        <Link
-                                            href="/categories"
-                                            className="dropdown-item view-all"
-                                            onClick={() => {
-                                                setShowCategoryDropdown(false);
-                                            }}
-                                        >
-                                            Ver Todas
-                                        </Link>
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-                        </li>
+                                )}
+                            </li>
 
-                        {/* ADICIONE O NOVO ITEM DE MENU AQUI */}
-                        <li className="nav-item">
-                            <Link
-                                href="/series"
-                                className={
-                                    pathname.startsWith("/series")
-                                        ? "nav-link active"
-                                        : "nav-link"
-                                }
-                            >
-                                <span className="nav-icon-container">
-                                    <BookOpen size={16} />
-                                </span>
-                                <span>Séries</span>
-                            </Link>
-                        </li>
-                    </ul>
-                </nav>
+                            <li>
+                                <Link
+                                    href="/series"
+                                    className="flex items-center text-[#484DB5] hover:text-[#7A80FB] text-[1rem]"
+                                >
+                                    <span className="mr-1">
+                                        <BookOpen size={16} className="max-h-[1rem]" />
+                                    </span>
+                                    <span>Séries</span>
+                                </Link>
+                            </li>
+                        </ul>
+                    </nav>
 
-                <div className="search-container">
-                    {/* Seu formulário de busca existente */}
-                </div>
-
-                {/* Adicionar NotificationBell apenas na versão desktop */}
-                {user && !isMobile && <NotificationBell />}
-
-                <div className="header-actions">
-                    {loading ? (
-                        <div className="loading-text">Carregando...</div>
-                    ) : user ? (
-                        <div className="user-account" ref={userDropdownRef}>
-                            <button
-                                className={`account-button ${
-                                    showUserDropdown ? "is-active" : ""
-                                }`}
-                                onClick={() =>
-                                    setShowUserDropdown(!showUserDropdown)
-                                }
-                            >
-                                <span className="account-name">
-                                    {username || "Usuário"}
-                                </span>
-                                <ChevronDown
-                                    size={16}
-                                    className="dropdown-icon"
+                    <div className="hidden md:block mx-auto">
+                        <form onSubmit={handleSearchSubmit}>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Pesquisar... (Ctrl+K)"
+                                    aria-label="Pesquisar no site"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    ref={searchInputRef}
+                                    className="w-[21.3rem] max-h-[2.5rem] pl-3 pr-10 py-2 border border-[#B7B7B7] rounded-md focus:outline-none focus:ring-1 focus:ring-[#484DB5]"
                                 />
-                            </button>
+                                <button 
+                                    type="submit"
+                                    aria-label="Buscar"
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#B7B7B7]"
+                                >
+                                    <Search size={20} className="max-h-[1rem]" />
+                                </button>
+                            </div>
+                        </form>
+                    </div>
 
-                            {showUserDropdown && (
-                                <div className="account-dropdown">
-                                    <Link
-                                        href="/dashboard"
-                                        className={`account-link ${
-                                            pathname.startsWith("/dashboard")
-                                                ? "active"
-                                                : ""
-                                        }`}
-                                        onClick={() =>
-                                            setShowUserDropdown(false)
-                                        }
-                                    >
-                                        <LayoutDashboard
-                                            size={18}
-                                            className="account-icon"
-                                        />
-                                        <span>Meu Painel</span>
-                                    </Link>
-
-                                    <Link
-                                        href={`/profile/${encodeURIComponent(
-                                            username
-                                        )}`}
-                                        className={`account-link ${
-                                            pathname.startsWith("/profile") &&
-                                            !pathname.startsWith(
-                                                "/profile/edit"
-                                            )
-                                                ? "active"
-                                                : ""
-                                        }`}
-                                        onClick={() =>
-                                            setShowUserDropdown(false)
-                                        }
-                                    >
-                                        <User
-                                            size={18}
-                                            className="account-icon"
-                                        />
-                                        <span>Meu Perfil</span>
-                                    </Link>
-
-                                    {isAdmin && (
-                                        <Link
-                                            href="/admin"
-                                            className={`account-link ${
-                                                pathname.startsWith("/admin")
-                                                    ? "active"
-                                                    : ""
-                                            }`}
-                                            onClick={() =>
-                                                setShowUserDropdown(false)
-                                            }
-                                        >
-                                            <Settings
-                                                size={18}
-                                                className="account-icon"
-                                            />
-                                            <span>Administração</span>
-                                        </Link>
-                                    )}
-
-                                    <div className="account-divider"></div>
-
-                                    <button
-                                        onClick={handleSignOut}
-                                        className="account-link logout"
-                                    >
-                                        <LogOut
-                                            size={18}
-                                            className="account-icon"
-                                        />
-                                        <span>Sair</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="auth-actions">
-                            <Link
-                                href="/signup"
-                                className={`auth-link signup ${
-                                    pathname === "/signup" ? "active" : ""
-                                }`}
-                            >
-                                Cadastrar
-                            </Link>
-                            <Link
-                                href="/login"
-                                className={`auth-link login ${
-                                    pathname === "/login" ? "active" : ""
-                                }`}
-                            >
-                                Entrar
-                            </Link>
-                        </div>
-                    )}
+                    <div className="hidden md:flex items-center space-x-4">
+                        <Link 
+                            href="/signup"
+                            className="text-[#484DB5] hover:text-[#7A80FB] text-[1rem]"
+                        >
+                            Cadastre-se
+                        </Link>
+                        <Link 
+                            href="/login"
+                            className="bg-[#484DB5] hover:bg-[#7A80FB] text-white max-h-[2.5rem] w-[7.5rem] flex items-center justify-center py-2 rounded-md transition-colors"
+                        >
+                            Entrar
+                        </Link>
+                    </div>
+                    
+                    {/* Botão do menu mobile */}
+                    <button 
+                        className="md:hidden text-[#484DB5]"
+                        onClick={() => setShowMobileMenu(true)}
+                        aria-label="Menu"
+                    >
+                        <Menu size={24} />
+                    </button>
                 </div>
-            </div>
-        </header>
+            </header>
+            
+            {/* Menu mobile */}
+            <MobileMenu 
+                isOpen={showMobileMenu} 
+                onClose={() => setShowMobileMenu(false)}
+                onSearch={handleSearchSubmit}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+            />
+        </>
     );
 }

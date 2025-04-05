@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import { Book, ChevronRight } from "lucide-react";
 import { generateSlug } from "@/lib/utils";
+import Card from "./Card";
 
 export default function SeriesHighlights() {
     const [series, setSeries] = useState([]);
@@ -126,9 +127,9 @@ export default function SeriesHighlights() {
 
     if (loading) {
         return (
-            <div className="series-highlights-loading">
-                <div className="loader-large"></div>
-                <p>Carregando séries populares...</p>
+            <div className="flex flex-col items-center justify-center py-10">
+                <div className="w-12 h-12 border-4 border-gray-200 border-t-purple-600 rounded-full animate-spin mb-4"></div>
+                <p className="text-gray-600">Carregando séries populares...</p>
             </div>
         );
     }
@@ -138,69 +139,38 @@ export default function SeriesHighlights() {
     }
 
     return (
-        <section className="series-highlights-section">
-            <div className="section-header">
-                <h2>
-                    <Book className="section-icon" size={22} />
-                    <span>Séries em Destaque</span>
+        <section className="py-8">
+            <div className="flex items-center justify-between mb-6">
+                <h2 className="text-[1.8rem] font-bold mb-4 relative">
+                    Séries em Destaque
+                    <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
                 </h2>
-                <Link href="/series" className="view-all-link">
+                <Link href="/series" className="flex items-center text-[#484DB5] hover:text-[#7A80FB] font-medium">
                     <span>Ver Todas</span>
-                    <ChevronRight size={16} />
+                    <ChevronRight size={16} className="ml-1" />
                 </Link>
             </div>
 
-            <div className="series-highlights-grid">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 {series.map((serie) => (
-                    <Link
-                        href={`/series/${generateSlug(serie.title, serie.id)}`}
+                    <Card
                         key={serie.id}
-                        className="series-highlight-card"
-                    >
-                        <div className="series-card-image">
-                            {serie.cover_url ? (
-                                <img
-                                    src={serie.cover_url}
-                                    alt={serie.title}
-                                    className="series-cover-image"
-                                />
-                            ) : (
-                                <div className="series-cover-placeholder">
-                                    {serie.title.charAt(0).toUpperCase()}
-                                </div>
-                            )}
-                        </div>
-                        <div className="series-card-content">
-                            <h3 className="series-title">{serie.title}</h3>
-                            <p className="series-author">
-                                por {serie.author_name}
-                            </p>
-                            <div className="series-meta">
-                                <span className="series-chapters">
-                                    {serie.chapter_count}{" "}
-                                    {serie.chapter_count === 1
-                                        ? "capítulo"
-                                        : "capítulos"}
-                                </span>
-                                {serie.genre && (
-                                    <span className="series-genre">
-                                        {serie.genre}
-                                    </span>
-                                )}
-                            </div>
-                            <div className="series-stats">
-                                <span className="series-views">
-                                    {serie.view_count.toLocaleString("pt-BR")}{" "}
-                                    visualizações
-                                </span>
-                                <span className="series-status">
-                                    {serie.is_completed
-                                        ? "Completa"
-                                        : "Em andamento"}
-                                </span>
-                            </div>
-                        </div>
-                    </Link>
+                        title={serie.title}
+                        author={serie.author_name}
+                        coverUrl={serie.cover_url}
+                        href={`/series/${generateSlug(serie.title, serie.id)}`}
+                        stats={[
+                            `${serie.chapter_count} ${
+                                serie.chapter_count === 1 ? "capítulo" : "capítulos"
+                            }`
+                        ]}
+                        badges={serie.genre ? [serie.genre] : []}
+                        footerLeft={`${serie.view_count.toLocaleString("pt-BR")} visualizações`}
+                        footerRight={{
+                            text: serie.is_completed ? "Completa" : "Em andamento",
+                            color: serie.is_completed ? "text-green-600" : "text-amber-600"
+                        }}
+                    />
                 ))}
             </div>
         </section>

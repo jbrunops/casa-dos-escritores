@@ -56,74 +56,60 @@ casa-dos-escritores/
 │   ├── favicon.ico
 │   └── images/               # Imagens do site
 │
-├── src/
-│   ├── app/                  # Organização por rotas (Next.js App Router)
+├── eslint.config.mjs         # Configuração do ESLint
+├── next.config.mjs           # Configuração do Next.js
+├── src/                      # Código-fonte da aplicação
+│   ├── app/                  # Pastas de rotas do Next.js App Router
 │   │   ├── api/              # Endpoints da API
 │   │   │   ├── auth/         # Autenticação
-│   │   │   ├── notifications/ # API de notificações
-│   │   │   ├── profile/      # Perfis de usuário
-│   │   │   ├── series/       # API de séries
-│   │   │   └── stories/      # API de histórias
-│   │   │
-│   │   ├── chapter/[id]/     # Página de capítulo individual
-│   │   ├── dashboard/        # Área do usuário
-│   │   │   ├── edit-chapter/ # Edição de capítulos
-│   │   │   ├── edit-series/  # Edição de séries
-│   │   │   ├── edit-story/   # Edição de histórias
-│   │   │   ├── new/          # Criação de conteúdo
-│   │   │   ├── new-chapter/  # Criação de capítulos
-│   │   │   └── settings/     # Configurações do usuário
-│   │   │
-│   │   ├── login/            # Página de login
-│   │   ├── notifications/    # Central de notificações
-│   │   ├── profile/[username]/ # Perfil público
-│   │   ├── register/         # Registro de usuário
-│   │   ├── reset-password/   # Recuperação de senha
-│   │   ├── series/           # Listagem de séries
-│   │   │   └── [id]/         # Página de série específica
-│   │   │
-│   │   ├── settings/         # Configurações da conta
-│   │   ├── story/[id]/       # Página de história individual
+│   │   │   ├── stories/      # Operações de histórias
+│   │   │   └── users/        # Operações de usuários
+│   │   ├── dashboard/        # Painel do usuário
+│   │   ├── profile/          # Página de perfil
+│   │   ├── story/            # Página de história
 │   │   └── layout.js         # Layout global
 │   │
-│   ├── components/           # Componentes reutilizáveis
+│   ├── components/           # Componentes React reutilizáveis
 │   │   ├── AuthForm.js       # Formulário de autenticação
 │   │   ├── DarkModeToggle.js # Alternador de tema
-│   │   ├── Header.js         # Cabeçalho responsivo
-│   │   ├── MobileSeries.js   # Componente de séries para mobile
-│   │   ├── NavBar.js         # Barra de navegação
-│   │   ├── NotificationBell.js # Sino de notificações
-│   │   ├── Pagination.js     # Componente de paginação
-│   │   ├── SeriesActions.js  # Ações para séries
-│   │   ├── SeriesHighlights.js # Destaques de séries
-│   │   ├── StoryActions.js   # Ações para histórias
-│   │   ├── StoryCard.js      # Card de história
-│   │   ├── StoryContent.js   # Exibição do conteúdo da história
-│   │   ├── StoryHighlights.js # Destaques de histórias
+│   │   ├── Header.js         # Cabeçalho do site
+│   │   ├── Sidebar.js        # Barra lateral
 │   │   └── TipTapEditor.js   # Editor de texto rico
 │   │
-│   ├── lib/                  # Utilitários e bibliotecas
+│   ├── lib/                  # Bibliotecas e utilitários
 │   │   ├── supabase-browser.js # Cliente Supabase para browser
 │   │   ├── supabase-server.js  # Cliente Supabase para server
 │   │   └── utils.js          # Funções utilitárias
 │   │
 │   └── styles/               # Estilos CSS
-│       ├── chapters.css      # Estilos para capítulos
-│       ├── dashboard.css     # Estilos para dashboard
-│       ├── editor.css        # Estilos para o editor
-│       ├── globals.css       # Estilos globais
-│       ├── layout.css        # Estilos de layout
-│       ├── notifications.css # Estilos para notificações
-│       ├── pages.css         # Estilos para páginas específicas
-│       ├── profile.css       # Estilos para perfil
-│       ├── series.css        # Estilos para séries
-│       ├── stories.css       # Estilos para histórias
-│       └── styles-mobile/    # Estilos específicos para mobile
-│           ├── index.css     # Índice de estilos mobile
-│           ├── mobile-header.css # Cabeçalho mobile
-│           └── mobile-notifications.css # Notificações mobile
+│       ├── base/             # Estilos base e variáveis
+│       │   ├── variables.css # Variáveis CSS (cores, espaçamentos)
+│       │   ├── reset.css     # Reset de estilos
+│       │   ├── typography.css # Tipografia
+│       │   ├── utilities.css # Classes utilitárias
+│       │   └── mobile/       # Versões mobile dos estilos base
+│       │
+│       ├── layout/           # Estilos de estrutura
+│       │   ├── grid.css      # Sistema de grid
+│       │   ├── header.css    # Cabeçalho
+│       │   ├── footer.css    # Rodapé
+│       │   ├── sidebar.css   # Barra lateral
+│       │   └── mobile/       # Versões mobile dos layouts
+│       │
+│       ├── components/       # Estilos de componentes
+│       │   ├── buttons.css   # Botões
+│       │   ├── cards.css     # Cards
+│       │   ├── forms.css     # Formulários
+│       │   ├── alerts.css    # Alertas e mensagens
+│       │   └── mobile/       # Versões mobile dos componentes
+│       │
+│       └── pages/            # Estilos específicos de páginas
+│           ├── home.css      # Página inicial
+│           ├── auth.css      # Páginas de autenticação
+│           ├── profile.css   # Página de perfil
+│           ├── story.css     # Página de história
+│           └── mobile/       # Versões mobile das páginas
 │
-├── next.config.js            # Configuração do Next.js
 └── package.json              # Dependências do projeto
 ```
 
@@ -167,3 +153,87 @@ Otimizações implementadas para garantir uma experiência fluida:
 - **Compressão de Assets**: Otimização de imagens e recursos estáticos
 
 A Casa dos Escritores oferece uma experiência completa tanto para escritores quanto para leitores, com foco em usabilidade, organização de conteúdo, notificações em tempo real e uma interface responsiva para todas as plataformas.
+
+# Casa dos Escritores - Estrutura de Estilos
+
+Este projeto utiliza uma estrutura modular e organizada para os arquivos CSS, facilitando a manutenção e escalabilidade do código.
+
+## Estrutura de Arquivos
+
+```
+src/styles/
+├── base/                  # Estilos base e primitivos
+│   ├── colors.css         # Variáveis de cores
+│   ├── typography.css     # Estilos de tipografia
+│   ├── spacing.css        # Variáveis de espaçamento
+│   ├── mobile/            # Estilos base para mobile
+│   │   ├── typography.css # Tipografia mobile
+│   │   └── elements.css   # Elementos básicos mobile
+│   └── index.css          # Arquivo índice para importação
+├── layout/                # Estilos de layout e estrutura
+│   ├── grid.css           # Sistema de grid
+│   ├── header.css         # Estilos do cabeçalho
+│   ├── footer.css         # Estilos do rodapé
+│   ├── mobile/            # Estilos de layout para mobile
+│   │   ├── grid.css       # Grid mobile
+│   │   └── header.css     # Cabeçalho mobile
+│   └── index.css          # Arquivo índice para importação
+├── components/            # Estilos de componentes reutilizáveis
+│   ├── buttons.css        # Estilos de botões
+│   ├── cards.css          # Cartões e containers
+│   ├── forms.css          # Formulários e campos
+│   ├── navigation.css     # Navegação e menus
+│   ├── tables.css         # Tabelas
+│   ├── chapters.css       # Componentes de capítulos
+│   ├── notifications.css  # Componentes de notificações
+│   ├── mobile/            # Estilos de componentes para mobile
+│   │   ├── buttons.css    # Botões mobile
+│   │   └── ...            # Outros componentes mobile
+│   └── index.css          # Arquivo índice para importação
+└── pages/                 # Estilos específicos de páginas
+    ├── home.css           # Página inicial
+    ├── profile.css        # Página de perfil
+    ├── dashboard.css      # Painel do usuário
+    ├── editor.css         # Editor (estilos comuns)
+    ├── editor-story.css   # Editor de histórias
+    ├── editor-series.css  # Editor de séries
+    ├── story.css          # Página de história
+    ├── series.css         # Página de série
+    ├── chapter.css        # Página de capítulo
+    ├── mobile/            # Estilos de páginas para mobile
+    │   ├── home.css       # Página inicial mobile
+    │   └── ...            # Outras páginas mobile
+    └── index.css          # Arquivo índice para importação
+```
+
+## Convenções de Nomenclatura
+
+- As classes seguem o padrão de nomenclatura orientado a componentes.
+- Prefixos são usados para indicar o contexto (por exemplo, `btn-` para botões).
+- Modificadores são separados por hífens (por exemplo, `btn-primary`, `btn-large`).
+
+## Hierarquia de Importação
+
+O arquivo `globals.css` importa todos os arquivos de estilo na seguinte ordem:
+
+1. Base - Estilos fundamentais e variáveis
+2. Layout - Estrutura e grid
+3. Componentes - Elementos reutilizáveis 
+4. Páginas - Estilos específicos de páginas
+5. Mobile - Responsividade para dispositivos móveis
+
+## Responsividade
+
+Os estilos responsivos são organizados em arquivos separados para facilitar a manutenção:
+
+- Os estilos para tablet estão em media queries de `max-width: 768px`
+- Os estilos para mobile estão em media queries de `max-width: 480px`
+
+## Variáveis CSS
+
+Variáveis CSS são utilizadas para cores, espaçamento, sombras e outros valores:
+
+- `var(--color-*)` - Sistema de cores
+- `var(--space-*)` - Sistema de espaçamento
+- `var(--shadow-*)` - Sistema de sombras
+- `var(--radius-*)` - Sistema de border-radius

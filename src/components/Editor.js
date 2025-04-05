@@ -12,16 +12,16 @@ export default function Editor({ value, onChange }) {
     };
 
     return (
-        <div className="editor-container">
-            <div className="toolbar">
-                <div className="hint">
+        <div className="w-full border border-gray-200 rounded-md shadow-sm overflow-hidden">
+            <div className="p-3 bg-gray-50 border-b border-gray-200">
+                <div className="text-sm text-gray-600 italic">
                     Este editor é uma versão simplificada. Você pode usar HTML
-                    básico como <code>&lt;b&gt;</code>, <code>&lt;i&gt;</code>,{" "}
-                    <code>&lt;p&gt;</code>.
+                    básico como <code className="px-1 py-0.5 bg-gray-100 rounded text-purple-600">&lt;b&gt;</code>, <code className="px-1 py-0.5 bg-gray-100 rounded text-purple-600">&lt;i&gt;</code>,{" "}
+                    <code className="px-1 py-0.5 bg-gray-100 rounded text-purple-600">&lt;p&gt;</code>.
                 </div>
             </div>
             <textarea
-                className="content-editor"
+                className="w-full p-4 min-h-[300px] border-0 focus:ring-0 focus:outline-none"
                 value={editorValue}
                 onChange={handleChange}
                 rows={15}

@@ -1,245 +1,208 @@
-// src/app/search/page.js
-import { createServerSupabaseClient } from "@/lib/supabase-server";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+"use client";
+
+import { useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { createBrowserClient } from "@/lib/supabase-browser";
+import Card from "@/components/Card";
 import { generateSlug } from "@/lib/utils";
+import Link from "next/link";
 
-export const metadata = {
-    title: "Resultados de pesquisa",
-    description: "Pesquise histórias em nossa plataforma",
-};
-
-export default async function SearchPage({ searchParams }) {
-    const query = searchParams.q || "";
-
-    // Se não há consulta, redirecionar para home
-    if (!query) {
-        return (
-            <div className="search-results-page">
-                <h1>Pesquisa</h1>
-                <p className="no-results">
-                    Por favor, insira um termo de pesquisa.
-                </p>
-                <Link href="/" className="btn primary">
-                    Voltar para o início
-                </Link>
-            </div>
-        );
-    }
-
-    const supabase = await createServerSupabaseClient();
-
-    try {
-        // Buscar histórias que correspondem à consulta
-        const { data: stories, error } = await supabase
-            .from("stories")
-            .select(
-                `
-                id,
-                title,
-                content,
-                created_at,
-                category,
-                profiles(username)
-            `
-            )
-            .eq("is_published", true)
-            .or(
-                `title.ilike.%${query}%,content.ilike.%${query}%,category.ilike.%${query}%`
-            )
-            .order("created_at", { ascending: false });
-
-        if (error) {
-            throw error;
-        }
-
-        // Buscar perfis de usuário que correspondem à consulta
-        const { data: profiles, error: profilesError } = await supabase
-            .from("profiles")
-            .select(
-                `
-                id,
-                username,
-                bio,
-                avatar_url
-            `
-            )
-            .ilike("username", `%${query}%`)
-            .limit(10);
-
-        if (profilesError) {
-            console.error("Erro ao buscar perfis:", profilesError);
-        }
-
-        // Função para criar resumo do conteúdo HTML
-        const createSummary = (htmlContent, maxLength = 150) => {
-            // Remover todas as tags HTML
-            const textContent = htmlContent?.replace(/<[^>]*>/g, "") || "";
-
-            // Limitar o tamanho e adicionar reticências se necessário
-            if (textContent.length <= maxLength) {
-                return textContent;
+export default function SearchResults() {
+    const searchParams = useSearchParams();
+    const query = searchParams.get("q") || "";
+    
+    const [results, setResults] = useState({ series: [], stories: [], chapters: [] });
+    const [loading, setLoading] = useState(true);
+    const [resultCount, setResultCount] = useState(0);
+    const supabase = createBrowserClient();
+    
+    useEffect(() => {
+        async function fetchResults() {
+            if (!query || query.trim() === "") {
+                setLoading(false);
+                return;
             }
-
-            // Cortar no final de uma palavra
-            let summary = textContent.substring(0, maxLength);
-            summary = summary.substring(0, summary.lastIndexOf(" "));
-            return `${summary}...`;
-        };
-
-        // Destacar o termo da pesquisa no texto
-        const highlightText = (text, query) => {
-            // Escapar caracteres especiais na consulta
-            const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-            // Criar uma expressão regular para buscar o termo (não sensível a maiúsculas/minúsculas)
-            const regex = new RegExp(`(${safeQuery})`, "gi");
-
-            // Dividir o texto pelo termo e criar um array com o termo destacado
-            const parts = text.split(regex);
-
-            return parts
-                .map((part, i) =>
-                    regex.test(part)
-                        ? `<mark class="search-highlight">${part}</mark>`
-                        : part
-                )
-                .join("");
-        };
-
-        // Formatar a data para o formato compacto
-        const formatDate = (dateString) => {
-            const date = new Date(dateString);
-            return date.toLocaleDateString("pt-BR", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-            });
-        };
-
-        // Processar os resultados para destaque
-        const processedStories = stories.map((story) => ({
-            ...story,
-            highlightedTitle: highlightText(story.title, query),
-            summary: highlightText(createSummary(story.content), query),
-        }));
-
-        return (
-            <div className="search-results-page">
-                <h1>Resultados para &quot;{query}&quot;</h1>
-
-                <div className="search-results-count">
-                    Encontrados {stories.length + (profiles?.length || 0)}{" "}
-                    resultados
+            
+            setLoading(true);
+            
+            try {
+                // Pesquisar séries
+                const { data: seriesData, error: seriesError } = await supabase
+                    .from("series")
+                    .select(`
+                        id, 
+                        title, 
+                        cover_url, 
+                        genre, 
+                        view_count, 
+                        is_completed, 
+                        author_id, 
+                        profiles(username)
+                    `)
+                    .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
+                    .limit(10);
+                    
+                if (seriesError) console.error("Erro ao pesquisar séries:", seriesError);
+                
+                // Pesquisar histórias individuais
+                const { data: storiesData, error: storiesError } = await supabase
+                    .from("stories")
+                    .select(`
+                        id, 
+                        title, 
+                        cover_url,
+                        genre,
+                        view_count,
+                        author_id,
+                        profiles(username)
+                    `)
+                    .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
+                    .limit(10);
+                    
+                if (storiesError) console.error("Erro ao pesquisar histórias:", storiesError);
+                
+                // Pesquisar capítulos
+                const { data: chaptersData, error: chaptersError } = await supabase
+                    .from("chapters")
+                    .select(`
+                        id,
+                        title,
+                        series_id,
+                        series(title, cover_url),
+                        view_count,
+                        author_id,
+                        profiles(username)
+                    `)
+                    .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
+                    .limit(10);
+                    
+                if (chaptersError) console.error("Erro ao pesquisar capítulos:", chaptersError);
+                
+                // Processar e configurar resultados
+                const processedSeries = seriesData ? seriesData.map(series => ({
+                    ...series,
+                    author_name: series.profiles ? series.profiles.username : "Autor desconhecido"
+                })) : [];
+                
+                const processedStories = storiesData ? storiesData.map(story => ({
+                    ...story,
+                    author_name: story.profiles ? story.profiles.username : "Autor desconhecido" 
+                })) : [];
+                
+                const processedChapters = chaptersData ? chaptersData.map(chapter => ({
+                    ...chapter,
+                    author_name: chapter.profiles ? chapter.profiles.username : "Autor desconhecido",
+                    series_title: chapter.series ? chapter.series.title : "",
+                    cover_url: chapter.series ? chapter.series.cover_url : null
+                })) : [];
+                
+                setResults({
+                    series: processedSeries || [],
+                    stories: processedStories || [],
+                    chapters: processedChapters || []
+                });
+                
+                setResultCount(
+                    (processedSeries?.length || 0) + 
+                    (processedStories?.length || 0) + 
+                    (processedChapters?.length || 0)
+                );
+            } catch (error) {
+                console.error("Erro ao realizar pesquisa:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        fetchResults();
+    }, [query]);
+    
+    return (
+        <div className="container mx-auto px-4 py-8">
+            <h1 className="text-2xl font-bold mb-4">Resultados para: {query}</h1>
+            
+            {loading ? (
+                <div className="flex items-center justify-center py-20">
+                    <div className="w-12 h-12 border-4 border-gray-200 border-t-purple-600 rounded-full animate-spin"></div>
                 </div>
-
-                {/* Resultados de perfis */}
-                {profiles && profiles.length > 0 && (
-                    <div className="search-section">
-                        <h2>Escritores</h2>
-                        <div className="writers-results">
-                            {profiles.map((profile) => (
-                                <Link
-                                    href={`/profile/${encodeURIComponent(
-                                        profile.username
-                                    )}`}
-                                    key={profile.id}
-                                    className="writer-result-card"
-                                >
-                                    {profile.avatar_url ? (
-                                        <img
-                                            src={profile.avatar_url}
-                                            alt={profile.username}
-                                            className="writer-avatar"
-                                        />
-                                    ) : (
-                                        <div className="writer-avatar-placeholder">
-                                            {profile.username
-                                                .charAt(0)
-                                                .toUpperCase()}
-                                        </div>
-                                    )}
-                                    <div className="writer-info">
-                                        <h3>{profile.username}</h3>
-                                        {profile.bio && (
-                                            <p className="writer-bio">
-                                                {profile.bio.length > 100
-                                                    ? profile.bio.substring(
-                                                          0,
-                                                          100
-                                                      ) + "..."
-                                                    : profile.bio}
-                                            </p>
-                                        )}
-                                    </div>
-                                </Link>
-                            ))}
+            ) : (
+                <>
+                    {resultCount === 0 ? (
+                        <div className="text-center py-12">
+                            <p className="text-gray-600 mb-6">Nenhum resultado encontrado para "{query}"</p>
+                            <Link href="/" className="text-purple-600 hover:text-purple-800">
+                                Voltar para a página inicial
+                            </Link>
                         </div>
-                    </div>
-                )}
-
-                {/* Resultados de histórias */}
-                <div className="search-section">
-                    <h2>Histórias</h2>
-
-                    {processedStories.length === 0 ? (
-                        <p className="no-results">
-                            Nenhuma história encontrada para &quot;{query}
-                            &quot;.
-                            <br />
-                            Tente outras palavras-chave ou categorias.
-                        </p>
                     ) : (
-                        <div className="story-results">
-                            {processedStories.map((story) => (
-                                <Link
-                                    href={`/story/${generateSlug(story.title, story.id)}`}
-                                    key={story.id}
-                                    className="story-result-card"
-                                >
-                                    <div className="result-header">
-                                        <h3
-                                            dangerouslySetInnerHTML={{
-                                                __html: story.highlightedTitle,
-                                            }}
-                                        ></h3>
-                                        {story.category && (
-                                            <span className="story-category-badge">
-                                                {story.category}
-                                            </span>
-                                        )}
+                        <div className="space-y-8">
+                            {/* Resultados de Séries */}
+                            {results.series.length > 0 && (
+                                <div>
+                                    <h2 className="text-xl font-semibold mb-4">Séries</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                        {results.series.map(serie => (
+                                            <Card 
+                                                key={`series-${serie.id}`}
+                                                title={serie.title}
+                                                author={serie.author_name}
+                                                coverUrl={serie.cover_url}
+                                                href={`/series/${generateSlug(serie.title, serie.id)}`}
+                                                badges={serie.genre ? [serie.genre] : []}
+                                                footerLeft={`${serie.view_count || 0} visualizações`}
+                                                footerRight={{
+                                                    text: serie.is_completed ? "Completa" : "Em andamento",
+                                                    color: serie.is_completed ? "text-green-600" : "text-amber-600"
+                                                }}
+                                            />
+                                        ))}
                                     </div>
-
-                                    <div className="result-meta">
-                                        <span className="result-author">
-                                            Por {story.profiles.username}
-                                        </span>
-                                        <span className="result-date">
-                                            {formatDate(story.created_at)}
-                                        </span>
+                                </div>
+                            )}
+                            
+                            {/* Resultados de Histórias */}
+                            {results.stories.length > 0 && (
+                                <div>
+                                    <h2 className="text-xl font-semibold mb-4">Histórias</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                        {results.stories.map(story => (
+                                            <Card 
+                                                key={`story-${story.id}`}
+                                                title={story.title}
+                                                author={story.author_name}
+                                                coverUrl={story.cover_url}
+                                                href={`/story/${generateSlug(story.title, story.id)}`}
+                                                badges={story.genre ? [story.genre] : []}
+                                                footerLeft={`${story.view_count || 0} visualizações`}
+                                            />
+                                        ))}
                                     </div>
-
-                                    <p
-                                        className="result-summary"
-                                        dangerouslySetInnerHTML={{
-                                            __html: story.summary,
-                                        }}
-                                    ></p>
-                                </Link>
-                            ))}
+                                </div>
+                            )}
+                            
+                            {/* Resultados de Capítulos */}
+                            {results.chapters.length > 0 && (
+                                <div>
+                                    <h2 className="text-xl font-semibold mb-4">Capítulos</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                        {results.chapters.map(chapter => (
+                                            <Card 
+                                                key={`chapter-${chapter.id}`}
+                                                title={chapter.title}
+                                                author={chapter.author_name}
+                                                coverUrl={chapter.cover_url}
+                                                href={`/chapter/${generateSlug(chapter.title, chapter.id)}`}
+                                                stats={[`Da série: ${chapter.series_title}`]}
+                                                footerLeft={`${chapter.view_count || 0} visualizações`}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
-                </div>
-
-                <div className="search-actions">
-                    <Link href="/" className="btn secondary">
-                        Voltar para o início
-                    </Link>
-                </div>
-            </div>
-        );
-    } catch (error) {
-        console.error("Erro na busca:", error);
-        return notFound();
-    }
+                </>
+            )}
+        </div>
+    );
 }

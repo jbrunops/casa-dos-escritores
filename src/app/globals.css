@@ -1,28 +1,84 @@
-/* Importações principais */
-@import "../styles/base.css";
-@import "../styles/variables.css";
-@import "../styles/layout.css";
-@import "../styles/components.css";
-@import "../styles/buttons.css"; /* Estilos padronizados de botões */
-@import "../styles/pages.css";
-@import "../styles/editor.css";
-@import "../styles/story-editor.css";
-@import "../styles/dashboard.css";
-@import "../styles/admin.css"; /* Estilos do painel administrativo */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Importação dos estilos mobile */
-@import "../styles/styles-mobile/index.css";
-@import "../styles/styles-mobile/mobile-buttons.css"; /* Estilos mobile para botões */
+/* Configuração global da fonte */
+@layer base {
+  html {
+    font-family: 'Poppins', system-ui, sans-serif;
+  }
+}
 
-/* Adicione esta linha ao final do arquivo */
-@import "../styles/notifications.css";
+/* Animação para a linha decorativa dos títulos */
+@keyframes shimmer {
+  0% {
+    background-position: -8.6rem 0;
+  }
+  100% {
+    background-position: 8.6rem 0;
+  }
+}
 
-/* Adicione estas linhas no final do arquivo */
-@import "../styles/series.css";
-@import "../styles/series-editor.css";
+.title-line {
+  position: relative;
+  overflow: hidden;
+}
 
-/* Adicione esta linha no final do arquivo */
-@import "../styles/content-type.css";
+.title-line::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+  background-size: 17.2rem 100%;
+  animation: shimmer 2s infinite;
+}
 
-/* Importação dos estilos de capítulos */
-@import "../styles/chapters.css";
+/* Estilos para o Editor TipTap */
+@layer components {
+  /* Estilos para o conteúdo do editor */
+  .prose h1 {
+    @apply text-3xl font-bold mt-6 mb-4;
+  }
+  
+  .prose h2 {
+    @apply text-2xl font-bold mt-5 mb-3;
+  }
+  
+  .prose h3 {
+    @apply text-xl font-bold mt-4 mb-2;
+  }
+  
+  .prose p {
+    @apply my-4;
+  }
+  
+  .prose ul {
+    @apply list-disc pl-5 my-4;
+  }
+  
+  .prose ol {
+    @apply list-decimal pl-5 my-4;
+  }
+  
+  .prose blockquote {
+    @apply border-l-4 border-gray-300 pl-4 italic my-4;
+  }
+  
+  .prose a {
+    @apply text-purple-600 underline hover:text-purple-800;
+  }
+  
+  .prose img {
+    @apply max-w-full h-auto rounded-md my-4;
+  }
+}
+
+/* Remover outline em elementos focados em dispositivos que não são de ponteiro */
+@media (pointer: coarse) {
+  * {
+    @apply focus:outline-none;
+  }
+}

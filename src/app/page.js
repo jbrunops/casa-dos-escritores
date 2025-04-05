@@ -217,26 +217,26 @@ export default async function HomePage() {
 
     return (
         <div className="home-page">
-            <section className="hero">
-                <h1>O lugar certo para nós!</h1>
-                <p>
-                    Um espaço para compartilhar suas histórias com o mundo,
+            <section className="mt-[1.8rem] mb-[1.8rem] max-h-[14.3rem] flex flex-col items-center justify-center text-center py-12 px-4" 
+                style={{ background: "linear-gradient(91deg, #FEFEFE 0.72%, #F4F4F4 128.06%)" }}>
+                <h1 className="text-[1.8rem] font-bold text-black mb-4">
+                    O lugar certo para você inserir suas ideias!
+                </h1>
+                <p className="text-[1rem] text-black max-w-2xl">
+                    Crie, compartilhe; escreva fantasia, terror, humor, ficção científica e muito mais.
                     <br />
-                    comentar, conversar, seguir, favoritar e criar sem limites.
-                    Seja você!
+                    Escreva até seus pensamentos e opiniões. Aqui você é livre!
                 </p>
-                {/* <div className="hero-buttons">
-                    <Link href="/signup" className="btn primary">
-                        Cadastre-se
-                    </Link>
-                </div> */}
             </section>
 
-            <section className="columns-section">
-                <div className="columns-grid">
+            <section className="columns-section my-10">
+                <div className="columns-grid grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Coluna 1: Histórias Recentes */}
                     <div className="column">
-                        <h2>Histórias Recentes</h2>
+                        <h2 className="text-[1.8rem] font-bold mb-4 relative">
+                            Histórias Recentes
+                            <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
+                        </h2>
                         <div className="stories-list">
                             {recentContent?.length === 0 ? (
                                 <p>Nenhuma história publicada ainda.</p>
@@ -301,7 +301,10 @@ export default async function HomePage() {
 
                     {/* Coluna 2: Mais Comentados */}
                     <div className="column">
-                        <h2>Mais Comentados</h2>
+                        <h2 className="text-[1.8rem] font-bold mb-4 relative">
+                            Mais Comentadas
+                            <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
+                        </h2>
                         <div className="stories-list">
                             {allContentWithComments?.length === 0 ? (
                                 <p>Nenhuma história comentada ainda.</p>
@@ -394,7 +397,10 @@ export default async function HomePage() {
 
                     {/* Coluna 3: Top 10 Escritores */}
                     <div className="column">
-                        <h2>Top 10 Escritores</h2>
+                        <h2 className="text-[1.8rem] font-bold mb-4 relative">
+                            Top 10 Escritores
+                            <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
+                        </h2>
                         <div className="writers-list">
                             {topWriters?.length === 0 ? (
                                 <p>Nenhum escritor ativo ainda.</p>
@@ -453,7 +459,10 @@ export default async function HomePage() {
             </section>
 
             <section className="features-section">
-                <h2>Como funciona</h2>
+                <h2 className="text-[1.8rem] font-bold mb-4 text-center relative">
+                    Como funciona
+                    <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 mx-auto title-line"></div>
+                </h2>
 
                 <div className="features-grid">
                     <div className="feature-card">
