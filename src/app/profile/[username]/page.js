@@ -15,6 +15,7 @@ import {
     Award,
     Calendar 
 } from "lucide-react";
+import Image from "next/image";
 
 export async function generateMetadata({ params }) {
     const username = await Promise.resolve(params.username);
@@ -114,30 +115,15 @@ export default async function ProfilePage({ params }) {
                     {/* Avatar */}
                     <div className="profile-avatar-wrapper">
                         {profile.avatar_url ? (
-                            <div 
-                                className="profile-avatar" 
-                                style={{
-                                    backgroundImage: `url(${profile.avatar_url})`,
-                                    backgroundSize: 'cover',
-                                    backgroundPosition: 'center',
-                                    width: '150px',
-                                    height: '150px',
-                                    borderRadius: '50%',
-                                    border: '4px solid var(--color-primary)',
-                                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
-                                }}
-                            ></div>
+                            <Image
+                                src={profile.avatar_url}
+                                alt={`${profile.username} avatar`}
+                                width={112}
+                                height={112}
+                                className="profile-avatar"
+                            />
                         ) : (
-                            <div 
-                                className="profile-avatar avatar-placeholder"
-                                style={{
-                                    width: '150px',
-                                    height: '150px',
-                                    borderRadius: '50%',
-                                    border: '4px solid var(--color-primary)',
-                                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
-                                }}
-                            >
+                            <div className="avatar-placeholder">
                                 {profile.username.charAt(0).toUpperCase()}
                             </div>
                         )}
@@ -149,15 +135,13 @@ export default async function ProfilePage({ params }) {
                         
                         {/* Membro desde */}
                         <div className="join-date">
-                            <Calendar size={16} />
-                            <span>Membro desde {joinDate}</span>
+                            <Clock className="w-4 h-4" />
+                            <span>Entrou em {joinDate}</span>
                         </div>
 
                         {/* Bio */}
                         {profile.bio && (
-                            <div className="profile-bio">
-                                <p>{profile.bio}</p>
-                            </div>
+                            <p className="profile-bio">{profile.bio}</p>
                         )}
 
                         {/* Links sociais */}
@@ -165,34 +149,28 @@ export default async function ProfilePage({ params }) {
                             {profile.website_url && (
                                 <a
                                     href={formatUrl(profile.website_url)}
-                                    className="btn-secondary"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    aria-label="Website"
                                 >
-                                    <Globe size={18} />
-                                    <span>Website</span>
+                                    <Globe className="w-4 h-4" />
+                                    <span>Site</span>
                                 </a>
                             )}
                             {profile.twitter_url && (
                                 <a
                                     href={formatUrl(profile.twitter_url)}
-                                    className="btn-secondary"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    aria-label="Twitter"
                                 >
-                                    <Twitter size={18} />
+                                    <Twitter className="w-4 h-4" />
                                     <span>Twitter</span>
                                 </a>
                             )}
                             {profile.facebook_url && (
                                 <a
                                     href={formatUrl(profile.facebook_url)}
-                                    className="btn-secondary"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    aria-label="Facebook"
                                 >
                                     <Facebook size={18} />
                                     <span>Facebook</span>
@@ -201,12 +179,10 @@ export default async function ProfilePage({ params }) {
                             {profile.instagram_url && (
                                 <a
                                     href={formatUrl(profile.instagram_url)}
-                                    className="btn-secondary"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    aria-label="Instagram"
                                 >
-                                    <Instagram size={18} />
+                                    <Instagram className="w-4 h-4" />
                                     <span>Instagram</span>
                                 </a>
                             )}
@@ -218,53 +194,39 @@ export default async function ProfilePage({ params }) {
                                 <Link
                                     href="/profile/edit"
                                     className="btn-primary"
-                                    style={{ 
-                                        width: '233px',
-                                        backgroundColor: '#484DB5',
-                                        color: 'white'
-                                    }}
                                 >
-                                    <Edit size={18} style={{ color: 'white' }} />
-                                    <span style={{ color: 'white' }}>Editar Perfil</span>
+                                    <Edit size={18} />
+                                    <span>Editar Perfil</span>
                                 </Link>
                             </div>
                         )}
                     </div>
-                </div>
-                
-                {/* Stats Cards */}
-                <div className="profile-stats-cards">
-                    <div className="profile-stat-card">
-                        <div className="stat-card-icon">
-                            <BookText size={24} />
-                        </div>
-                        <div className="stat-card-info">
-                            <div className="stat-card-value">{stories?.length || 0}</div>
-                            <div className="stat-card-label">Histórias</div>
-                        </div>
-                    </div>
                     
-                    <div className="profile-stat-card">
-                        <div className="stat-card-icon">
-                            <Eye size={24} />
+                    {/* Stats Cards */}
+                    <div className="profile-stats-cards">
+                        <div className="profile-stat-card">
+                            <div className="stat-card-info">
+                                <div className="stat-card-value">{stories?.length || 0}</div>
+                                <div className="stat-card-label">Histórias</div>
+                            </div>
                         </div>
-                        <div className="stat-card-info">
-                            <div className="stat-card-value">{totalViews}</div>
-                            <div className="stat-card-label">Visualizações</div>
+                        
+                        <div className="profile-stat-card">
+                            <div className="stat-card-info">
+                                <div className="stat-card-value">{totalViews}</div>
+                                <div className="stat-card-label">Visualizações</div>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div className="profile-stat-card">
-                        <div className="stat-card-icon">
-                            <Award size={24} />
-                        </div>
-                        <div className="stat-card-info">
-                            <div className="stat-card-value">{favoriteCategory}</div>
-                            <div className="stat-card-label">Categoria Favorita</div>
+                        
+                        <div className="profile-stat-card">
+                            <div className="stat-card-info">
+                                <div className="stat-card-value">{favoriteCategory || "-"}</div>
+                                <div className="stat-card-label">Categoria Favorita</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
+                
                 {/* Histórias organizadas por categoria */}
                 <div className="profile-content">
                     <div className="profile-content-header">

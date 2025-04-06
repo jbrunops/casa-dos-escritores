@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import { 
     User, 
@@ -13,7 +14,8 @@ import {
     Upload, 
     Info, 
     CheckCircle, 
-    AlertCircle
+    AlertCircle,
+    ArrowLeft
 } from "lucide-react";
 
 export default function EditProfilePage() {
@@ -242,8 +244,14 @@ export default function EditProfilePage() {
     return (
         <div className="edit-profile-page">
             <div className="edit-profile-header">
+                <Link href={`/profile/${username}`} className="back-link">
+                    <ArrowLeft size={18} />
+                    <span>Voltar ao perfil</span>
+                </Link>
                 <h1>Editar Perfil</h1>
-                <p className="edit-profile-subheading">Atualize suas informações pessoais e links de redes sociais</p>
+                <p className="edit-profile-subheading">
+                    Atualize suas informações pessoais e links de redes sociais
+                </p>
             </div>
 
             {error && (
