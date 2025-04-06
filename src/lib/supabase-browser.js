@@ -13,13 +13,11 @@ export function createBrowserClient() {
         console.error('URL:', supabaseUrl ? 'Definida' : 'Não definida');
         console.error('KEY:', supabaseKey ? 'Definida' : 'Não definida');
         
-        // Valores de fallback (usado tanto para desenvolvimento quanto para produção, se necessário)
-        const fallbackUrl = "https://kkykesdoqdeagnuvlxao.supabase.co";
-        const fallbackKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtreWtlc2RvcWRlYWdudXZseGFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3ODc5NTYsImV4cCI6MjA1OTM2Mzk1Nn0.kS69ce8FLws_rXMvbqOhRgMsaPntbzDGgwckQHYTnyk";
-        
+        // Usar os valores das variáveis ambiente se estiverem disponíveis, mesmo que pareçam vazios
+        // Isso evita o uso de fallbacks potencialmente inválidos
         return createClient(
-            fallbackUrl,
-            fallbackKey
+            supabaseUrl || "",
+            supabaseKey || ""
         );
     }
     

@@ -16,25 +16,24 @@ export async function POST(request) {
             console.error("URL:", supabaseUrl ? "Definida" : "Não definida");
             console.error("Service Key:", serviceRoleKey ? "Definida" : "Não definida");
             
-            // Valores de fallback
-            const fallbackUrl = "https://kkykesdoqdeagnuvlxao.supabase.co";
-            const fallbackServiceKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtreWtlc2RvcWRlYWdudXZseGFvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Mzc4Nzk1NiwiZXhwIjoyMDU5MzYzOTU2fQ.mpMIymtj-VHrouVu9RGEcQY3qvNOAi6hgjUW-Cs2in0";
-            
-            // Usar cliente do Supabase com valores de fallback
-            var supabase = createClient(fallbackUrl, fallbackServiceKey);
-            console.log("Usando valores de fallback para o Supabase");
-        } else {
-            // Usar cliente do Supabase com chave de serviço para ignorar RLS
-            var supabase = createClient(supabaseUrl, serviceRoleKey);
-            console.log("Usando variáveis de ambiente para o Supabase");
+            // Retornar erro claro para o usuário
+            return NextResponse.json({ 
+                error: "Configuração do servidor incompleta. Por favor, contate o administrador." 
+            }, { status: 500 });
         }
+            
+        // Usar cliente do Supabase com chave de serviço para ignorar RLS
+        const supabase = createClient(supabaseUrl, serviceRoleKey);
+        console.log("Usando variáveis de ambiente para o Supabase");
         
         // Verificar se o bucket 'covers' existe
         const { data: buckets, error: listError } = await supabase.storage.listBuckets();
         
         if (listError) {
             console.error("Erro ao listar buckets:", listError);
-            return NextResponse.json({ error: "Erro ao acessar storage" }, { status: 500 });
+            return NextResponse.json({ 
+                error: "Erro ao acessar storage. Detalhes: " + listError.message 
+            }, { status: 500 });
         }
         
         // Criar o bucket se não existir
@@ -49,7 +48,9 @@ export async function POST(request) {
             
             if (createError) {
                 console.error("Erro ao criar bucket:", createError);
-                return NextResponse.json({ error: "Erro ao criar bucket de armazenamento" }, { status: 500 });
+                return NextResponse.json({ 
+                    error: "Erro ao criar bucket de armazenamento. Detalhes: " + createError.message 
+                }, { status: 500 });
             }
             
             console.log("Bucket criado com sucesso");
@@ -62,6 +63,9 @@ export async function POST(request) {
         
         if (policyError) {
             console.error("Erro ao verificar política do bucket:", policyError);
+            return NextResponse.json({ 
+                error: "Erro ao verificar política do bucket. Detalhes: " + policyError.message 
+            }, { status: 500 });
         } else if (!bucket.public) {
             console.log("Atualizando bucket para acesso público");
             // Tornar o bucket público
@@ -71,6 +75,9 @@ export async function POST(request) {
             
             if (updateError) {
                 console.error("Erro ao atualizar política do bucket:", updateError);
+                return NextResponse.json({ 
+                    error: "Erro ao configurar bucket para acesso público. Detalhes: " + updateError.message 
+                }, { status: 500 });
             } else {
                 console.log("Bucket atualizado para acesso público");
             }
@@ -103,14 +110,26 @@ export async function POST(request) {
         console.log("Nome do arquivo gerado:", fileName);
         console.log("Caminho do arquivo:", filePath);
         
-        // Converter ArrayBuffer para Blob
-        const blob = new Blob([buffer]);
+        // Verificar se a pasta series_covers existe no bucket e criar se necessário
+        const { data: folderData, error: folderError } = await supabase.storage
+            .from(bucketName)
+            .list();
+            
+        if (folderError) {
+            console.error("Erro ao listar conteúdo do bucket:", folderError);
+            return NextResponse.json({ 
+                error: "Erro ao verificar estrutura de pastas. Detalhes: " + folderError.message 
+            }, { status: 500 });
+        }
+        
+        // Upload do arquivo usando Uint8Array para maior compatibilidade
+        const uint8Array = new Uint8Array(buffer);
         
         // Upload do arquivo
         console.log("Iniciando upload do arquivo para o Supabase...");
         const { data, error: uploadError } = await supabase.storage
             .from(bucketName)
-            .upload(filePath, blob, {
+            .upload(filePath, uint8Array, {
                 contentType: file.type,
                 cacheControl: "3600",
                 upsert: true
@@ -118,7 +137,9 @@ export async function POST(request) {
             
         if (uploadError) {
             console.error("Erro no upload:", uploadError);
-            return NextResponse.json({ error: `Erro no upload: ${uploadError.message}` }, { status: 500 });
+            return NextResponse.json({ 
+                error: `Erro no upload: ${uploadError.message}` 
+            }, { status: 500 });
         }
         
         console.log("Upload concluído com sucesso, obtendo URL pública");
@@ -139,6 +160,9 @@ export async function POST(request) {
         return NextResponse.json({ url });
     } catch (error) {
         console.error("Erro no servidor:", error);
-        return NextResponse.json({ error: `Erro no servidor: ${error.message}` }, { status: 500 });
+        return NextResponse.json({ 
+            error: `Erro no servidor: ${error.message}`, 
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined 
+        }, { status: 500 });
     }
 } 

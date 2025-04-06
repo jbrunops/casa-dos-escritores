@@ -175,10 +175,18 @@ export default function EditProfilePage() {
                         .substring(2)}.${fileExt}`;
                     const filePath = `avatars/${fileName}`;
 
+                    // Converter para ArrayBuffer e depois para Uint8Array para maior compatibilidade
+                    const arrayBuffer = await avatarFile.arrayBuffer();
+                    const uint8Array = new Uint8Array(arrayBuffer);
+
                     // Upload para o Storage
                     const { error: uploadError } = await supabase.storage
                         .from("avatars")
-                        .upload(filePath, avatarFile);
+                        .upload(filePath, uint8Array, {
+                            contentType: avatarFile.type,
+                            cacheControl: "3600",
+                            upsert: true
+                        });
 
                     if (uploadError) {
                         console.error("Erro no upload:", uploadError);
@@ -195,6 +203,7 @@ export default function EditProfilePage() {
                     console.error("Erro no upload do avatar:", uploadErr);
                     // Se houver erro no upload, manter a URL atual
                     // mas não interromper o processo de atualização do perfil
+                    setError("Erro ao fazer upload da imagem. Seu perfil será atualizado sem a nova imagem.");
                 }
             }
 

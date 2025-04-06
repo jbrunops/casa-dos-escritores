@@ -63,6 +63,7 @@ export default function SeriesHighlights() {
                 if (error) {
                     console.error("Erro na consulta das séries:", error);
                     setSeries([]);
+                    setLoading(false);
                     return;
                 }
 
@@ -70,34 +71,63 @@ export default function SeriesHighlights() {
                 if (!data || data.length === 0) {
                     console.log("Nenhuma série encontrada");
                     setSeries([]);
+                    setLoading(false);
                     return;
                 }
 
-                // Buscar autores e contagem de capítulos
-                const seriesWithDetails = await Promise.all(
-                    data.map(async (serie) => {
-                        // Buscar autor
-                        const { data: author } = await supabase
-                            .from("profiles")
-                            .select("username")
-                            .eq("id", serie.author_id)
-                            .single();
+                try {
+                    // Buscar autores e contagem de capítulos
+                    const seriesWithDetails = await Promise.all(
+                        data.map(async (serie) => {
+                            // Buscar autor
+                            let authorName = "Autor desconhecido";
+                            try {
+                                const { data: author } = await supabase
+                                    .from("profiles")
+                                    .select("username")
+                                    .eq("id", serie.author_id)
+                                    .single();
+                                    
+                                if (author && author.username) {
+                                    authorName = author.username;
+                                }
+                            } catch (authorError) {
+                                console.error("Erro ao buscar autor:", authorError);
+                            }
 
-                        // Buscar contagem de capítulos
-                        const { count } = await supabase
-                            .from("chapters")
-                            .select("*", { count: "exact" })
-                            .eq("series_id", serie.id);
+                            // Buscar contagem de capítulos
+                            let chapterCount = 0;
+                            try {
+                                const { count } = await supabase
+                                    .from("chapters")
+                                    .select("*", { count: "exact" })
+                                    .eq("series_id", serie.id);
+                                    
+                                if (count !== null && count !== undefined) {
+                                    chapterCount = count;
+                                }
+                            } catch (chapterError) {
+                                console.error("Erro ao buscar capítulos:", chapterError);
+                            }
 
-                        return {
-                            ...serie,
-                            author_name: author?.username || "Autor desconhecido",
-                            chapter_count: count || 0,
-                        };
-                    })
-                );
+                            return {
+                                ...serie,
+                                author_name: authorName,
+                                chapter_count: chapterCount,
+                            };
+                        })
+                    );
 
-                setSeries(seriesWithDetails);
+                    setSeries(seriesWithDetails);
+                } catch (detailsError) {
+                    console.error("Erro ao buscar detalhes das séries:", detailsError);
+                    // Mesmo com erro nos detalhes, exibir séries com dados básicos
+                    setSeries(data.map(serie => ({
+                        ...serie,
+                        author_name: "Autor desconhecido",
+                        chapter_count: 0
+                    })));
+                }
             } catch (error) {
                 console.error("Erro ao buscar séries populares:", error);
                 setSeries([]);
@@ -106,7 +136,18 @@ export default function SeriesHighlights() {
             }
         }
 
+        // Definir um timeout para garantir que loading não fique preso
+        const timeoutId = setTimeout(() => {
+            if (loading) {
+                console.log("Timeout de carregamento atingido, forçando estado de não-loading");
+                setLoading(false);
+            }
+        }, 10000); // 10 segundos de timeout
+
         fetchPopularSeries();
+
+        // Limpar timeout ao desmontar componente
+        return () => clearTimeout(timeoutId);
     }, []);
 
     const nextSlide = () => {
