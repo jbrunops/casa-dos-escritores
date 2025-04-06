@@ -218,8 +218,8 @@ export default async function HomePage() {
     return (
         <main>
             <div className="home-page">
-                <section className="hero-section py-16 bg-gradient-to-b from-[#f8f9ff] to-white">
-                    <section className="mt-[1.8rem] mb-[1.8rem] max-h-[14.3rem] flex flex-col items-center justify-center text-center py-12 px-4" 
+                <section className="hero-section py-16 bg-white">
+                    <section className="mt-[1.875rem] mb-[1.875rem] max-h-[14.3rem] flex flex-col items-center justify-center text-center py-12 px-4" 
                         style={{
                             backgroundImage: "url('/images/banner.jpg')",
                             backgroundSize: "cover",
@@ -227,22 +227,12 @@ export default async function HomePage() {
                             backgroundRepeat: "no-repeat",
                         }}
                     >
-                        <h1 className="text-4xl font-extrabold text-white mb-4 drop-shadow-lg">
-                            Casa dos Escritores
+                        <h1 className="text-4xl font-extrabold text-[#484DB5] mb-4">
+                            O lugar certo para você inserir suas ideias!
                         </h1>
-                        <p className="text-xl text-white mb-8 max-w-3xl drop-shadow-md">
-                            Compartilhe suas histórias e séries com o mundo
+                        <p className="text-lg text-[#484DB5] mb-8 max-w-3xl bg-[#E5E7EB] px-4 py-2 rounded">
+                            Crie, compartilhe; escreva fantasia, terror, humor, ficção científica e muito mais.
                         </p>
-                        <div className="flex space-x-4">
-                            <Link href="/write" className="bg-[#484DB5] hover:bg-[#3a3e9f] text-white px-6 py-3 rounded-md flex items-center font-bold shadow-md transition duration-300">
-                                <Edit className="mr-2" size={20} />
-                                Escrever História
-                            </Link>
-                            <Link href="/series" className="bg-white hover:bg-gray-100 text-[#484DB5] px-6 py-3 rounded-md flex items-center font-bold shadow-md transition duration-300">
-                                <BookOpen className="mr-2" size={20} />
-                                Explorar Séries
-                            </Link>
-                        </div>
                     </section>
                 </section>
 
