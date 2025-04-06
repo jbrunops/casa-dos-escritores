@@ -130,22 +130,22 @@ export default async function SeriesPage({ searchParams }) {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className="flex flex-wrap gap-6 justify-center">
                             {seriesWithChapterCount.map((serie) => (
                                 <Link
                                     href={`/series/${generateSlug(serie.title, serie.id)}`}
                                     key={serie.id}
-                                    className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col border border-[#E5E7EB] h-full"
+                                    className="bg-white rounded-lg overflow-hidden shadow-sm flex flex-col border border-[#E5E7EB] w-[220px]"
                                 >
-                                    <div className="h-[300px] relative bg-gray-100">
+                                    <div className="relative h-[300px] bg-gray-100">
                                         {serie.cover_url ? (
                                             <img
                                                 src={serie.cover_url}
                                                 alt={serie.title}
-                                                className="object-contain w-full h-full"
+                                                className="object-cover w-full h-full"
                                             />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#f5f5ff] to-[#e6e7ff]">
+                                            <div className="w-full h-full flex items-center justify-center bg-[#f8f9fe]">
                                                 <span className="text-5xl font-bold text-[#484DB5]">
                                                     {serie.title
                                                         .charAt(0)
@@ -153,51 +153,42 @@ export default async function SeriesPage({ searchParams }) {
                                                 </span>
                                             </div>
                                         )}
-                                        {serie.is_completed ? (
-                                            <span className="absolute top-2 right-2 bg-green-500 text-white text-xs font-medium px-2 py-1 rounded">
-                                                Completa
-                                            </span>
-                                        ) : (
-                                            <span className="absolute top-2 right-2 bg-amber-500 text-white text-xs font-medium px-2 py-1 rounded">
-                                                Em andamento
-                                            </span>
-                                        )}
                                     </div>
                                     <div className="p-4 flex-grow flex flex-col">
-                                        <h3 className="text-lg font-bold text-gray-800 mb-1 line-clamp-2">
+                                        <h3 className="text-base font-semibold text-gray-800 mb-1 line-clamp-2">
                                             {serie.title}
                                         </h3>
                                         
-                                        <div className="flex items-center text-gray-600 text-sm mb-2">
-                                            <User className="w-4 h-4 mr-1" />
-                                            <span className="line-clamp-1">{serie.author_name}</span>
-                                        </div>
-                                        
-                                        <div className="flex flex-wrap mt-auto pt-2 text-sm text-gray-600">
-                                            <div className="flex items-center mr-4">
-                                                <BookOpen className="w-4 h-4 mr-1" />
-                                                <span>
-                                                    {serie.chapter_count}{" "}
-                                                    {serie.chapter_count === 1
-                                                        ? "capítulo"
-                                                        : "capítulos"}
-                                                </span>
-                                            </div>
-                                            
-                                            <div className="flex items-center">
-                                                <Eye className="w-4 h-4 mr-1" />
-                                                <span>{serie.view_count || 0}</span>
-                                            </div>
+                                        <div className="text-xs text-gray-500 mb-1">
+                                            {serie.author_name}
                                         </div>
                                         
                                         {serie.genre && (
-                                            <div className="mt-3 flex">
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f5f5ff] text-[#484DB5]">
-                                                    <Tag className="w-3 h-3 mr-1" />
+                                            <div className="mb-4">
+                                                <span className="text-xs text-[#484DB5]">
                                                     {serie.genre}
                                                 </span>
                                             </div>
                                         )}
+                                        
+                                        <div className="flex justify-between items-center mt-auto text-xs text-gray-600">
+                                            <div className="flex space-x-4">
+                                                <div className="flex items-center">
+                                                    <Eye className="w-4 h-4 mr-1" />
+                                                    <span>{serie.view_count || 0}</span>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <BookOpen className="w-4 h-4 mr-1" />
+                                                    <span>{serie.chapter_count}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            {!serie.is_completed && (
+                                                <span className="bg-[#484DB5] text-white text-xs px-2 py-0.5 rounded">
+                                                    em andamento
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 </Link>
                             ))}

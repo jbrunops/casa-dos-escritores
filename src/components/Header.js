@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, Compass, BookOpen, Search, Menu, User, LogOut, LayoutDashboard, BookMarked } from "lucide-react";
 import MobileMenu from "./MobileMenu";
-import { createBrowserClient } from "@/lib/supabase-browser";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Header() {
     const pathname = usePathname();
@@ -13,58 +13,13 @@ export default function Header() {
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [user, setUser] = useState(null);
-    const [profile, setProfile] = useState(null);
-    const [loading, setLoading] = useState(true);
     const categoryDropdownRef = useRef(null);
     const searchInputRef = useRef(null);
-    const supabase = createBrowserClient();
     const [showUserDropdown, setShowUserDropdown] = useState(false);
     const userDropdownRef = useRef(null);
     
-    // Verificar autenticação do usuário
-    useEffect(() => {
-        async function checkAuth() {
-            try {
-                setLoading(true);
-                const { data: { session } } = await supabase.auth.getSession();
-                
-                if (session?.user) {
-                    setUser(session.user);
-                    
-                    // Buscar perfil do usuário
-                    const { data } = await supabase
-                        .from('profiles')
-                        .select('*')
-                        .eq('id', session.user.id)
-                        .single();
-                        
-                    if (data) {
-                        setProfile(data);
-                    }
-                }
-            } catch (error) {
-                console.error('Erro ao verificar autenticação:', error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        
-        checkAuth();
-    }, []);
-    
-    // Função para fazer logout
-    const handleLogout = async () => {
-        try {
-            await supabase.auth.signOut();
-            setUser(null);
-            setProfile(null);
-            router.push('/');
-            router.refresh();
-        } catch (error) {
-            console.error('Erro ao fazer logout:', error);
-        }
-    };
+    // Usar o contexto de autenticação
+    const { user, profile, loading, signOut } = useAuth();
     
     // Fechar dropdown ao clicar fora
     useEffect(() => {
@@ -294,7 +249,7 @@ export default function Header() {
                                                     <button
                                                         onClick={() => {
                                                             setShowUserDropdown(false);
-                                                            handleLogout();
+                                                            signOut();
                                                         }}
                                                         className="flex items-center w-full text-left px-4 py-2 text-red-600 hover:text-red-700 hover:bg-gray-50"
                                                     >
@@ -345,7 +300,7 @@ export default function Header() {
                 setSearchQuery={setSearchQuery}
                 user={user}
                 profile={profile}
-                onLogout={handleLogout}
+                onLogout={signOut}
             />
         </>
     );

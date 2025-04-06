@@ -1,6 +1,7 @@
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata = {
     title: "Plataforma para Escritores",
@@ -17,11 +18,13 @@ export default function RootLayout({ children }) {
                 />
             </head>
             <body className="flex flex-col min-h-screen bg-white font-sans" suppressHydrationWarning>
-                <Header />
-                <main className="flex-grow w-full">
-                    {children}
-                </main>
-                <Footer />
+                <AuthProvider>
+                    <Header />
+                    <main className="flex-grow w-full">
+                        {children}
+                    </main>
+                    <Footer />
+                </AuthProvider>
             </body>
         </html>
     );

@@ -237,6 +237,10 @@ export default function SeriesPage() {
                                 <BookOpen size={16} className="mr-1" />
                                 <span>{chapters?.length || 0} capítulos</span>
                             </div>
+                            
+                            <div className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#484DB5] text-white">
+                                {series.is_completed ? "Completa" : "Em andamento"}
+                            </div>
                         </div>
 
                         {/* Descrição */}

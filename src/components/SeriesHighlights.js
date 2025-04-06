@@ -187,45 +187,56 @@ export default function SeriesHighlights() {
                             <div className="series-card-rank">
                                 #{index + 1}
                             </div>
-                            {serie.is_completed && (
-                                <span className="series-card-badge">
-                                    Completa
-                                </span>
-                            )}
                             <div className="series-card-image">
                                 {serie.cover_url ? (
                                     <img 
                                         src={serie.cover_url} 
                                         alt={serie.title} 
                                         loading="lazy"
+                                        className="w-full h-full object-cover"
                                     />
                                 ) : (
-                                    <div className="w-full h-full bg-[#EEF0FF] flex items-center justify-center">
-                                        <BookOpen size={48} className="text-[#484DB5] opacity-50" />
+                                    <div className="w-full h-full bg-[#f8f9fe] flex items-center justify-center">
+                                        <span className="text-5xl font-bold text-[#484DB5]">
+                                            {serie.title.charAt(0).toUpperCase()}
+                                        </span>
                                     </div>
+                                )}
+                                {serie.is_completed && (
+                                    <span className="absolute top-2 right-2 bg-green-500 text-white text-xs font-medium px-2 py-1 rounded">
+                                        Completa
+                                    </span>
                                 )}
                             </div>
                             
-                            <div className="series-card-content">
-                                <h3 className="series-card-title">{serie.title}</h3>
-                                <p className="series-card-author">por {serie.author_name}</p>
+                            <div className="p-4 flex-grow flex flex-col">
+                                <h3 className="text-base font-semibold text-gray-800 mb-1 line-clamp-2">{serie.title}</h3>
+                                <div className="text-xs text-gray-500 mb-1">{serie.author_name}</div>
+                                
                                 {serie.genre && (
-                                    <p className="series-card-genre">{serie.genre}</p>
+                                    <div className="mb-4">
+                                        <span className="text-xs text-[#484DB5]">
+                                            {serie.genre}
+                                        </span>
+                                    </div>
                                 )}
                                 
-                                <div className="series-card-stats">
-                                    <div className="series-card-stat">
-                                        <Eye size={16} />
-                                        <span>{formatCount(serie.view_count)}</span>
-                                    </div>
-                                    <div className="series-card-stat">
-                                        <Book size={16} />
-                                        <span>{serie.chapter_count}</span>
-                                    </div>
-                                    {!serie.is_completed && (
-                                        <div className="series-card-status">
-                                            em andamento
+                                <div className="flex justify-between items-center mt-auto text-xs text-gray-600">
+                                    <div className="flex space-x-4">
+                                        <div className="flex items-center">
+                                            <Eye className="w-4 h-4 mr-1" />
+                                            <span>{formatCount(serie.view_count)}</span>
                                         </div>
+                                        <div className="flex items-center">
+                                            <Book className="w-4 h-4 mr-1" />
+                                            <span>{serie.chapter_count}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    {!serie.is_completed && (
+                                        <span className="bg-[#484DB5] text-white text-xs px-2 py-0.5 rounded">
+                                            em andamento
+                                        </span>
                                     )}
                                 </div>
                             </div>

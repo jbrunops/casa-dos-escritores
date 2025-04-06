@@ -5,12 +5,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X, Compass, BookOpen, ChevronDown, Search, User, LogOut, LayoutDashboard, BookMarked } from "lucide-react";
 import MobileSeries from "./MobileSeries";
+import { useAuth } from "@/contexts/AuthContext";
 
-export default function MobileMenu({ isOpen, onClose, onSearch, searchQuery = '', setSearchQuery, user, profile, onLogout }) {
+export default function MobileMenu({ isOpen, onClose, onSearch, searchQuery = '', setSearchQuery }) {
   const menuRef = useRef(null);
   const pathname = usePathname();
   const [showCategories, setShowCategories] = useState(false);
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
+  // Usar o contexto de autenticação
+  const { user, profile, signOut } = useAuth();
   
   // Atualizar estado local quando a prop muda
   useEffect(() => {
@@ -63,7 +66,7 @@ export default function MobileMenu({ isOpen, onClose, onSearch, searchQuery = ''
   // Função para lidar com logout no menu mobile
   const handleMobileLogout = () => {
     onClose();
-    if (onLogout) onLogout();
+    signOut();
   };
   
   if (!isOpen) return null;
@@ -253,17 +256,18 @@ export default function MobileMenu({ isOpen, onClose, onSearch, searchQuery = ''
                   <Link
                     href="/login"
                     onClick={onClose}
-                    className="block bg-[#484DB5] hover:bg-[#7A80FB] text-white text-center max-h-[2.5rem] w-full py-2 rounded-md transition-colors"
+                    className="flex items-center text-[#484DB5] hover:text-[#7A80FB] py-2 font-medium"
                   >
-                    <span className="font-bold">Entrar</span>
+                    <User size={18} className="mr-2" />
+                    <span>Entrar</span>
                   </Link>
                 </li>
                 
-                <li className="mt-3">
+                <li>
                   <Link
                     href="/signup"
                     onClick={onClose}
-                    className="block text-[#484DB5] hover:text-[#7A80FB] text-center text-[1rem] py-2"
+                    className="flex items-center bg-[#484DB5] text-white py-2 px-4 rounded-md hover:bg-[#7A80FB] mt-2"
                   >
                     <span>Cadastre-se</span>
                   </Link>

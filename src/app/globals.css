@@ -318,8 +318,8 @@
 }
 
 .series-card {
-  width: 17.125rem;
-  height: 31rem;
+  width: 220px;
+  height: auto;
   flex-shrink: 0;
   border: 1px solid #E5E7EB;
   border-radius: 0.5rem;
@@ -336,9 +336,9 @@
 }
 
 .series-card-image {
-  height: 24rem;
+  height: 300px;
   position: relative;
-  background-color: #f3f3f3;
+  background-color: #f8f9fe;
   overflow: hidden;
 }
 
@@ -362,8 +362,8 @@
   left: 0;
   background-color: #484DB5;
   color: white;
-  padding: 0.3rem 0.8rem;
-  font-size: 1rem;
+  padding: 0.25rem 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   border-radius: 0 5px 5px 0;
 }
@@ -441,12 +441,11 @@
   }
   
   .series-card {
-    width: 16rem;
-    height: 31rem;
+    width: 220px;
   }
   
   .series-card-image {
-    height: 24rem;
+    height: 300px;
   }
   
   .carousel-button {
@@ -469,15 +468,12 @@
 }
 
 .series-card-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   background-color: #484DB5;
   color: white;
-  padding: 0.25rem 0.6rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
   font-size: 0.75rem;
-  border-radius: 3px;
-  margin-left: auto;
+  font-weight: 500;
 }
 
 /* Estilos para a seção Como Funciona */
