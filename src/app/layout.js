@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
             <body className="flex flex-col min-h-screen bg-white font-sans" suppressHydrationWarning>
                 <AuthProvider>
                     <Header />
-                    <main className="flex-grow w-full">
+                    <main className="flex-grow w-full px-4 md:px-0">
                         {children}
                     </main>
                     <Footer />

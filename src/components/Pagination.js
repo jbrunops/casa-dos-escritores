@@ -41,28 +41,28 @@ export default function Pagination({ currentPage, totalPages, baseUrl }) {
     const pageNumbers = getPageNumbers();
 
     return (
-        <div className="flex items-center justify-center my-8">
+        <div className="flex flex-wrap items-center justify-center my-8 px-4">
             {/* Botão Anterior */}
             {currentPage > 1 ? (
                 <Link
                     href={`${baseUrl}?page=${currentPage - 1}`}
-                    className="px-4 py-2 mx-1 rounded bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-purple-700 transition-colors"
+                    className="px-3 py-2 my-1 mx-1 rounded bg-white border border-[#E5E7EB] text-gray-700 hover:bg-gray-50 hover:text-[#484DB5] transition-colors text-sm"
                 >
                     Anterior
                 </Link>
             ) : (
-                <span className="px-4 py-2 mx-1 rounded bg-gray-100 border border-gray-300 text-gray-400 cursor-not-allowed">
+                <span className="px-3 py-2 my-1 mx-1 rounded bg-gray-100 border border-[#E5E7EB] text-gray-400 cursor-not-allowed text-sm">
                     Anterior
                 </span>
             )}
 
             {/* Números das páginas */}
-            <div className="flex mx-2">
+            <div className="flex flex-wrap mx-1 justify-center">
                 {pageNumbers.map((page, index) =>
                     page === "..." ? (
                         <span
                             key={`ellipsis-${index}`}
-                            className="px-4 py-2 mx-1 text-gray-600"
+                            className="px-3 py-2 mx-1 my-1 text-gray-600 text-sm"
                         >
                             ...
                         </span>
@@ -70,10 +70,10 @@ export default function Pagination({ currentPage, totalPages, baseUrl }) {
                         <Link
                             key={page}
                             href={`${baseUrl}?page=${page}`}
-                            className={`px-4 py-2 mx-1 rounded ${
+                            className={`px-3 py-2 mx-1 my-1 rounded text-sm ${
                                 currentPage === page 
-                                ? "bg-purple-600 text-white" 
-                                : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-purple-700"
+                                ? "bg-[#484DB5] text-white" 
+                                : "bg-white border border-[#E5E7EB] text-gray-700 hover:bg-gray-50 hover:text-[#484DB5]"
                             } transition-colors`}
                         >
                             {page}
@@ -86,12 +86,12 @@ export default function Pagination({ currentPage, totalPages, baseUrl }) {
             {currentPage < totalPages ? (
                 <Link
                     href={`${baseUrl}?page=${currentPage + 1}`}
-                    className="px-4 py-2 mx-1 rounded bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-purple-700 transition-colors"
+                    className="px-3 py-2 my-1 mx-1 rounded bg-white border border-[#E5E7EB] text-gray-700 hover:bg-gray-50 hover:text-[#484DB5] transition-colors text-sm"
                 >
                     Próximo
                 </Link>
             ) : (
-                <span className="px-4 py-2 mx-1 rounded bg-gray-100 border border-gray-300 text-gray-400 cursor-not-allowed">
+                <span className="px-3 py-2 my-1 mx-1 rounded bg-gray-100 border border-[#E5E7EB] text-gray-400 cursor-not-allowed text-sm">
                     Próximo
                 </span>
             )}
