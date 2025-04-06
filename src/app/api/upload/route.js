@@ -7,36 +7,79 @@ export async function POST(request) {
         console.log("Iniciando processamento de upload");
         
         // Acessar as chaves do Supabase
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        let serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+        // Defina a chave correta caso esteja em ambiente de desenvolvimento
+        // e a variável não esteja sendo carregada corretamente
+        const hardcodedServiceRoleKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtreWtlc2RvcWRlYWdudXZseGFvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Mzc4Nzk1NiwiZXhwIjoyMDU5MzYzOTU2fQ.mpMIymtj-VHrouVu9RGEcQY3qvNOAi6hgjUW-Cs2in0";
 
         // Verificar se as chaves estão definidas
         if (!supabaseUrl || !serviceRoleKey) {
             console.error("Variáveis de ambiente não carregadas corretamente:");
-            console.error("URL:", supabaseUrl ? "Definida" : "Não definida");
-            console.error("Service Key:", serviceRoleKey ? "Definida" : "Não definida");
+            console.error("NEXT_PUBLIC_SUPABASE_URL:", supabaseUrl ? "Definida" : "Não definida");
+            console.error("SUPABASE_SERVICE_ROLE_KEY:", serviceRoleKey ? "Definida" : "Não definida");
             
-            // Retornar erro claro para o usuário
-            return NextResponse.json({ 
-                error: "Configuração do servidor incompleta. Por favor, contate o administrador." 
-            }, { status: 500 });
-        }
-            
-        // Usar cliente do Supabase com chave de serviço para ignorar RLS
-        const supabase = createClient(supabaseUrl, serviceRoleKey);
-        console.log("Cliente Supabase criado com chave de serviço");
-        
-        try {
-            // Verificar se o bucket 'covers' existe
-            const { data: buckets, error: listError } = await supabase.storage.listBuckets();
-            
-            if (listError) {
-                console.error("Erro ao listar buckets:", listError);
+            // Carregar valores padrão (apenas em desenvolvimento)
+            if (process.env.NODE_ENV === 'development') {
+                console.log("Tentando usar valores padrão em ambiente de desenvolvimento");
+                
+                if (!supabaseUrl) {
+                    supabaseUrl = "https://kkykesdoqdeagnuvlxao.supabase.co";
+                    console.log("Usando URL padrão do Supabase");
+                }
+                
+                if (!serviceRoleKey) {
+                    console.log("Usando chave de serviço hardcoded para desenvolvimento");
+                    serviceRoleKey = hardcodedServiceRoleKey;
+                }
+            } else {
+                // Em produção, falhar se as variáveis não estiverem definidas
                 return NextResponse.json({ 
-                    error: "Erro ao acessar storage. Detalhes: " + listError.message 
+                    error: "Configuração do servidor incompleta. Por favor, contate o administrador." 
                 }, { status: 500 });
             }
+        }
+        
+        console.log("Usando Supabase URL:", supabaseUrl);
+        console.log("Chave de serviço do Supabase está definida:", !!serviceRoleKey);
             
+        // Usar cliente do Supabase com chave de serviço para ignorar RLS
+        console.log("Criando cliente Supabase com chave de serviço");
+        console.log("Primeiros 10 caracteres da chave:", serviceRoleKey.substring(0, 10) + "...");
+        
+        const supabase = createClient(supabaseUrl, serviceRoleKey, {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false
+            }
+        });
+        console.log("Cliente Supabase criado com chave de serviço");
+        
+        // Verificar conexão com o Supabase
+        let buckets;
+        try {
+            // Para o serviço, em vez de verificar autenticação, apenas 
+            // verificamos se conseguimos listar buckets para confirmar 
+            // que a chave está funcionando
+            const { data: bucketsData, error: listError } = await supabase.storage.listBuckets();
+            
+            if (listError) {
+                console.error("Erro ao verificar conexão com Supabase:", listError);
+                return NextResponse.json({ 
+                    error: `Erro ao acessar Supabase Storage com chave de serviço: ${listError.message}` 
+                }, { status: 500 });
+            }
+            buckets = bucketsData;
+            console.log("Conexão com Supabase verificada com sucesso");
+        } catch (authError) {
+            console.error("Erro ao verificar conexão com Supabase:", authError);
+            return NextResponse.json({ 
+                error: `Erro na autenticação do Supabase: ${authError.message}` 
+            }, { status: 500 });
+        }
+        
+        try {
             // Criar o bucket se não existir
             const bucketName = "covers";
             let bucketExists = buckets.some(bucket => bucket.name === bucketName);
@@ -118,18 +161,8 @@ export async function POST(request) {
             console.log("Nome do arquivo gerado:", fileName);
             console.log("Caminho do arquivo:", filePath);
             
-            // Verificar se a pasta series_covers existe
+            // Bucket para upload
             const bucketName = "covers";
-            const { data: folderData, error: folderError } = await supabase.storage
-                .from(bucketName)
-                .list();
-                
-            if (folderError) {
-                console.error("Erro ao listar conteúdo do bucket:", folderError);
-                return NextResponse.json({ 
-                    error: "Erro ao verificar estrutura de pastas. Detalhes: " + folderError.message 
-                }, { status: 500 });
-            }
             
             // Upload do arquivo usando Uint8Array para maior compatibilidade
             const uint8Array = new Uint8Array(buffer);
@@ -176,7 +209,7 @@ export async function POST(request) {
     } catch (error) {
         console.error("Erro no servidor:", error);
         return NextResponse.json({ 
-            error: `Erro no upload da imagem: Erro ao acessar storage. Detalhes: Invalid signature`,
+            error: `Erro no upload da imagem: ${error.message || "Erro desconhecido"}`,
             stack: process.env.NODE_ENV === 'development' ? error.stack : undefined 
         }, { status: 500 });
     }
