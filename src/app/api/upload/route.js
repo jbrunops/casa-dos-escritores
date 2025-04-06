@@ -4,6 +4,8 @@ import { createClient } from "@supabase/supabase-js";
 // Função para lidar com upload de arquivos usando a chave de serviço
 export async function POST(request) {
     try {
+        console.log("Iniciando processamento de upload");
+        
         // Acessar as chaves do Supabase
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
         const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -24,6 +26,7 @@ export async function POST(request) {
         } else {
             // Usar cliente do Supabase com chave de serviço para ignorar RLS
             var supabase = createClient(supabaseUrl, serviceRoleKey);
+            console.log("Usando variáveis de ambiente para o Supabase");
         }
         
         // Verificar se o bucket 'covers' existe
@@ -39,6 +42,7 @@ export async function POST(request) {
         let bucketExists = buckets.some(bucket => bucket.name === bucketName);
         
         if (!bucketExists) {
+            console.log("Bucket 'covers' não encontrado. Criando...");
             const { error: createError } = await supabase.storage.createBucket(bucketName, {
                 public: true
             });
@@ -49,6 +53,8 @@ export async function POST(request) {
             }
             
             console.log("Bucket criado com sucesso");
+        } else {
+            console.log("Bucket 'covers' já existe");
         }
         
         // Verificar políticas de acesso
@@ -57,6 +63,7 @@ export async function POST(request) {
         if (policyError) {
             console.error("Erro ao verificar política do bucket:", policyError);
         } else if (!bucket.public) {
+            console.log("Atualizando bucket para acesso público");
             // Tornar o bucket público
             const { error: updateError } = await supabase.storage.updateBucket(bucketName, {
                 public: true
@@ -64,32 +71,43 @@ export async function POST(request) {
             
             if (updateError) {
                 console.error("Erro ao atualizar política do bucket:", updateError);
+            } else {
+                console.log("Bucket atualizado para acesso público");
             }
         }
 
         // Processar o FormData
+        console.log("Processando FormData do request");
         const formData = await request.formData();
         const file = formData.get("file");
         const userId = formData.get("userId");
         
         if (!file) {
+            console.error("Nenhum arquivo enviado no FormData");
             return NextResponse.json({ error: "Nenhum arquivo enviado" }, { status: 400 });
         }
         
         if (!userId) {
+            console.error("ID do usuário não fornecido no FormData");
             return NextResponse.json({ error: "ID do usuário não fornecido" }, { status: 400 });
         }
 
+        console.log("Arquivo recebido:", file.name, "Tipo:", file.type, "Tamanho:", file.size);
+
         // Obter informações do arquivo
         const buffer = await file.arrayBuffer();
-        const fileExt = file.name.split(".").pop();
+        const fileExt = file.name.split(".").pop().toLowerCase();
         const fileName = `series_${userId}_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
         const filePath = `series_covers/${fileName}`;
+        
+        console.log("Nome do arquivo gerado:", fileName);
+        console.log("Caminho do arquivo:", filePath);
         
         // Converter ArrayBuffer para Blob
         const blob = new Blob([buffer]);
         
         // Upload do arquivo
+        console.log("Iniciando upload do arquivo para o Supabase...");
         const { data, error: uploadError } = await supabase.storage
             .from(bucketName)
             .upload(filePath, blob, {
@@ -103,6 +121,8 @@ export async function POST(request) {
             return NextResponse.json({ error: `Erro no upload: ${uploadError.message}` }, { status: 500 });
         }
         
+        console.log("Upload concluído com sucesso, obtendo URL pública");
+        
         // Obter URL pública
         const { data: publicUrlData } = supabase.storage
             .from(bucketName)
@@ -111,9 +131,11 @@ export async function POST(request) {
         const url = publicUrlData?.publicUrl;
         
         if (!url) {
+            console.error("Falha ao obter URL pública");
             return NextResponse.json({ error: "Falha ao obter URL pública" }, { status: 500 });
         }
         
+        console.log("URL pública obtida:", url);
         return NextResponse.json({ url });
     } catch (error) {
         console.error("Erro no servidor:", error);
