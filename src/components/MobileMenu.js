@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { X, Compass, BookOpen, ChevronDown, Search } from "lucide-react";
+import { X, Compass, BookOpen, ChevronDown, Search, User, LogOut, LayoutDashboard, BookMarked } from "lucide-react";
 import MobileSeries from "./MobileSeries";
 
-export default function MobileMenu({ isOpen, onClose, onSearch, searchQuery = '', setSearchQuery }) {
+export default function MobileMenu({ isOpen, onClose, onSearch, searchQuery = '', setSearchQuery, user, profile, onLogout }) {
   const menuRef = useRef(null);
   const pathname = usePathname();
   const [showCategories, setShowCategories] = useState(false);
@@ -58,6 +58,12 @@ export default function MobileMenu({ isOpen, onClose, onSearch, searchQuery = ''
       onSearch(e);
       onClose();
     }
+  };
+  
+  // Função para lidar com logout no menu mobile
+  const handleMobileLogout = () => {
+    onClose();
+    if (onLogout) onLogout();
   };
   
   if (!isOpen) return null;
@@ -157,25 +163,83 @@ export default function MobileMenu({ isOpen, onClose, onSearch, searchQuery = ''
             
             <div className="border-t border-gray-100 my-4"></div>
             
-            <li>
-              <Link
-                href="/login"
-                onClick={onClose}
-                className="block bg-[#484DB5] hover:bg-[#7A80FB] text-white text-center max-h-[2.5rem] w-full py-2 rounded-md transition-colors"
-              >
-                <span>Entrar</span>
-              </Link>
-            </li>
-            
-            <li className="mt-3">
-              <Link
-                href="/signup"
-                onClick={onClose}
-                className="block text-[#484DB5] hover:text-[#7A80FB] text-center text-[1rem] py-2"
-              >
-                <span>Cadastre-se</span>
-              </Link>
-            </li>
+            {user ? (
+              <>
+                {/* Menu para usuário logado */}
+                <li>
+                  <div className="flex items-center mb-4 py-2">
+                    <User size={20} className="text-[#484DB5] mr-2" />
+                    <span className="font-medium text-gray-800">{profile?.username || 'Usuário'}</span>
+                  </div>
+                </li>
+                
+                <li>
+                  <Link
+                    href="/dashboard"
+                    onClick={onClose}
+                    className="flex items-center text-[#484DB5] hover:text-[#7A80FB] py-2"
+                  >
+                    <LayoutDashboard size={18} className="mr-2" />
+                    <span>Meu Painel</span>
+                  </Link>
+                </li>
+                
+                <li>
+                  <Link
+                    href={`/profile/${profile?.username || ''}`}
+                    onClick={onClose}
+                    className="flex items-center text-[#484DB5] hover:text-[#7A80FB] py-2"
+                  >
+                    <User size={18} className="mr-2" />
+                    <span>Meu Perfil</span>
+                  </Link>
+                </li>
+                
+                <li>
+                  <Link
+                    href="/dashboard/series"
+                    onClick={onClose}
+                    className="flex items-center text-[#484DB5] hover:text-[#7A80FB] py-2"
+                  >
+                    <BookMarked size={18} className="mr-2" />
+                    <span>Minhas Séries</span>
+                  </Link>
+                </li>
+                
+                <li className="border-t border-gray-100 pt-4 mt-4">
+                  <button
+                    onClick={handleMobileLogout}
+                    className="flex items-center w-full text-red-600 hover:text-red-700 py-2"
+                  >
+                    <LogOut size={18} className="mr-2" />
+                    <span>Sair</span>
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                {/* Menu para visitantes */}
+                <li>
+                  <Link
+                    href="/login"
+                    onClick={onClose}
+                    className="block bg-[#484DB5] hover:bg-[#7A80FB] text-white text-center max-h-[2.5rem] w-full py-2 rounded-md transition-colors"
+                  >
+                    <span className="font-bold">Entrar</span>
+                  </Link>
+                </li>
+                
+                <li className="mt-3">
+                  <Link
+                    href="/signup"
+                    onClick={onClose}
+                    className="block text-[#484DB5] hover:text-[#7A80FB] text-center text-[1rem] py-2"
+                  >
+                    <span>Cadastre-se</span>
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </nav>
       </div>

@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Compass, BookOpen, Search, Menu } from "lucide-react";
+import { ChevronDown, Compass, BookOpen, Search, Menu, User, LogOut, LayoutDashboard, BookMarked } from "lucide-react";
 import MobileMenu from "./MobileMenu";
+import { createBrowserClient } from "@/lib/supabase-browser";
 
 export default function Header() {
     const pathname = usePathname();
@@ -12,14 +13,78 @@ export default function Header() {
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [user, setUser] = useState(null);
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
     const categoryDropdownRef = useRef(null);
     const searchInputRef = useRef(null);
+    const supabase = createBrowserClient();
+    const [showUserDropdown, setShowUserDropdown] = useState(false);
+    const userDropdownRef = useRef(null);
+    
+    // Verificar autenticação do usuário
+    useEffect(() => {
+        async function checkAuth() {
+            try {
+                setLoading(true);
+                const { data: { session } } = await supabase.auth.getSession();
+                
+                if (session?.user) {
+                    setUser(session.user);
+                    
+                    // Buscar perfil do usuário
+                    const { data } = await supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', session.user.id)
+                        .single();
+                        
+                    if (data) {
+                        setProfile(data);
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao verificar autenticação:', error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        checkAuth();
+    }, []);
+    
+    // Função para fazer logout
+    const handleLogout = async () => {
+        try {
+            await supabase.auth.signOut();
+            setUser(null);
+            setProfile(null);
+            router.push('/');
+            router.refresh();
+        } catch (error) {
+            console.error('Erro ao fazer logout:', error);
+        }
+    };
     
     // Fechar dropdown ao clicar fora
     useEffect(() => {
         function handleClickOutside(event) {
             if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target)) {
                 setShowCategoryDropdown(false);
+            }
+        }
+        
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+    
+    // Fechar user dropdown ao clicar fora
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+                setShowUserDropdown(false);
             }
         }
         
@@ -159,18 +224,78 @@ export default function Header() {
                     </div>
 
                     <div className="hidden md:flex items-center space-x-4">
-                        <Link 
-                            href="/signup"
-                            className="text-[#484DB5] hover:text-[#7A80FB] text-[1rem] font-bold"
-                        >
-                            Cadastre-se
-                        </Link>
-                        <Link 
-                            href="/login"
-                            className="bg-[#484DB5] hover:bg-[#7A80FB] text-white max-h-[2.5rem] w-[7.5rem] flex items-center justify-center py-2 rounded-md transition-colors"
-                        >
-                            Entrar
-                        </Link>
+                        {!loading && (
+                            <>
+                                {user ? (
+                                    <div ref={userDropdownRef} className="relative">
+                                        <button
+                                            onClick={() => setShowUserDropdown(!showUserDropdown)}
+                                            className="flex items-center text-[#484DB5] hover:text-[#7A80FB] text-[1rem] font-medium"
+                                        >
+                                            <User size={18} className="mr-1" />
+                                            <span>{profile?.username || 'Perfil'}</span>
+                                            <ChevronDown size={16} className="ml-1 max-h-[1rem]" />
+                                        </button>
+
+                                        {showUserDropdown && (
+                                            <div className="absolute top-full right-0 mt-1 w-48 bg-white rounded-md shadow-lg z-10">
+                                                <div className="py-1">
+                                                    <Link
+                                                        href="/dashboard"
+                                                        onClick={() => setShowUserDropdown(false)}
+                                                        className="flex items-center px-4 py-2 text-[#484DB5] hover:text-[#7A80FB] hover:bg-gray-50"
+                                                    >
+                                                        <LayoutDashboard size={16} className="mr-2" />
+                                                        Meu Painel
+                                                    </Link>
+                                                    <Link
+                                                        href={`/profile/${profile?.username || ''}`}
+                                                        onClick={() => setShowUserDropdown(false)}
+                                                        className="flex items-center px-4 py-2 text-[#484DB5] hover:text-[#7A80FB] hover:bg-gray-50"
+                                                    >
+                                                        <User size={16} className="mr-2" />
+                                                        Meu Perfil
+                                                    </Link>
+                                                    <Link
+                                                        href="/dashboard/series"
+                                                        onClick={() => setShowUserDropdown(false)}
+                                                        className="flex items-center px-4 py-2 text-[#484DB5] hover:text-[#7A80FB] hover:bg-gray-50"
+                                                    >
+                                                        <BookMarked size={16} className="mr-2" />
+                                                        Minhas Séries
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => {
+                                                            setShowUserDropdown(false);
+                                                            handleLogout();
+                                                        }}
+                                                        className="flex items-center w-full text-left px-4 py-2 text-red-600 hover:text-red-700 hover:bg-gray-50"
+                                                    >
+                                                        <LogOut size={16} className="mr-2" />
+                                                        Sair
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <>
+                                        <Link 
+                                            href="/signup"
+                                            className="text-[#484DB5] hover:text-[#7A80FB] text-[1rem] font-bold"
+                                        >
+                                            Cadastre-se
+                                        </Link>
+                                        <Link 
+                                            href="/login"
+                                            className="bg-[#484DB5] hover:bg-[#7A80FB] text-white max-h-[2.5rem] w-[7.5rem] flex items-center justify-center py-2 rounded-md transition-colors"
+                                        >
+                                            <span className="font-bold">Entrar</span>
+                                        </Link>
+                                    </>
+                                )}
+                            </>
+                        )}
                     </div>
                     
                     {/* Botão do menu mobile */}
@@ -191,6 +316,9 @@ export default function Header() {
                 onSearch={handleSearchSubmit}
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
+                user={user}
+                profile={profile}
+                onLogout={handleLogout}
             />
         </>
     );
