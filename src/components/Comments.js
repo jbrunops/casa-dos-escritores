@@ -259,11 +259,11 @@ export default function Comments({
             <div
                 key={comment.id}
                 className={`mb-4 ${
-                    level > 0 ? "pl-4 md:pl-6 border-l-2 border-gray-200" : ""
+                    level > 0 ? "pl-4 md:pl-6 border-l-2 border-[#E5E7EB]" : ""
                 }`}
             >
                 <div
-                    className="bg-white rounded-lg p-4 shadow-sm"
+                    className="bg-white rounded-lg p-4 shadow-sm border border-[#E5E7EB]"
                     style={{ marginLeft: `${level * 8}px` }}
                 >
                     <div className="flex justify-between items-center mb-2">
@@ -277,7 +277,7 @@ export default function Comments({
                                     className="w-8 h-8 rounded-full mr-2 object-cover"
                                 />
                             ) : (
-                                <div className="w-8 h-8 rounded-full mr-2 bg-purple-600 text-white flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-full mr-2 bg-[#484DB5] text-white flex items-center justify-center">
                                     {(comment.profiles?.username || "A")
                                         .charAt(0)
                                         .toUpperCase()}
@@ -298,7 +298,7 @@ export default function Comments({
                         <div className="flex justify-end mt-2">
                             <button
                                 onClick={() => handleReply(comment)}
-                                className="flex items-center text-sm text-gray-600 hover:text-purple-600 transition-colors"
+                                className="flex items-center text-sm text-gray-600 hover:text-[#484DB5] transition-colors"
                             >
                                 <Reply size={16} className="mr-1" />
                                 <span>Responder</span>
@@ -322,9 +322,9 @@ export default function Comments({
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-lg p-6 mb-6">
             <h3 className="text-xl font-semibold mb-4 flex items-center text-gray-800">
-                <span className="flex items-center justify-center mr-2 text-purple-600">
+                <span className="flex items-center justify-center mr-2 text-[#484DB5]">
                     <MessageSquare size={20} />
                 </span>
                 Comentários ({comments.length})
@@ -344,7 +344,7 @@ export default function Comments({
                     )}
 
                     {replyTo && (
-                        <div className="flex items-center justify-between bg-gray-50 p-2 rounded-md mb-2">
+                        <div className="flex items-center justify-between bg-gray-50 p-2 rounded-md mb-2 border border-[#E5E7EB]">
                             <span className="text-sm text-gray-600">
                                 Respondendo para{" "}
                                 <span className="font-medium">{replyTo.profiles?.username || "Usuário"}</span>
@@ -367,12 +367,12 @@ export default function Comments({
                         placeholder="Escreva seu comentário..."
                         disabled={submitting}
                         required
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent mb-3 min-h-[100px]"
+                        className="w-full p-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent mb-3 min-h-[100px]"
                     />
                     <button
                         type="submit"
                         disabled={submitting || !newComment.trim()}
-                        className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        className="bg-[#484DB5] text-white px-4 py-2 rounded-md hover:bg-[#3a3e9f] focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                     >
                         {submitting ? (
                             <>
@@ -386,13 +386,13 @@ export default function Comments({
                 </form>
             ) : (
                 <p className="text-gray-700 mb-6">
-                    <Link href="/login" className="text-purple-600 hover:text-purple-800 font-medium">Faça login</Link> para comentar
+                    <Link href="/login" className="text-[#484DB5] hover:text-[#3a3e9f] font-medium">Faça login</Link> para comentar
                 </p>
             )}
 
             <div className="mb-4">
                 {comments.length === 0 ? (
-                    <p className="text-gray-500 text-center py-6 bg-gray-50 rounded-md">
+                    <p className="text-gray-500 text-center py-6 bg-gray-50 rounded-md border border-[#E5E7EB]">
                         Nenhum comentário ainda. Seja o primeiro a comentar!
                     </p>
                 ) : (
@@ -400,7 +400,7 @@ export default function Comments({
                 )}
             </div>
 
-            <button onClick={loadComments} className="flex items-center text-gray-600 hover:text-purple-600 transition-colors">
+            <button onClick={loadComments} className="flex items-center text-gray-600 hover:text-[#484DB5] transition-colors">
                 <RefreshCw size={16} className="mr-1" />
                 Atualizar comentários
             </button>

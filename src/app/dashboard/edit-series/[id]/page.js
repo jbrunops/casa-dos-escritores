@@ -293,163 +293,176 @@ export default function EditSeriesPage() {
 
     if (loading) {
         return (
-            <div className="loading-container">
-                <div className="loader-large"></div>
-                <p>Carregando série...</p>
+            <div className="container mx-auto px-4 py-8">
+                <div className="flex flex-col items-center justify-center py-16">
+                    <div className="w-12 h-12 border-4 border-gray-200 border-t-[#484DB5] rounded-full animate-spin mb-4"></div>
+                    <p className="text-gray-600">Carregando série...</p>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="series-editor-container">
-            <div className="series-editor-header">
-                <h1>Editar Série</h1>
-            </div>
-
-            <div className="back-dashboard">
-                <Link href={`/series/${id}`} className="back-link">
-                    <ArrowLeft size={16} />
-                    <span>Voltar para a série</span>
-                </Link>
-            </div>
-
-            {error && (
-                <div className="series-message error">
-                    <AlertTriangle size={20} />
-                    <span>{error}</span>
+        <div className="container mx-auto px-4 py-8">
+            <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-[#E5E7EB] overflow-hidden">
+                <div className="bg-gray-50 border-b border-[#E5E7EB] px-6 py-4">
+                    <h1 className="text-2xl font-bold text-gray-800">Editar Série</h1>
                 </div>
-            )}
 
-            {success && (
-                <div className="series-message success">
-                    <CheckCircle2 size={20} />
-                    <span>{success}</span>
+                <div className="p-2 border-b border-[#E5E7EB]">
+                    <Link href={`/series/${id}`} className="inline-flex items-center px-3 py-1.5 text-sm text-gray-600 hover:text-[#484DB5] transition-colors">
+                        <ArrowLeft size={16} className="mr-1" />
+                        <span>Voltar para a série</span>
+                    </Link>
                 </div>
-            )}
 
-            <form onSubmit={handleSubmit} className="series-editor-form">
-                <div className="series-form-grid">
-                    <div className="series-form-column">
-                        <div className="series-form-group">
-                            <label htmlFor="title">Título da Série</label>
-                            <input
-                                id="title"
-                                type="text"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                className="series-input"
-                                placeholder="Um título cativante para sua série..."
-                                required
-                            />
-                        </div>
-
-                        <div className="series-form-group">
-                            <label htmlFor="description">Descrição</label>
-                            <textarea
-                                id="description"
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                className="series-textarea"
-                                placeholder="Do que se trata a sua série? Descreva para atrair leitores..."
-                                rows={4}
-                            />
-                        </div>
-
-                        <div className="series-form-row">
-                            <div className="series-form-group">
-                                <label htmlFor="genre">Gênero</label>
-                                <select
-                                    id="genre"
-                                    value={genre}
-                                    onChange={(e) => setGenre(e.target.value)}
-                                    className="series-select"
-                                >
-                                    <option value="">Selecione um gênero</option>
-                                    {genres.map((g) => (
-                                        <option key={g} value={g}>
-                                            {g}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="series-form-group">
-                                <label htmlFor="isCompleted">Status da Série</label>
-                                <div className="finale-checkbox">
-                                    <input
-                                        type="checkbox"
-                                        id="isCompleted"
-                                        checked={isCompleted}
-                                        onChange={(e) => setIsCompleted(e.target.checked)}
-                                    />
-                                    <label htmlFor="isCompleted">
-                                        Marcar como concluída
-                                    </label>
-                                </div>
-                                <p className="form-hint">
-                                    {isCompleted
-                                        ? "Sua série será marcada como finalizada"
-                                        : "Sua série aparecerá como 'Em andamento'"}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="series-form-group">
-                            <label htmlFor="tags">
-                                Tags (Até 5 - pressione Enter para adicionar)
-                            </label>
-                            <input
-                                id="tags"
-                                type="text"
-                                value={tagInput}
-                                onChange={(e) => setTagInput(e.target.value)}
-                                onKeyDown={handleAddTag}
-                                className="series-input"
-                                placeholder="Adicione tags relevantes..."
-                                disabled={tags.length >= 5}
-                            />
-                            {tags.length >= 5 && (
-                                <p className="form-hint">
-                                    Você atingiu o limite de 5 tags
-                                </p>
-                            )}
-
-                            {tags.length > 0 && (
-                                <div className="tags-container">
-                                    {tags.map((tag) => (
-                                        <span key={tag} className="tag">
-                                            {tag}
-                                            <button
-                                                type="button"
-                                                className="tag-remove"
-                                                onClick={() => handleRemoveTag(tag)}
-                                                aria-label="Remover tag"
-                                            >
-                                                &times;
-                                            </button>
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                {error && (
+                    <div className="mx-6 mt-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md flex items-center">
+                        <AlertTriangle size={20} className="mr-2 flex-shrink-0" />
+                        <span>{error}</span>
                     </div>
+                )}
 
-                    <div className="series-form-column">
-                        <div className="series-form-group">
-                            <label>Capa da Série</label>
-                            <div className="cover-upload-container">
+                {success && (
+                    <div className="mx-6 mt-4 bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md flex items-center">
+                        <CheckCircle2 size={20} className="mr-2 flex-shrink-0" />
+                        <span>{success}</span>
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                                    Título da Série
+                                </label>
+                                <input
+                                    id="title"
+                                    type="text"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent"
+                                    placeholder="Um título cativante para sua série..."
+                                    required
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                                    Descrição
+                                </label>
+                                <textarea
+                                    id="description"
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent"
+                                    placeholder="Do que se trata a sua série? Descreva para atrair leitores..."
+                                    rows={4}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label htmlFor="genre" className="block text-sm font-medium text-gray-700">
+                                        Gênero
+                                    </label>
+                                    <select
+                                        id="genre"
+                                        value={genre}
+                                        onChange={(e) => setGenre(e.target.value)}
+                                        className="w-full px-3 py-2 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent bg-white"
+                                    >
+                                        <option value="">Selecione um gênero</option>
+                                        {genres.map((g) => (
+                                            <option key={g} value={g}>
+                                                {g}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        Status da Série
+                                    </label>
+                                    <div className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            id="isCompleted"
+                                            checked={isCompleted}
+                                            onChange={(e) => setIsCompleted(e.target.checked)}
+                                            className="h-4 w-4 text-[#484DB5] border-[#E5E7EB] rounded focus:ring-[#484DB5]"
+                                        />
+                                        <label htmlFor="isCompleted" className="ml-2 block text-sm text-gray-700">
+                                            Marcar como concluída
+                                        </label>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {isCompleted
+                                            ? "Sua série será marcada como finalizada"
+                                            : "Sua série aparecerá como 'Em andamento'"}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
+                                    Tags (Até 5 - pressione Enter para adicionar)
+                                </label>
+                                <input
+                                    id="tags"
+                                    type="text"
+                                    value={tagInput}
+                                    onChange={(e) => setTagInput(e.target.value)}
+                                    onKeyDown={handleAddTag}
+                                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500"
+                                    placeholder="Adicione tags relevantes..."
+                                    disabled={tags.length >= 5}
+                                />
+                                {tags.length >= 5 && (
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Você atingiu o limite de 5 tags
+                                    </p>
+                                )}
+
+                                {tags.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {tags.map((tag) => (
+                                            <span key={tag} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-[#f5f5ff] text-[#484DB5]">
+                                                {tag}
+                                                <button
+                                                    type="button"
+                                                    className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-[#484DB5] hover:bg-[#e6e7ff] focus:outline-none"
+                                                    onClick={() => handleRemoveTag(tag)}
+                                                    aria-label="Remover tag"
+                                                >
+                                                    &times;
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Capa da Série
+                                </label>
                                 {coverPreview ? (
-                                    <div className="cover-preview-container">
+                                    <div className="border border-[#E5E7EB] rounded-md overflow-hidden">
                                         <img
                                             src={coverPreview}
                                             alt="Preview da capa"
-                                            className="cover-preview"
+                                            className="w-full h-auto object-contain"
                                             key={coverPreview}
                                         />
-                                        <div className="cover-actions">
+                                        <div className="flex justify-center gap-3 p-3 bg-gray-50 border-t border-[#E5E7EB]">
                                             <button
                                                 type="button"
-                                                className="cover-change-btn"
+                                                className="px-3 py-1.5 text-sm border border-[#484DB5] text-[#484DB5] rounded-md hover:bg-[#f5f5ff] transition-colors"
                                                 onClick={() => document.getElementById('coverFileInput').click()}
                                             >
                                                 Trocar imagem
@@ -457,7 +470,7 @@ export default function EditSeriesPage() {
                                             {coverFile && (
                                                 <button
                                                     type="button"
-                                                    className="cover-remove-btn"
+                                                    className="px-3 py-1.5 text-sm border border-red-500 text-red-500 rounded-md hover:bg-red-50 transition-colors"
                                                     onClick={handleRemoveCover}
                                                 >
                                                     Cancelar
@@ -469,50 +482,57 @@ export default function EditSeriesPage() {
                                             type="file"
                                             accept="image/jpeg, image/png, image/gif"
                                             onChange={handleCoverChange}
-                                            className="cover-input hidden"
-                                            style={{ display: 'none' }}
+                                            className="hidden"
                                         />
                                     </div>
                                 ) : (
-                                    <div className="cover-upload">
-                                        <div className="cover-placeholder">
-                                            <Image size={48} opacity={0.3} />
-                                            <span>
+                                    <div className="border-2 border-dashed border-[#E5E7EB] rounded-md p-6 flex flex-col items-center justify-center h-96 cursor-pointer hover:border-[#484DB5] transition-colors">
+                                        <div onClick={() => document.getElementById('coverFileInput').click()} className="text-center">
+                                            <Image size={48} className="mx-auto mb-4 text-gray-400" />
+                                            <p className="text-gray-700">
                                                 Clique para enviar uma imagem
-                                                <br />
-                                                <small>JPG, PNG ou GIF • Máx 2MB</small>
-                                            </span>
+                                            </p>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                JPG, PNG ou GIF • Máx 2MB
+                                            </p>
                                         </div>
                                         <input
+                                            id="coverFileInput"
                                             type="file"
                                             accept="image/jpeg, image/png, image/gif"
                                             onChange={handleCoverChange}
-                                            className="cover-input"
+                                            className="hidden"
                                         />
                                     </div>
                                 )}
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Uma boa capa ajuda a atrair mais leitores.
+                                </p>
                             </div>
-                            <p className="form-hint">
-                                Uma boa capa ajuda a atrair mais leitores.
-                            </p>
                         </div>
                     </div>
-                </div>
 
-                <div className="series-actions">
-                    <button
-                        type="submit"
-                        disabled={saving || !formChanged}
-                        className="series-btn series-btn-primary"
-                    >
-                        {saving ? (
-                            <span>Salvando...</span>
-                        ) : (
-                            <span>Salvar Alterações</span>
-                        )}
-                    </button>
-                </div>
-            </form>
+                    <div className="mt-8 flex justify-end">
+                        <button
+                            type="submit"
+                            disabled={saving || !formChanged}
+                            className="inline-flex items-center px-4 py-2 bg-[#484DB5] text-white rounded-md hover:bg-[#3a3e9f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {saving ? (
+                                <>
+                                    <span className="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                                    <span>Salvando...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Save size={18} className="mr-2" />
+                                    <span>Salvar Alterações</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 } 

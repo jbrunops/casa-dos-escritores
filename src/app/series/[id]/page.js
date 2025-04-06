@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
-import { BookOpen, Calendar, User, Edit, Trash2, Plus } from "lucide-react";
+import { BookOpen, Calendar, User, Edit, Trash2, Plus, MessageCircle } from "lucide-react";
 import { useParams } from "next/navigation";
 import { extractIdFromSlug, generateSlug } from "@/lib/utils";
 import Comments from "@/components/Comments";
@@ -156,10 +156,10 @@ export default function SeriesPage() {
 
     if (loading) {
         return (
-            <div className="content-wrapper">
-                <div className="loading-container">
-                    <div className="loader-large"></div>
-                    <p>Carregando série...</p>
+            <div className="container mx-auto px-4 py-8">
+                <div className="flex flex-col items-center justify-center py-16">
+                    <div className="w-12 h-12 border-4 border-gray-200 border-t-[#484DB5] rounded-full animate-spin mb-4"></div>
+                    <p className="text-gray-600">Carregando série...</p>
                 </div>
             </div>
         );
@@ -167,12 +167,12 @@ export default function SeriesPage() {
 
     if (error || !series) {
         return (
-            <div className="content-wrapper">
-                <div className="message-banner error">
+            <div className="container mx-auto px-4 py-8">
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
                     {error || "Série não encontrada."}
                 </div>
-                <div className="text-center mt-4">
-                    <Link href="/series" className="btn primary">
+                <div className="text-center">
+                    <Link href="/series" className="inline-flex items-center px-4 py-2 bg-[#484DB5] text-white rounded-md hover:bg-[#3a3e9f] transition-colors">
                         Voltar para todas as séries
                     </Link>
                 </div>
@@ -181,74 +181,76 @@ export default function SeriesPage() {
     }
 
     return (
-        <div className="content-wrapper">
-            <div className="series-detail-container">
+        <div className="container mx-auto px-4 py-8">
+            <div className="max-w-5xl mx-auto">
                 {/* Header com informações da série */}
-                <div className="series-detail-header">
-                    <div className="series-detail-cover">
+                <div className="flex flex-col md:flex-row bg-white rounded-lg shadow-sm border border-[#E5E7EB] overflow-hidden mb-8">
+                    <div className="md:w-1/3 lg:w-1/4 p-4">
                         {series.cover_url ? (
                             <img
                                 src={series.cover_url}
                                 alt={series.title}
-                                className="series-detail-cover-image"
+                                className="w-full h-auto object-contain rounded-md"
                             />
                         ) : (
-                            <div className="series-cover-placeholder">
-                                {series.title.charAt(0).toUpperCase()}
+                            <div className="h-full min-h-[300px] w-full rounded-md flex items-center justify-center bg-gradient-to-br from-[#f5f5ff] to-[#e6e7ff]">
+                                <span className="text-6xl font-bold text-[#484DB5]">
+                                    {series.title.charAt(0).toUpperCase()}
+                                </span>
                             </div>
                         )}
                     </div>
 
-                    <div className="series-detail-info">
-                        <h1 className="series-detail-title">{series.title}</h1>
+                    <div className="md:w-2/3 lg:w-3/4 p-6">
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">{series.title}</h1>
                         
                         {/* Gênero destacado */}
                         {series.genre && (
-                            <div className="series-detail-genre">
+                            <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-[#f5f5ff] text-[#484DB5] mb-4">
                                 {series.genre}
                             </div>
                         )}
 
                         {/* Metadados da série */}
-                        <div className="series-detail-meta">
-                            <div className="series-detail-meta-item">
-                                <User size={16} />
+                        <div className="flex flex-wrap gap-4 mb-4 text-sm text-gray-600">
+                            <div className="flex items-center">
+                                <User size={16} className="mr-1" />
                                 <span>
                                     Por{" "}
                                     <Link
                                         href={`/profile/${encodeURIComponent(
                                             author?.username || "usuário"
                                         )}`}
-                                        className="author-link"
+                                        className="text-[#484DB5] hover:text-[#3a3e9f]"
                                     >
                                         {author?.username || "Usuário"}
                                     </Link>
                                 </span>
                             </div>
 
-                            <div className="series-detail-meta-item">
-                                <Calendar size={16} />
+                            <div className="flex items-center">
+                                <Calendar size={16} className="mr-1" />
                                 <span>{formatDate(series.created_at)}</span>
                             </div>
 
-                            <div className="series-detail-meta-item">
-                                <BookOpen size={16} />
+                            <div className="flex items-center">
+                                <BookOpen size={16} className="mr-1" />
                                 <span>{chapters?.length || 0} capítulos</span>
                             </div>
                         </div>
 
                         {/* Descrição */}
                         {series.description && (
-                            <div className="series-detail-description">
-                                <p>{series.description}</p>
+                            <div className="mb-6">
+                                <p className="text-gray-700">{series.description}</p>
                             </div>
                         )}
 
                         {/* Tags */}
                         {series.tags && series.tags.length > 0 && (
-                            <div className="series-detail-tags-container">
+                            <div className="flex flex-wrap gap-2 mb-6">
                                 {series.tags.map((tag) => (
-                                    <span key={tag} className="series-detail-tag">
+                                    <span key={tag} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f5f5ff] text-[#484DB5]">
                                         {tag}
                                     </span>
                                 ))}
@@ -256,18 +258,17 @@ export default function SeriesPage() {
                         )}
 
                         {/* Botões de ação */}
-                        <div className="series-detail-actions">
+                        <div className="flex flex-wrap gap-2 sm:gap-3">
                             {chapters.length > 0 && (
                                 <Link
                                     href={`/chapter/${generateSlug(
                                         chapters[0].title,
                                         chapters[0].id
                                     )}`}
-                                    className="series-action-btn series-action-primary"
-                                    style={{color: 'white'}}
+                                    className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-[#484DB5] text-white rounded-md hover:bg-[#3a3e9f] transition-colors"
                                 >
-                                    <BookOpen size={18} style={{color: 'white'}} />
-                                    <span style={{color: 'white'}}>Ver Série</span>
+                                    <BookOpen size={16} className="mr-1 sm:mr-2" />
+                                    <span>Ler Série</span>
                                 </Link>
                             )}
 
@@ -275,19 +276,19 @@ export default function SeriesPage() {
                                 <>
                                     <Link
                                         href={`/dashboard/edit-series/${series.id}`}
-                                        className="series-action-btn series-action-secondary"
+                                        className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-white border border-[#484DB5] text-[#484DB5] rounded-md hover:bg-[#f5f5ff] transition-colors"
                                     >
-                                        <Edit size={18} />
-                                        <span>Editar Série</span>
+                                        <Edit size={16} className="mr-1 sm:mr-2" />
+                                        <span>Editar</span>
                                     </Link>
 
                                     <button
                                         onClick={handleDeleteSeries}
                                         disabled={deleting}
-                                        className="series-action-btn series-action-danger"
+                                        className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-white border border-red-500 text-red-500 rounded-md hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        <Trash2 size={18} />
-                                        <span>{deleting ? "Excluindo..." : "Excluir Série"}</span>
+                                        <Trash2 size={16} className="mr-1 sm:mr-2" />
+                                        <span>{deleting ? "Excluindo..." : "Excluir"}</span>
                                     </button>
                                 </>
                             )}
@@ -296,67 +297,64 @@ export default function SeriesPage() {
                 </div>
 
                 {/* Seção de capítulos */}
-                <div className="series-chapters-section">
-                    <div className="series-chapters-header">
-                        <h2 className="series-chapters-title">Capítulos</h2>
+                <div className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] overflow-hidden mb-8">
+                    <div className="flex justify-between items-center p-4 border-b border-[#E5E7EB] bg-gray-50">
+                        <h2 className="text-xl font-semibold text-gray-800">Capítulos</h2>
                         
                         {isAuthor && (
                             <Link
                                 href={`/dashboard/new-chapter/${series.id}`}
-                                className="add-chapter-btn"
-                                style={{color: 'white'}}
+                                className="inline-flex items-center px-3 py-1.5 bg-[#484DB5] text-white text-sm rounded-md hover:bg-[#3a3e9f] transition-colors"
                             >
-                                <Plus size={16} style={{color: 'white'}} />
-                                <span style={{color: 'white'}}>Adicionar Capítulo</span>
+                                <Plus size={16} className="mr-1" />
+                                <span>Adicionar</span>
                             </Link>
                         )}
                     </div>
 
                     {chapters.length === 0 ? (
-                        <div className="empty-chapters-message">
+                        <div className="p-8 text-center text-gray-500">
                             <p>Nenhum capítulo disponível nesta série ainda.</p>
                         </div>
                     ) : (
-                        <div className="chapters-list">
+                        <div className="divide-y divide-[#E5E7EB]">
                             {chapters.map((chapter) => (
                                 <div
                                     key={chapter.id}
-                                    className="chapter-item"
+                                    className="flex justify-between p-4 hover:bg-gray-50"
                                 >
-                                    <div className="chapter-content">
-                                        <span className="chapter-number">
+                                    <div className="flex-1">
+                                        <span className="text-sm font-medium text-[#484DB5]">
                                             Capítulo {chapter.chapter_number}
                                         </span>
-                                        <h3 className="chapter-title">
+                                        <h3 className="text-lg font-medium text-gray-800 mb-1">
                                             <Link
                                                 href={`/chapter/${generateSlug(chapter.title, chapter.id)}`}
-                                                className="chapter-link"
+                                                className="hover:text-[#484DB5] transition-colors"
                                             >
                                                 {chapter.title}
                                             </Link>
                                         </h3>
-                                        <div className="chapter-date">
+                                        <div className="text-sm text-gray-500">
                                             {formatDate(chapter.created_at)}
                                         </div>
                                     </div>
 
                                     {isAuthor && (
-                                        <div className="chapter-actions">
+                                        <div className="flex items-center gap-2">
                                             <Link
                                                 href={`/dashboard/edit-chapter/${chapter.id}`}
-                                                className="chapter-action-btn edit"
+                                                className="inline-flex items-center justify-center w-8 h-8 bg-[#f5f5ff] text-[#484DB5] rounded-full hover:bg-[#e6e7ff]"
                                                 title="Editar Capítulo"
-                                                style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
                                             >
-                                                <Edit size={20} />
+                                                <Edit size={16} />
                                             </Link>
                                             <button
                                                 onClick={() => handleDeleteChapter(chapter.id)}
-                                                className="chapter-action-btn delete"
+                                                className="inline-flex items-center justify-center w-8 h-8 bg-red-50 text-red-500 rounded-full hover:bg-red-100"
                                                 title="Excluir Capítulo"
-                                                style={{ backgroundColor: 'var(--color-error-light)', color: 'var(--color-error)' }}
                                             >
-                                                <Trash2 size={20} />
+                                                <Trash2 size={16} />
                                             </button>
                                         </div>
                                     )}
@@ -367,12 +365,20 @@ export default function SeriesPage() {
                 </div>
                 
                 {/* Seção de comentários */}
-                <div className="series-comments-section">
-                    <Comments 
-                        contentId={id} 
-                        contentType="series" 
-                        userId={currentUserId}
-                    />
+                <div className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] overflow-hidden">
+                    <div className="p-4 border-b border-[#E5E7EB] bg-gray-50">
+                        <h2 className="text-xl font-semibold text-gray-800 flex items-center">
+                            <MessageCircle size={20} className="mr-2 text-[#484DB5]" />
+                            Comentários
+                        </h2>
+                    </div>
+                    <div className="p-4">
+                        <Comments 
+                            contentId={id} 
+                            contentType="series" 
+                            userId={currentUserId}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

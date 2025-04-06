@@ -352,7 +352,7 @@ export default function NewSeriesPage() {
                                         <img
                                             src={coverPreview}
                                             alt="Preview da capa"
-                                            className="w-full h-auto max-h-96 object-cover"
+                                            className="w-full h-auto object-contain"
                                             key={coverPreview}
                                         />
                                         <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-3 flex justify-between">

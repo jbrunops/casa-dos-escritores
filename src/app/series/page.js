@@ -137,12 +137,12 @@ export default async function SeriesPage({ searchParams }) {
                                     key={serie.id}
                                     className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col border border-[#E5E7EB] h-full"
                                 >
-                                    <div className="aspect-[2/3] relative bg-gray-100">
+                                    <div className="h-[300px] relative bg-gray-100">
                                         {serie.cover_url ? (
                                             <img
                                                 src={serie.cover_url}
                                                 alt={serie.title}
-                                                className="object-cover w-full h-full"
+                                                className="object-contain w-full h-full"
                                             />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#f5f5ff] to-[#e6e7ff]">
