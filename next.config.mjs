@@ -6,7 +6,6 @@ const nextConfig = {
         ignoreDuringBuilds: true,
     },
     // Otimizações para Vercel
-    swcMinify: true,
     reactStrictMode: true,
     poweredByHeader: false,
     // Configuração para imagens externas que possam ser usadas
