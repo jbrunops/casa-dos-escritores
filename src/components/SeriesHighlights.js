@@ -10,9 +10,15 @@ import { generateSlug } from "@/lib/utils";
 export default function SeriesHighlights() {
     const [series, setSeries] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const carouselRef = useRef(null);
-    const supabase = createBrowserClient();
+    const supabaseRef = useRef(null);
+
+    // Inicializar o cliente Supabase apenas uma vez
+    if (!supabaseRef.current) {
+        supabaseRef.current = createBrowserClient();
+    }
 
     // Número de cards visíveis dependendo do tamanho da tela
     const getVisibleCards = () => {
@@ -39,9 +45,19 @@ export default function SeriesHighlights() {
     }, []);
 
     useEffect(() => {
+        let isMounted = true;
+        let timeoutId = null;
+        
         async function fetchPopularSeries() {
             try {
-                setLoading(true);
+                if (isMounted) {
+                    setLoading(true);
+                    setError(null); // Resetar o erro ao iniciar uma nova busca
+                }
+                
+                // Usar o cliente armazenado na ref para evitar recriações
+                const supabase = supabaseRef.current;
+                
                 // Buscar até 10 séries mais visualizadas
                 const { data, error } = await supabase
                     .from("series")
@@ -62,92 +78,120 @@ export default function SeriesHighlights() {
 
                 if (error) {
                     console.error("Erro na consulta das séries:", error);
-                    setSeries([]);
-                    setLoading(false);
+                    if (isMounted) {
+                        setError("Não foi possível carregar as séries em destaque");
+                        setLoading(false);
+                    }
                     return;
                 }
 
                 // Se não há dados, definir array vazio
                 if (!data || data.length === 0) {
                     console.log("Nenhuma série encontrada");
-                    setSeries([]);
-                    setLoading(false);
+                    if (isMounted) {
+                        setSeries([]);
+                        setLoading(false);
+                    }
                     return;
                 }
 
-                try {
-                    // Buscar autores e contagem de capítulos
-                    const seriesWithDetails = await Promise.all(
-                        data.map(async (serie) => {
-                            // Buscar autor
-                            let authorName = "Autor desconhecido";
-                            try {
-                                const { data: author } = await supabase
-                                    .from("profiles")
-                                    .select("username")
-                                    .eq("id", serie.author_id)
-                                    .single();
-                                    
-                                if (author && author.username) {
-                                    authorName = author.username;
-                                }
-                            } catch (authorError) {
-                                console.error("Erro ao buscar autor:", authorError);
-                            }
-
-                            // Buscar contagem de capítulos
-                            let chapterCount = 0;
-                            try {
-                                const { count } = await supabase
-                                    .from("chapters")
-                                    .select("*", { count: "exact" })
-                                    .eq("series_id", serie.id);
-                                    
-                                if (count !== null && count !== undefined) {
-                                    chapterCount = count;
-                                }
-                            } catch (chapterError) {
-                                console.error("Erro ao buscar capítulos:", chapterError);
-                            }
-
-                            return {
-                                ...serie,
-                                author_name: authorName,
-                                chapter_count: chapterCount,
-                            };
-                        })
-                    );
-
-                    setSeries(seriesWithDetails);
-                } catch (detailsError) {
-                    console.error("Erro ao buscar detalhes das séries:", detailsError);
-                    // Mesmo com erro nos detalhes, exibir séries com dados básicos
+                // Para evitar longos tempos de carregamento, primeiro exibimos os dados básicos
+                if (isMounted) {
                     setSeries(data.map(serie => ({
                         ...serie,
-                        author_name: "Autor desconhecido",
+                        author_name: "Carregando...",
                         chapter_count: 0
                     })));
                 }
+                
+                // Depois buscamos os detalhes adicionais - com catch para cada série individual
+                const seriesWithDetails = await Promise.all(
+                    data.map(async (serie) => {
+                        // Buscar autor
+                        let authorName = "Autor desconhecido";
+                        try {
+                            const { data: author } = await supabase
+                                .from("profiles")
+                                .select("username")
+                                .eq("id", serie.author_id)
+                                .single();
+                                
+                            if (author && author.username) {
+                                authorName = author.username;
+                            }
+                        } catch (authorError) {
+                            console.error("Erro ao buscar autor:", authorError);
+                        }
+
+                        // Buscar contagem de capítulos
+                        let chapterCount = 0;
+                        try {
+                            const { count } = await supabase
+                                .from("chapters")
+                                .select("*", { count: "exact" })
+                                .eq("series_id", serie.id);
+                                
+                            if (count !== null && count !== undefined) {
+                                chapterCount = count;
+                            }
+                        } catch (chapterError) {
+                            console.error("Erro ao buscar capítulos:", chapterError);
+                        }
+
+                        return {
+                            ...serie,
+                            author_name: authorName,
+                            chapter_count: chapterCount,
+                        };
+                    })
+                ).catch(e => {
+                    console.error("Erro ao processar detalhes das séries:", e);
+                    // Retornar os dados básicos em caso de erro
+                    return data.map(serie => ({
+                        ...serie, 
+                        author_name: "Autor desconhecido",
+                        chapter_count: 0
+                    }));
+                });
+
+                if (isMounted && seriesWithDetails) {
+                    setSeries(seriesWithDetails);
+                    setError(null); // Limpar erro se a busca foi bem-sucedida
+                }
             } catch (error) {
                 console.error("Erro ao buscar séries populares:", error);
-                setSeries([]);
+                if (isMounted) {
+                    // Não redefinir séries se já temos dados
+                    if (series.length === 0) {
+                        setError("Erro ao carregar séries");
+                    }
+                }
             } finally {
-                setLoading(false);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         }
 
-        // Definir um timeout para garantir que loading não fique preso
-        const timeoutId = setTimeout(() => {
-            if (loading) {
-                console.log("Timeout de carregamento atingido, forçando estado de não-loading");
-                setLoading(false);
-            }
-        }, 10000); // 10 segundos de timeout
-
         fetchPopularSeries();
 
+        // Definir um timeout para garantir que loading não fique preso
+        timeoutId = setTimeout(() => {
+            if (isMounted && loading) {
+                console.log("Timeout de carregamento atingido, forçando estado de não-loading");
+                setLoading(false);
+                // Não definir erro se já temos séries carregadas
+                if (series.length === 0) {
+                    setError("Tempo limite excedido ao carregar séries");
+                }
+            }
+        }, 8000); // Aumentado para 8 segundos para dar mais tempo
+
         // Limpar timeout ao desmontar componente
-        return () => clearTimeout(timeoutId);
+        return () => {
+            isMounted = false;
+            if (timeoutId) clearTimeout(timeoutId);
+        };
     }, []);
 
     const nextSlide = () => {
@@ -173,12 +217,37 @@ export default function SeriesHighlights() {
         return count.toString();
     };
 
-    // Se está carregando, mostrar spinner
-    if (loading) {
+    // Se ocorreu um erro E não temos séries, mostrar mensagem
+    if (error && series.length === 0) {
         return (
-            <div className="flex items-center justify-center py-12">
-                <div className="w-10 h-10 border-4 border-gray-200 border-t-[#484DB5] rounded-full animate-spin"></div>
-            </div>
+            <section className="py-8">
+                <div className="max-w-[75rem] mx-auto px-4">
+                    <h2 className="text-[1.8rem] font-bold mb-4 relative">
+                        Séries em Destaque
+                        <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
+                    </h2>
+                    <p className="text-gray-500">
+                        Não foi possível carregar as séries em destaque. Por favor, tente novamente mais tarde.
+                    </p>
+                </div>
+            </section>
+        );
+    }
+
+    // Se está carregando e não temos séries ainda, mostrar spinner
+    if (loading && series.length === 0) {
+        return (
+            <section className="py-8">
+                <div className="max-w-[75rem] mx-auto px-4">
+                    <h2 className="text-[1.8rem] font-bold mb-4 relative">
+                        Séries em Destaque
+                        <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
+                    </h2>
+                    <div className="flex items-center justify-center py-8">
+                        <div className="w-10 h-10 border-4 border-gray-200 border-t-[#484DB5] rounded-full animate-spin"></div>
+                    </div>
+                </div>
+            </section>
         );
     }
 
@@ -249,10 +318,9 @@ export default function SeriesHighlights() {
                                     </span>
                                 )}
                             </div>
-                            
                             <div className="p-4 flex-grow flex flex-col">
                                 <h3 className="text-base font-semibold text-gray-800 mb-1 line-clamp-2">{serie.title}</h3>
-                                <div className="text-xs text-gray-500 mb-1">{serie.author_name}</div>
+                                <div className="text-xs text-gray-500 mb-1">por {serie.author_name}</div>
                                 
                                 {serie.genre && (
                                     <div className="mb-4">
@@ -266,10 +334,10 @@ export default function SeriesHighlights() {
                                     <div className="flex space-x-4">
                                         <div className="flex items-center">
                                             <Eye className="w-4 h-4 mr-1" />
-                                            <span>{formatCount(serie.view_count)}</span>
+                                            <span>{formatCount(serie.view_count || 0)}</span>
                                         </div>
                                         <div className="flex items-center">
-                                            <Book className="w-4 h-4 mr-1" />
+                                            <BookOpen className="w-4 h-4 mr-1" />
                                             <span>{serie.chapter_count}</span>
                                         </div>
                                     </div>

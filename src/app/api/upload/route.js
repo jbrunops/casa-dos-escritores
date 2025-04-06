@@ -24,63 +24,70 @@ export async function POST(request) {
             
         // Usar cliente do Supabase com chave de serviço para ignorar RLS
         const supabase = createClient(supabaseUrl, serviceRoleKey);
-        console.log("Usando variáveis de ambiente para o Supabase");
+        console.log("Cliente Supabase criado com chave de serviço");
         
-        // Verificar se o bucket 'covers' existe
-        const { data: buckets, error: listError } = await supabase.storage.listBuckets();
-        
-        if (listError) {
-            console.error("Erro ao listar buckets:", listError);
-            return NextResponse.json({ 
-                error: "Erro ao acessar storage. Detalhes: " + listError.message 
-            }, { status: 500 });
-        }
-        
-        // Criar o bucket se não existir
-        const bucketName = "covers";
-        let bucketExists = buckets.some(bucket => bucket.name === bucketName);
-        
-        if (!bucketExists) {
-            console.log("Bucket 'covers' não encontrado. Criando...");
-            const { error: createError } = await supabase.storage.createBucket(bucketName, {
-                public: true
-            });
+        try {
+            // Verificar se o bucket 'covers' existe
+            const { data: buckets, error: listError } = await supabase.storage.listBuckets();
             
-            if (createError) {
-                console.error("Erro ao criar bucket:", createError);
+            if (listError) {
+                console.error("Erro ao listar buckets:", listError);
                 return NextResponse.json({ 
-                    error: "Erro ao criar bucket de armazenamento. Detalhes: " + createError.message 
+                    error: "Erro ao acessar storage. Detalhes: " + listError.message 
                 }, { status: 500 });
             }
             
-            console.log("Bucket criado com sucesso");
-        } else {
-            console.log("Bucket 'covers' já existe");
-        }
-        
-        // Verificar políticas de acesso
-        const { data: bucket, error: policyError } = await supabase.storage.getBucket(bucketName);
-        
-        if (policyError) {
-            console.error("Erro ao verificar política do bucket:", policyError);
-            return NextResponse.json({ 
-                error: "Erro ao verificar política do bucket. Detalhes: " + policyError.message 
-            }, { status: 500 });
-        } else if (!bucket.public) {
-            console.log("Atualizando bucket para acesso público");
-            // Tornar o bucket público
-            const { error: updateError } = await supabase.storage.updateBucket(bucketName, {
-                public: true
-            });
+            // Criar o bucket se não existir
+            const bucketName = "covers";
+            let bucketExists = buckets.some(bucket => bucket.name === bucketName);
             
-            if (updateError) {
-                console.error("Erro ao atualizar política do bucket:", updateError);
-                return NextResponse.json({ 
-                    error: "Erro ao configurar bucket para acesso público. Detalhes: " + updateError.message 
-                }, { status: 500 });
+            if (!bucketExists) {
+                console.log("Bucket 'covers' não encontrado. Criando...");
+                const { error: createError } = await supabase.storage.createBucket(bucketName, {
+                    public: true
+                });
+                
+                if (createError) {
+                    console.error("Erro ao criar bucket:", createError);
+                    return NextResponse.json({ 
+                        error: "Erro ao criar bucket de armazenamento. Detalhes: " + createError.message 
+                    }, { status: 500 });
+                }
+                
+                console.log("Bucket criado com sucesso");
             } else {
-                console.log("Bucket atualizado para acesso público");
+                console.log("Bucket 'covers' já existe");
             }
+            
+            // Verificar políticas de acesso
+            const { data: bucket, error: policyError } = await supabase.storage.getBucket(bucketName);
+            
+            if (policyError) {
+                console.error("Erro ao verificar política do bucket:", policyError);
+                return NextResponse.json({ 
+                    error: "Erro ao verificar política do bucket. Detalhes: " + policyError.message 
+                }, { status: 500 });
+            } else if (!bucket.public) {
+                console.log("Atualizando bucket para acesso público");
+                // Tornar o bucket público
+                const { error: updateError } = await supabase.storage.updateBucket(bucketName, {
+                    public: true
+                });
+                
+                if (updateError) {
+                    console.error("Erro ao atualizar política do bucket:", updateError);
+                    return NextResponse.json({ 
+                        error: "Erro ao configurar bucket para acesso público. Detalhes: " + updateError.message 
+                    }, { status: 500 });
+                } else {
+                    console.log("Bucket atualizado para acesso público");
+                }
+            }
+        } catch (storageError) {
+            console.error("Erro ao configurar storage:", storageError);
+            return NextResponse.json({ 
+                error: "Erro ao configurar storage. Detalhes: " + storageError.message 
+            }, { status: 500 });
         }
 
         // Processar o FormData
@@ -101,67 +108,75 @@ export async function POST(request) {
 
         console.log("Arquivo recebido:", file.name, "Tipo:", file.type, "Tamanho:", file.size);
 
-        // Obter informações do arquivo
-        const buffer = await file.arrayBuffer();
-        const fileExt = file.name.split(".").pop().toLowerCase();
-        const fileName = `series_${userId}_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-        const filePath = `series_covers/${fileName}`;
-        
-        console.log("Nome do arquivo gerado:", fileName);
-        console.log("Caminho do arquivo:", filePath);
-        
-        // Verificar se a pasta series_covers existe no bucket e criar se necessário
-        const { data: folderData, error: folderError } = await supabase.storage
-            .from(bucketName)
-            .list();
+        try {
+            // Obter informações do arquivo
+            const buffer = await file.arrayBuffer();
+            const fileExt = file.name.split(".").pop().toLowerCase();
+            const fileName = `series_${userId}_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const filePath = `series_covers/${fileName}`;
             
-        if (folderError) {
-            console.error("Erro ao listar conteúdo do bucket:", folderError);
+            console.log("Nome do arquivo gerado:", fileName);
+            console.log("Caminho do arquivo:", filePath);
+            
+            // Verificar se a pasta series_covers existe
+            const bucketName = "covers";
+            const { data: folderData, error: folderError } = await supabase.storage
+                .from(bucketName)
+                .list();
+                
+            if (folderError) {
+                console.error("Erro ao listar conteúdo do bucket:", folderError);
+                return NextResponse.json({ 
+                    error: "Erro ao verificar estrutura de pastas. Detalhes: " + folderError.message 
+                }, { status: 500 });
+            }
+            
+            // Upload do arquivo usando Uint8Array para maior compatibilidade
+            const uint8Array = new Uint8Array(buffer);
+            
+            // Upload do arquivo
+            console.log("Iniciando upload do arquivo para o Supabase...");
+            const { data, error: uploadError } = await supabase.storage
+                .from(bucketName)
+                .upload(filePath, uint8Array, {
+                    contentType: file.type,
+                    cacheControl: "3600",
+                    upsert: true
+                });
+                
+            if (uploadError) {
+                console.error("Erro no upload:", uploadError);
+                return NextResponse.json({ 
+                    error: `Erro no upload: ${uploadError.message}` 
+                }, { status: 500 });
+            }
+            
+            console.log("Upload concluído com sucesso, obtendo URL pública");
+            
+            // Obter URL pública
+            const { data: publicUrlData } = supabase.storage
+                .from(bucketName)
+                .getPublicUrl(filePath);
+                
+            const url = publicUrlData?.publicUrl;
+            
+            if (!url) {
+                console.error("Falha ao obter URL pública");
+                return NextResponse.json({ error: "Falha ao obter URL pública" }, { status: 500 });
+            }
+            
+            console.log("URL pública obtida:", url);
+            return NextResponse.json({ url });
+        } catch (fileError) {
+            console.error("Erro ao processar arquivo:", fileError);
             return NextResponse.json({ 
-                error: "Erro ao verificar estrutura de pastas. Detalhes: " + folderError.message 
+                error: `Erro ao processar arquivo: ${fileError.message}` 
             }, { status: 500 });
         }
-        
-        // Upload do arquivo usando Uint8Array para maior compatibilidade
-        const uint8Array = new Uint8Array(buffer);
-        
-        // Upload do arquivo
-        console.log("Iniciando upload do arquivo para o Supabase...");
-        const { data, error: uploadError } = await supabase.storage
-            .from(bucketName)
-            .upload(filePath, uint8Array, {
-                contentType: file.type,
-                cacheControl: "3600",
-                upsert: true
-            });
-            
-        if (uploadError) {
-            console.error("Erro no upload:", uploadError);
-            return NextResponse.json({ 
-                error: `Erro no upload: ${uploadError.message}` 
-            }, { status: 500 });
-        }
-        
-        console.log("Upload concluído com sucesso, obtendo URL pública");
-        
-        // Obter URL pública
-        const { data: publicUrlData } = supabase.storage
-            .from(bucketName)
-            .getPublicUrl(filePath);
-            
-        const url = publicUrlData?.publicUrl;
-        
-        if (!url) {
-            console.error("Falha ao obter URL pública");
-            return NextResponse.json({ error: "Falha ao obter URL pública" }, { status: 500 });
-        }
-        
-        console.log("URL pública obtida:", url);
-        return NextResponse.json({ url });
     } catch (error) {
         console.error("Erro no servidor:", error);
         return NextResponse.json({ 
-            error: `Erro no servidor: ${error.message}`, 
+            error: `Erro no upload da imagem: Erro ao acessar storage. Detalhes: Invalid signature`,
             stack: process.env.NODE_ENV === 'development' ? error.stack : undefined 
         }, { status: 500 });
     }

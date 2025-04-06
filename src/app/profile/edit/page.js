@@ -168,42 +168,47 @@ export default function EditProfilePage() {
             let finalAvatarUrl = avatarUrl;
             if (avatarFile) {
                 try {
-                    // Criar nome de arquivo único
-                    const fileExt = avatarFile.name.split(".").pop();
-                    const fileName = `${user.id}-${Math.random()
-                        .toString(36)
-                        .substring(2)}.${fileExt}`;
-                    const filePath = `avatars/${fileName}`;
-
-                    // Converter para ArrayBuffer e depois para Uint8Array para maior compatibilidade
-                    const arrayBuffer = await avatarFile.arrayBuffer();
-                    const uint8Array = new Uint8Array(arrayBuffer);
-
-                    // Upload para o Storage
-                    const { error: uploadError } = await supabase.storage
-                        .from("avatars")
-                        .upload(filePath, uint8Array, {
-                            contentType: avatarFile.type,
-                            cacheControl: "3600",
-                            upsert: true
-                        });
-
-                    if (uploadError) {
-                        console.error("Erro no upload:", uploadError);
-                        throw uploadError;
+                    // Usar a mesma abordagem da API de upload para séries
+                    const formData = new FormData();
+                    formData.append('file', avatarFile);
+                    formData.append('userId', user.id);
+                    
+                    // Chamando a API de upload
+                    const uploadResponse = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!uploadResponse.ok) {
+                        // Tentar extrair a mensagem de erro
+                        let errorMessage = "Erro no upload da imagem";
+                        try {
+                            const errorData = await uploadResponse.json();
+                            errorMessage = errorData.error || errorMessage;
+                        } catch (e) {
+                            console.error("Erro ao processar resposta de erro:", e);
+                        }
+                        throw new Error(errorMessage);
                     }
-
-                    // Obter URL pública
-                    const { data } = supabase.storage
-                        .from("avatars")
-                        .getPublicUrl(filePath);
-
-                    finalAvatarUrl = data.publicUrl;
+                    
+                    // Processar resposta de sucesso
+                    const uploadData = await uploadResponse.json();
+                    finalAvatarUrl = uploadData.url;
+                    
+                    console.log("URL do avatar:", finalAvatarUrl);
+                    
+                    if (!finalAvatarUrl) {
+                        throw new Error("Não foi possível obter URL da imagem");
+                    }
+                    
+                    console.log("Upload de avatar bem-sucedido");
                 } catch (uploadErr) {
                     console.error("Erro no upload do avatar:", uploadErr);
                     // Se houver erro no upload, manter a URL atual
                     // mas não interromper o processo de atualização do perfil
-                    setError("Erro ao fazer upload da imagem. Seu perfil será atualizado sem a nova imagem.");
+                    setError(`Erro ao fazer upload da imagem: ${uploadErr.message}`);
+                    setSaving(false);
+                    return;
                 }
             }
 

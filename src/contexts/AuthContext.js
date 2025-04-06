@@ -20,63 +20,101 @@ export function AuthProvider({ children }) {
 
   // Carregar usuário e perfil
   useEffect(() => {
+    let isMounted = true; // Evitar atualização em componentes desmontados
+
     async function loadUserAndProfile() {
       try {
         // Verificar sessão
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Erro ao verificar sessão:", sessionError);
+          if (isMounted) {
+            setUser(null);
+            setProfile(null);
+            setLoading(false);
+          }
+          return;
+        }
         
         if (session?.user) {
-          setUser(session.user);
+          if (isMounted) setUser(session.user);
           
           // Buscar perfil
-          const { data: profileData } = await supabase
+          const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single();
+          
+          if (profileError) {
+            console.error("Erro ao buscar perfil:", profileError);
+          }
             
-          if (profileData) {
+          if (profileData && isMounted) {
             setProfile(profileData);
           }
-        } else {
+        } else if (isMounted) {
           setUser(null);
           setProfile(null);
         }
       } catch (error) {
         console.error("Erro ao carregar usuário:", error);
-        setUser(null);
-        setProfile(null);
-      } finally {
-        setLoading(false);
-      }
-    }
-    
-    loadUserAndProfile();
-    
-    // Configurar o listener de autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-          setUser(session.user);
-          
-          // Buscar perfil atualizado
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-            
-          if (profileData) {
-            setProfile(profileData);
-          }
-        } else if (event === 'SIGNED_OUT') {
+        if (isMounted) {
           setUser(null);
           setProfile(null);
         }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    );
+    }
     
+    // Adicionar um pequeno timeout para garantir que o Supabase esteja pronto
+    const initTimeout = setTimeout(() => {
+      loadUserAndProfile();
+    }, 100);
+    
+    // Configurar o listener de autenticação
+    let subscription;
+    
+    try {
+      const { data } = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          console.log("Auth state changed:", event);
+          
+          if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+            if (isMounted) setUser(session?.user || null);
+            
+            if (session?.user) {
+              // Buscar perfil atualizado
+              const { data: profileData } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+                
+              if (profileData && isMounted) {
+                setProfile(profileData);
+              }
+            }
+          } else if (event === 'SIGNED_OUT' && isMounted) {
+            setUser(null);
+            setProfile(null);
+          }
+        }
+      );
+      
+      subscription = data.subscription;
+    } catch (error) {
+      console.error("Erro ao configurar listener de autenticação:", error);
+    }
+    
+    // Cleanup function
     return () => {
+      isMounted = false;
+      clearTimeout(initTimeout);
       subscription?.unsubscribe();
     };
   }, []);
