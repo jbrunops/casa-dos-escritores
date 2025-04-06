@@ -423,21 +423,6 @@ export default function DashboardPage() {
                     <h1>Meu Dashboard</h1>
                     <p>Bem-vindo, {profile?.username || "Escritor"}</p>
                 </div>
-
-                <div className="actions-section">
-                    <button
-                        onClick={refreshData}
-                        className="refresh-button"
-                        aria-label="Atualizar dados"
-                    >
-                        <RefreshCw size={20} />
-                    </button>
-
-                    <Link href="/dashboard/new" className="new-story-button">
-                        <PlusCircle size={20} />
-                        <span>Nova História</span>
-                    </Link>
-                </div>
             </div>
 
             {successMessage && (
@@ -448,7 +433,7 @@ export default function DashboardPage() {
                 <div className="stat-card">
                     <div className="stat-content">
                         <span className="stat-value">{stats.totalStories}</span>
-                        <span className="stat-label">Total de histórias</span>
+                        <span className="stat-label">Total de Histórias</span>
                     </div>
                 </div>
 
@@ -482,32 +467,47 @@ export default function DashboardPage() {
                 <div className="stories-header">
                     <h2>Minhas Histórias</h2>
 
-                    <div className="stories-tabs">
+                    <div className="actions-section">
                         <button
-                            className={`tab-btn ${
-                                activeTab === "all" ? "active" : ""
-                            }`}
-                            onClick={() => setActiveTab("all")}
+                            onClick={refreshData}
+                            className="refresh-button"
+                            aria-label="Atualizar dados"
                         >
-                            Todas
+                            <RefreshCw size={20} />
                         </button>
-                        <button
-                            className={`tab-btn ${
-                                activeTab === "published" ? "active" : ""
-                            }`}
-                            onClick={() => setActiveTab("published")}
-                        >
-                            Publicadas
-                        </button>
-                        <button
-                            className={`tab-btn ${
-                                activeTab === "drafts" ? "active" : ""
-                            }`}
-                            onClick={() => setActiveTab("drafts")}
-                        >
-                            Rascunhos
-                        </button>
+
+                        <Link href="/dashboard/new" className="new-story-button">
+                            <PlusCircle size={20} />
+                            <span>Nova História</span>
+                        </Link>
                     </div>
+                </div>
+                
+                <div className="stories-tabs">
+                    <button
+                        className={`tab-btn ${
+                            activeTab === "all" ? "active" : ""
+                        }`}
+                        onClick={() => setActiveTab("all")}
+                    >
+                        Todas
+                    </button>
+                    <button
+                        className={`tab-btn ${
+                            activeTab === "published" ? "active" : ""
+                        }`}
+                        onClick={() => setActiveTab("published")}
+                    >
+                        Publicadas
+                    </button>
+                    <button
+                        className={`tab-btn ${
+                            activeTab === "drafts" ? "active" : ""
+                        }`}
+                        onClick={() => setActiveTab("drafts")}
+                    >
+                        Rascunhos
+                    </button>
                 </div>
 
                 {loadingStories ? (
@@ -522,10 +522,14 @@ export default function DashboardPage() {
                                 ? "Você ainda não criou nenhuma história."
                                 : activeTab === "published"
                                 ? "Você ainda não publicou nenhuma história."
-                                : "Você não tem nenhum rascunho."}
+                                : stories.some(story => story.is_published)
+                                ? "Você não tem nenhum rascunho."
+                                : "Você ainda não criou nenhuma história."}
                         </p>
                         <Link href="/dashboard/new" className="create-first">
-                            Criar minha primeira história
+                            {activeTab === "drafts" && stories.some(story => story.is_published)
+                                ? "Criar uma nova história"
+                                : "Criar minha primeira história"}
                         </Link>
                     </div>
                 ) : (
@@ -621,34 +625,37 @@ export default function DashboardPage() {
             <div className="series-link-section">
                 <div className="series-link-header">
                     <h2>Minhas Séries</h2>
-                    <Link href="/series" className="view-all-series-link">
-                        <BookOpen size={18} />
-                        <span>Ver minhas séries</span>
+                    <Link href="/dashboard/new-series" className="new-story-button">
+                        <PlusCircle size={20} />
+                        <span>Nova Série</span>
                     </Link>
                 </div>
                 
                 <div className="series-stats-card">
                     <div className="series-stats-content">
                         <div className="series-stats-item">
-                            <span className="series-stats-label">Total de séries</span>
                             <span className="series-stats-value">{series.length}</span>
+                            <span className="series-stats-label">Total de Séries</span>
                         </div>
                         <div className="series-stats-item">
-                            <span className="series-stats-label">Completas</span>
                             <span className="series-stats-value">
                                 {series.filter(s => s.is_completed).length}
                             </span>
+                            <span className="series-stats-label">Completas</span>
                         </div>
                         <div className="series-stats-item">
-                            <span className="series-stats-label">Em andamento</span>
                             <span className="series-stats-value">
                                 {series.filter(s => !s.is_completed).length}
                             </span>
+                            <span className="series-stats-label">Em andamento</span>
                         </div>
                     </div>
-                    <Link href="/dashboard/new-series" className="create-series-link">
-                        <Plus size={16} />
-                        <span>Nova Série</span>
+                </div>
+                
+                <div className="series-footer">
+                    <Link href="/series" className="view-all-series-link">
+                        <BookOpen size={18} />
+                        <span>Ver Minhas Séries</span>
                     </Link>
                 </div>
             </div>
