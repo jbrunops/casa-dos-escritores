@@ -319,10 +319,10 @@
 
 .series-card {
   width: 17.125rem;
-  height: 24.125rem;
+  height: 31rem;
   flex-shrink: 0;
   border: 1px solid #E5E7EB;
-  border-radius: 5px;
+  border-radius: 0.5rem;
   background-color: white;
   position: relative;
   overflow: hidden;
@@ -330,8 +330,13 @@
   flex-direction: column;
 }
 
+/* Removendo completamente o hover */
+.series-card:hover {
+  /* Sem efeitos de hover */
+}
+
 .series-card-image {
-  height: 12.75rem;
+  height: 24rem;
   position: relative;
   background-color: #f3f3f3;
   overflow: hidden;
@@ -341,13 +346,14 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .series-card-content {
-  padding: 1.25rem;
+  flex: 1;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  flex: 1;
 }
 
 .series-card-badge {
@@ -366,7 +372,7 @@
   font-size: 1.125rem;
   font-weight: 700;
   color: black;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   line-height: 1.4;
 }
 
@@ -374,7 +380,7 @@
   font-size: 0.75rem;
   font-weight: 500;
   color: #9C9C9C;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.5rem;
 }
 
 .series-card-genre {
@@ -436,11 +442,11 @@
   
   .series-card {
     width: 16rem;
-    height: 22rem;
+    height: 31rem;
   }
   
   .series-card-image {
-    height: 11rem;
+    height: 24rem;
   }
   
   .carousel-button {
