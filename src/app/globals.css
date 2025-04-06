@@ -220,14 +220,20 @@
 .writer-card {
   display: flex;
   align-items: center;
-  width: 23rem;
-  height: 7.375rem;
-  padding: 1.25rem;
-  background-color: #F3F3F3;
+  width: 25.1rem;
+  height: 6.5rem;
+  padding: 1rem 1.25rem;
+  background-color: white;
   border: 1px solid #C4C4C4;
   border-radius: 5px;
   margin-bottom: 1rem;
   position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.writer-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .writer-rank {
@@ -285,18 +291,16 @@
 
 .writer-stats-container {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
+  margin-top: 0.3rem;
 }
 
 .writer-stat-badge {
-  height: 1.125rem;
-  background-color: #969696;
-  color: white;
-  font-size: 0.75rem;
-  padding: 0 0.5rem;
-  border-radius: 3px;
+  font-size: 0.8rem;
+  color: #484DB5;
   display: flex;
   align-items: center;
+  gap: 0.3rem;
 }
 
 /* Estilos para os cards de Séries em Destaque e carrossel */

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import { Edit, BookOpen, Share2, MessageSquare, BookText } from "lucide-react";
+import { Edit, BookOpen, Share2, MessageSquare, BookText, Eye } from "lucide-react";
 import SeriesHighlights from "@/components/SeriesHighlights";
 import { generateSlug } from "@/lib/utils";
 
@@ -429,10 +429,8 @@ export default async function HomePage() {
                                             </div>
                                             <div className="writer-stats-container">
                                                 <div className="writer-stat-badge">
+                                                    <BookOpen size={14} />
                                                     {writer.count} publicações
-                                                </div>
-                                                <div className="writer-stat-badge">
-                                                    {writer.views || 0} visualizações
                                                 </div>
                                             </div>
                                         </div>
