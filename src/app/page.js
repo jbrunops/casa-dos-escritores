@@ -216,284 +216,278 @@ export default async function HomePage() {
     };
 
     return (
-        <main>
-            <div className="home-page">
-                <section className="hero-section py-16 bg-white">
-                    <section className="mt-[1.875rem] mb-[1.875rem] max-h-[14.3rem] flex flex-col items-center justify-center text-center py-12 px-4" 
-                        style={{
-                            backgroundImage: "url('/images/banner.jpg')",
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                            backgroundRepeat: "no-repeat",
-                        }}
-                    >
-                        <h1 className="text-4xl font-extrabold text-[#484DB5] mb-4">
-                            O lugar certo para você inserir suas ideias!
-                        </h1>
-                        <p className="text-lg text-[#484DB5] mb-8 max-w-3xl bg-[#E5E7EB] px-4 py-2 rounded">
-                            Crie, compartilhe; escreva fantasia, terror, humor, ficção científica e muito mais.
-                        </p>
-                    </section>
-                </section>
+        <div className="home-page">
+            <section className="mt-[1.8rem] mb-[1.8rem] max-h-[14.3rem] flex flex-col items-center justify-center text-center py-12 px-4" 
+                style={{ background: "linear-gradient(91deg, #FEFEFE 0.72%, #F4F4F4 128.06%)" }}>
+                <h1 className="text-[1.8rem] font-bold text-black mb-4">
+                    O lugar certo para você inserir suas ideias!
+                </h1>
+                <p className="text-[1rem] text-black max-w-2xl">
+                    Crie, compartilhe; escreva fantasia, terror, humor, ficção científica e muito mais.
+                    <br />
+                    Escreva até seus pensamentos e opiniões. Aqui você é livre!
+                </p>
+            </section>
 
-                {/* Séries em destaque */}
-                <SeriesHighlights />
-                
-                <section className="columns-section my-10">
-                    <div className="columns-grid grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[75rem] mx-auto">
-                        {/* Coluna 1: Histórias Recentes */}
-                        <div className="column">
-                            <h2 className="text-[1.8rem] font-bold mb-4 relative">
-                                Histórias Recentes
-                                <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
-                            </h2>
-                            <div className="stories-list">
-                                {recentContent?.length === 0 ? (
-                                    <p>Nenhuma história publicada ainda.</p>
-                                ) : (
-                                    recentContent.map((content) => 
-                                        content.type === 'story' ? (
-                                            <Link
-                                                href={`/story/${generateSlug(content.title, content.id)}`}
-                                                key={`story-${content.id}`}
-                                                className="story-card"
-                                            >
-                                                <h3>{content.title}</h3>
-                                                <div className="chapter-series-info">
-                                                    <BookOpen size={16} className="text-[#484DB5]" />
-                                                    <span>Conto Único</span>
-                                                </div>
-                                                <p className="story-summary">
-                                                    {createSummary(content.content)}
-                                                </p>
-                                                <div className="story-meta-line">
-                                                    <span className="author-name">
-                                                        {content.profiles?.username || "Autor"}
-                                                    </span>
-                                                    <span className="story-date">
-                                                        {formatDate(content.created_at)}
-                                                    </span>
-                                                </div>
-                                            </Link>
-                                        ) : (
-                                            <Link
-                                                href={`/chapter/${generateSlug(content.title, content.id)}`}
-                                                key={`chapter-${content.id}`}
-                                                className="chapter-card"
-                                            >
-                                                <div className="chapter-card-badge">
-                                                    Capítulo
-                                                </div>
-                                                <h3>{content.title}</h3>
-                                                
-                                                <div className="chapter-series-info">
-                                                    <BookText size={16} className="text-[#484DB5]" />
-                                                    <span>Série: {content.series?.title}</span>
-                                                </div>
-                                                
-                                                <p className="chapter-summary">
-                                                    {createSummary(content.content)}
-                                                </p>
-                                                
-                                                <div className="chapter-meta-line">
-                                                    <span className="author-name">
-                                                        {content.author?.username || "Autor"}
-                                                    </span>
-                                                    <span className="story-date">
-                                                        {formatDate(content.created_at)}
-                                                    </span>
-                                                </div>
-                                            </Link>
-                                        )
-                                    )
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Coluna 2: Mais Comentados */}
-                        <div className="column">
-                            <h2 className="text-[1.8rem] font-bold mb-4 relative">
-                                Mais Comentadas
-                                <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
-                            </h2>
-                            <div className="stories-list">
-                                {allContentWithComments?.length === 0 ? (
-                                    <p>Nenhuma história comentada ainda.</p>
-                                ) : (
-                                    allContentWithComments.map((content) => 
-                                        content.type === 'story' ? (
-                                            <Link
-                                                href={`/story/${generateSlug(content.title, content.id)}`}
-                                                key={`story-${content.id}`}
-                                                className="story-card"
-                                            >
-                                                <h3>{content.title}</h3>
-                                                <div className="chapter-series-info">
-                                                    <BookOpen size={16} className="text-[#484DB5]" />
-                                                    <span>Conto Único</span>
-                                                </div>
-                                                <p className="story-summary">
-                                                    {createSummary(content.content)}
-                                                </p>
-                                                <div className="story-meta-line">
-                                                    <span className="author-name">
-                                                        {content.profiles?.username || "Autor"}
-                                                    </span>
-                                                    <div className="meta-right">
-                                                        <span className="story-date">
-                                                            {formatDate(content.created_at)}
-                                                        </span>
-                                                        <span className="comment-badge">
-                                                            <MessageSquare size={12} />
-                                                            <span>{content.comment_count}</span>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </Link>
-                                        ) : (
-                                            <Link
-                                                href={`/chapter/${generateSlug(content.title, content.id)}`}
-                                                key={`chapter-${content.id}`}
-                                                className="chapter-card"
-                                            >
-                                                <div className="chapter-card-badge">
-                                                    Capítulo
-                                                </div>
-                                                <h3>{content.title}</h3>
-                                                
-                                                <div className="chapter-series-info">
-                                                    <BookText size={16} className="text-[#484DB5]" />
-                                                    <span>Série: {content.series?.title}</span>
-                                                </div>
-                                                
-                                                <p className="chapter-summary">
-                                                    {createSummary(content.content)}
-                                                </p>
-                                                
-                                                <div className="chapter-meta-line">
-                                                    <span className="author-name">
-                                                        {content.author?.username || "Autor"}
-                                                    </span>
-                                                    <div className="meta-right">
-                                                        <span className="story-date">
-                                                            {formatDate(content.created_at)}
-                                                        </span>
-                                                        <span className="comment-badge">
-                                                            <MessageSquare size={12} />
-                                                            <span>{content.comment_count}</span>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </Link>
-                                        )
-                                    )
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Coluna 3: Top 10 Escritores */}
-                        <div className="column">
-                            <h2 className="text-[1.8rem] font-bold mb-4 relative">
-                                Top 10 Escritores
-                                <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
-                            </h2>
-                            <div className="writers-list">
-                                {topWriters?.length === 0 ? (
-                                    <p>Nenhum escritor ativo ainda.</p>
-                                ) : (
-                                    topWriters?.map((writer, index) => (
-                                        <div
-                                            key={writer.id}
-                                            className="writer-card"
+            <section className="columns-section my-10">
+                <div className="columns-grid grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[75rem] mx-auto">
+                    {/* Coluna 1: Histórias Recentes */}
+                    <div className="column">
+                        <h2 className="text-[1.8rem] font-bold mb-4 relative">
+                            Histórias Recentes
+                            <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
+                        </h2>
+                        <div className="stories-list">
+                            {recentContent?.length === 0 ? (
+                                <p>Nenhuma história publicada ainda.</p>
+                            ) : (
+                                recentContent.map((content) => 
+                                    content.type === 'story' ? (
+                                        <Link
+                                            href={`/story/${generateSlug(content.title, content.id)}`}
+                                            key={`story-${content.id}`}
+                                            className="story-card"
                                         >
-                                            <div className="writer-rank">
-                                                #{index + 1}
+                                            <h3>{content.title}</h3>
+                                            <div className="chapter-series-info">
+                                                <BookOpen size={16} className="text-[#484DB5]" />
+                                                <span>Conto Único</span>
                                             </div>
+                                            <p className="story-summary">
+                                                {createSummary(content.content)}
+                                            </p>
+                                            <div className="story-meta-line">
+                                                <span className="author-name">
+                                                    {content.profiles?.username || "Autor"}
+                                                </span>
+                                                <span className="story-date">
+                                                    {formatDate(content.created_at)}
+                                                </span>
+                                            </div>
+                                        </Link>
+                                    ) : (
+                                        <Link
+                                            href={`/chapter/${generateSlug(content.title, content.id)}`}
+                                            key={`chapter-${content.id}`}
+                                            className="chapter-card"
+                                        >
+                                            <div className="chapter-card-badge">
+                                                Capítulo
+                                            </div>
+                                            <h3>{content.title}</h3>
+                                            
+                                            <div className="chapter-series-info">
+                                                <BookText size={16} className="text-[#484DB5]" />
+                                                <span>Série: {content.series?.title}</span>
+                                            </div>
+                                            
+                                            <p className="chapter-summary">
+                                                {createSummary(content.content)}
+                                            </p>
+                                            
+                                            <div className="chapter-meta-line">
+                                                <span className="author-name">
+                                                    {content.author?.username || "Autor"}
+                                                </span>
+                                                <span className="story-date">
+                                                    {formatDate(content.created_at)}
+                                                </span>
+                                            </div>
+                                        </Link>
+                                    )
+                                )
+                            )}
+                        </div>
+                    </div>
 
-                                            {writer.avatar_url ? (
-                                                <img
-                                                    src={writer.avatar_url}
-                                                    alt={writer.username}
-                                                    className="writer-avatar"
-                                                />
-                                            ) : (
-                                                <div className="writer-avatar-placeholder">
-                                                    {writer.username
-                                                        .charAt(0)
-                                                        .toUpperCase()}
+                    {/* Coluna 2: Mais Comentados */}
+                    <div className="column">
+                        <h2 className="text-[1.8rem] font-bold mb-4 relative">
+                            Mais Comentadas
+                            <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
+                        </h2>
+                        <div className="stories-list">
+                            {allContentWithComments?.length === 0 ? (
+                                <p>Nenhuma história comentada ainda.</p>
+                            ) : (
+                                allContentWithComments.map((content) => 
+                                    content.type === 'story' ? (
+                                        <Link
+                                            href={`/story/${generateSlug(content.title, content.id)}`}
+                                            key={`story-${content.id}`}
+                                            className="story-card"
+                                        >
+                                            <h3>{content.title}</h3>
+                                            <div className="chapter-series-info">
+                                                <BookOpen size={16} className="text-[#484DB5]" />
+                                                <span>Conto Único</span>
+                                            </div>
+                                            <p className="story-summary">
+                                                {createSummary(content.content)}
+                                            </p>
+                                            <div className="story-meta-line">
+                                                <span className="author-name">
+                                                    {content.profiles?.username || "Autor"}
+                                                </span>
+                                                <div className="meta-right">
+                                                    <span className="story-date">
+                                                        {formatDate(content.created_at)}
+                                                    </span>
+                                                    <span className="comment-badge">
+                                                        <MessageSquare size={12} />
+                                                        <span>{content.comment_count}</span>
+                                                    </span>
                                                 </div>
-                                            )}
+                                            </div>
+                                        </Link>
+                                    ) : (
+                                        <Link
+                                            href={`/chapter/${generateSlug(content.title, content.id)}`}
+                                            key={`chapter-${content.id}`}
+                                            className="chapter-card"
+                                        >
+                                            <div className="chapter-card-badge">
+                                                Capítulo
+                                            </div>
+                                            <h3>{content.title}</h3>
+                                            
+                                            <div className="chapter-series-info">
+                                                <BookText size={16} className="text-[#484DB5]" />
+                                                <span>Série: {content.series?.title}</span>
+                                            </div>
+                                            
+                                            <p className="chapter-summary">
+                                                {createSummary(content.content)}
+                                            </p>
+                                            
+                                            <div className="chapter-meta-line">
+                                                <span className="author-name">
+                                                    {content.author?.username || "Autor"}
+                                                </span>
+                                                <div className="meta-right">
+                                                    <span className="story-date">
+                                                        {formatDate(content.created_at)}
+                                                    </span>
+                                                    <span className="comment-badge">
+                                                        <MessageSquare size={12} />
+                                                        <span>{content.comment_count}</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    )
+                                )
+                            )}
+                        </div>
+                    </div>
 
-                                            <div className="writer-info">
-                                                <h3>
-                                                    <Link
-                                                        href={`/profile/${encodeURIComponent(
-                                                            writer.username
-                                                        )}`}
-                                                    >
-                                                        {writer.username}
-                                                    </Link>
-                                                </h3>
-                                                <div className="writer-username">
-                                                    @{writer.username.toLowerCase()}
-                                                </div>
-                                                <div className="writer-stats-container">
-                                                    <div className="writer-stat-badge">
-                                                        <BookOpen size={14} />
-                                                        {writer.count} publicações
-                                                    </div>
+                    {/* Coluna 3: Top 10 Escritores */}
+                    <div className="column">
+                        <h2 className="text-[1.8rem] font-bold mb-4 relative">
+                            Top 10 Escritores
+                            <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
+                        </h2>
+                        <div className="writers-list">
+                            {topWriters?.length === 0 ? (
+                                <p>Nenhum escritor ativo ainda.</p>
+                            ) : (
+                                topWriters?.map((writer, index) => (
+                                    <div
+                                        key={writer.id}
+                                        className="writer-card"
+                                    >
+                                        <div className="writer-rank">
+                                            #{index + 1}
+                                        </div>
+
+                                        {writer.avatar_url ? (
+                                            <img
+                                                src={writer.avatar_url}
+                                                alt={writer.username}
+                                                className="writer-avatar"
+                                            />
+                                        ) : (
+                                            <div className="writer-avatar-placeholder">
+                                                {writer.username
+                                                    .charAt(0)
+                                                    .toUpperCase()}
+                                            </div>
+                                        )}
+
+                                        <div className="writer-info">
+                                            <h3>
+                                                <Link
+                                                    href={`/profile/${encodeURIComponent(
+                                                        writer.username
+                                                    )}`}
+                                                >
+                                                    {writer.username}
+                                                </Link>
+                                            </h3>
+                                            <div className="writer-username">
+                                                @{writer.username.toLowerCase()}
+                                            </div>
+                                            <div className="writer-stats-container">
+                                                <div className="writer-stat-badge">
+                                                    <BookOpen size={14} />
+                                                    {writer.count} publicações
                                                 </div>
                                             </div>
                                         </div>
-                                    ))
-                                )}
-                            </div>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <section className="features-section">
-                    <h2 className="text-[1.8rem] font-bold mb-4 relative">
-                        Como funciona
-                        <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
-                    </h2>
+            {/* NOVA SEÇÃO: Séries Destacadas */}
+            <section className="series-highlights-section">
+                <SeriesHighlights />
+            </section>
 
-                    <div className="features-grid">
-                        <div className="feature-card">
-                            <div className="feature-icon">
-                                <Edit size={28} />
-                            </div>
-                            <h3 className="feature-title">Crie uma conta</h3>
-                            <p className="feature-description">
-                                Registre-se gratuitamente para começar a compartilhar suas histórias com outros leitores. 
-                                O processo é simples e rápido.
-                            </p>
+            <section className="features-section">
+                <h2 className="text-[1.8rem] font-bold mb-4 relative">
+                    Como funciona
+                    <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
+                </h2>
+
+                <div className="features-grid">
+                    <div className="feature-card">
+                        <div className="feature-icon">
+                            <Edit size={28} />
                         </div>
-
-                        <div className="feature-card">
-                            <div className="feature-icon">
-                                <BookOpen size={28} />
-                            </div>
-                            <h3 className="feature-title">Escreva suas histórias</h3>
-                            <p className="feature-description">
-                                Use nosso editor intuitivo para criar suas obras. Crie contos únicos ou desenvolva séries com 
-                                múltiplos capítulos.
-                            </p>
-                        </div>
-
-                        <div className="feature-card">
-                            <div className="feature-icon">
-                                <Share2 size={28} />
-                            </div>
-                            <h3 className="feature-title">Compartilhe com o mundo</h3>
-                            <p className="feature-description">
-                                Publique suas histórias e receba feedback da comunidade. Acompanhe visualizações e comentários 
-                                em suas obras.
-                            </p>
-                        </div>
+                        <h3 className="feature-title">Crie uma conta</h3>
+                        <p className="feature-description">
+                            Registre-se gratuitamente para começar a compartilhar suas histórias com outros leitores. 
+                            O processo é simples e rápido.
+                        </p>
                     </div>
-                </section>
-            </div>
-        </main>
+
+                    <div className="feature-card">
+                        <div className="feature-icon">
+                            <BookOpen size={28} />
+                        </div>
+                        <h3 className="feature-title">Escreva suas histórias</h3>
+                        <p className="feature-description">
+                            Use nosso editor intuitivo para criar suas obras. Crie contos únicos ou desenvolva séries com 
+                            múltiplos capítulos.
+                        </p>
+                    </div>
+
+                    <div className="feature-card">
+                        <div className="feature-icon">
+                            <Share2 size={28} />
+                        </div>
+                        <h3 className="feature-title">Compartilhe com o mundo</h3>
+                        <p className="feature-description">
+                            Publique suas histórias e receba feedback da comunidade. Acompanhe visualizações e comentários 
+                            em suas obras.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
     );
 }

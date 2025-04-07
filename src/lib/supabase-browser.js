@@ -3,31 +3,28 @@
 import { createBrowserClient as createClient } from "@supabase/ssr";
 
 export function createBrowserClient() {
-    // Definir valores padrão para garantir que o cliente seja sempre criado
-    // Mesmo que as variáveis não estejam disponíveis
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://kkykesdoqdeagnuvlxao.supabase.co";
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtreWtlc2RvcWRlYWdudXZseGFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3ODc5NTYsImV4cCI6MjA1OTM2Mzk1Nn0.kS69ce8FLws_rXMvbqOhRgMsaPntbzDGgwckQHYTnyk";
+    // process.env só funciona no cliente se as variáveis começarem com NEXT_PUBLIC_
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     
     // Verificação adicional para depuração
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        console.warn('Supabase: Usando valores padrão porque as variáveis de ambiente não foram carregadas corretamente.');
+    if (!supabaseUrl || !supabaseKey) {
+        console.error('Variáveis de ambiente do Supabase não foram carregadas corretamente:');
+        console.error('URL:', supabaseUrl ? 'Definida' : 'Não definida');
+        console.error('KEY:', supabaseKey ? 'Definida' : 'Não definida');
+        
+        // Valores de fallback (usado tanto para desenvolvimento quanto para produção, se necessário)
+        const fallbackUrl = "https://kkykesdoqdeagnuvlxao.supabase.co";
+        const fallbackKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtreWtlc2RvcWRlYWdudXZseGFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3ODc5NTYsImV4cCI6MjA1OTM2Mzk1Nn0.kS69ce8FLws_rXMvbqOhRgMsaPntbzDGgwckQHYTnyk";
+        
+        return createClient(
+            fallbackUrl,
+            fallbackKey
+        );
     }
     
-    try {
-        // Criar o cliente com tratamento de erros
-        const client = createClient(
-            supabaseUrl,
-            supabaseKey
-        );
-        
-        return client;
-    } catch (error) {
-        console.error("Erro ao criar cliente Supabase:", error);
-        // Em caso de erro, retornar um cliente com valores padrão
-        // para evitar erros de aplicação
-        return createClient(
-            "https://kkykesdoqdeagnuvlxao.supabase.co",
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtreWtlc2RvcWRlYWdudXZseGFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3ODc5NTYsImV4cCI6MjA1OTM2Mzk1Nn0.kS69ce8FLws_rXMvbqOhRgMsaPntbzDGgwckQHYTnyk"
-        );
-    }
+    return createClient(
+        supabaseUrl,
+        supabaseKey
+    );
 }

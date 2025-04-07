@@ -20,101 +20,63 @@ export function AuthProvider({ children }) {
 
   // Carregar usuário e perfil
   useEffect(() => {
-    let isMounted = true; // Evitar atualização em componentes desmontados
-
     async function loadUserAndProfile() {
       try {
         // Verificar sessão
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error("Erro ao verificar sessão:", sessionError);
-          if (isMounted) {
-            setUser(null);
-            setProfile(null);
-            setLoading(false);
-          }
-          return;
-        }
+        const { data: { session } } = await supabase.auth.getSession();
         
         if (session?.user) {
-          if (isMounted) setUser(session.user);
+          setUser(session.user);
           
           // Buscar perfil
-          const { data: profileData, error: profileError } = await supabase
+          const { data: profileData } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single();
-          
-          if (profileError) {
-            console.error("Erro ao buscar perfil:", profileError);
-          }
             
-          if (profileData && isMounted) {
+          if (profileData) {
             setProfile(profileData);
           }
-        } else if (isMounted) {
+        } else {
           setUser(null);
           setProfile(null);
         }
       } catch (error) {
         console.error("Erro ao carregar usuário:", error);
-        if (isMounted) {
-          setUser(null);
-          setProfile(null);
-        }
+        setUser(null);
+        setProfile(null);
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     }
     
-    // Adicionar um pequeno timeout para garantir que o Supabase esteja pronto
-    const initTimeout = setTimeout(() => {
-      loadUserAndProfile();
-    }, 100);
+    loadUserAndProfile();
     
     // Configurar o listener de autenticação
-    let subscription;
-    
-    try {
-      const { data } = supabase.auth.onAuthStateChange(
-        async (event, session) => {
-          console.log("Auth state changed:", event);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+          setUser(session.user);
           
-          if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-            if (isMounted) setUser(session?.user || null);
+          // Buscar perfil atualizado
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
             
-            if (session?.user) {
-              // Buscar perfil atualizado
-              const { data: profileData } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-                
-              if (profileData && isMounted) {
-                setProfile(profileData);
-              }
-            }
-          } else if (event === 'SIGNED_OUT' && isMounted) {
-            setUser(null);
-            setProfile(null);
+          if (profileData) {
+            setProfile(profileData);
           }
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+          setProfile(null);
         }
-      );
-      
-      subscription = data.subscription;
-    } catch (error) {
-      console.error("Erro ao configurar listener de autenticação:", error);
-    }
+      }
+    );
     
-    // Cleanup function
     return () => {
-      isMounted = false;
-      clearTimeout(initTimeout);
       subscription?.unsubscribe();
     };
   }, []);
