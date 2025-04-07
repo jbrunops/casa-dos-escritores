@@ -209,57 +209,57 @@ export default function NewChapterPage() {
 
     if (loading) {
         return (
-            <div className="loading-container">
-                <div className="loader-large"></div>
-                <p>Carregando informações da série...</p>
+            <div className="flex flex-col items-center justify-center min-h-[50vh] p-6">
+                <div className="w-12 h-12 border-4 border-[#484DB5] border-t-transparent rounded-full animate-spin"></div>
+                <p className="mt-4 text-gray-600 font-medium">Carregando informações da série...</p>
             </div>
         );
     }
 
     return (
-        <div className="chapter-editor-container">
-            <div className="story-editor-header">
-                <h1>Novo Capítulo: {series?.title}</h1>
+        <div className="max-w-4xl mx-auto px-4 py-8">
+            <div className="mb-6">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Novo Capítulo: {series?.title}</h1>
             </div>
 
-            <div className="back-dashboard">
-                <Link href={`/series/${seriesId}`} className="back-link">
-                    <ArrowLeft size={16} />
+            <div className="mb-6">
+                <Link href={`/series/${seriesId}`} className="inline-flex items-center text-[#484DB5] hover:text-[#383aa3] transition-colors">
+                    <ArrowLeft size={16} className="mr-2" />
                     <span>Voltar para a série</span>
                 </Link>
             </div>
 
             {error && (
-                <div className="story-message error">
-                    <AlertTriangle size={20} />
+                <div className="flex items-center p-4 mb-6 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                    <AlertTriangle size={20} className="mr-2 flex-shrink-0" />
                     <span>{error}</span>
                 </div>
             )}
 
             {success && (
-                <div className="story-message success">
-                    <CheckCircle2 size={20} />
+                <div className="flex items-center p-4 mb-6 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                    <CheckCircle2 size={20} className="mr-2 flex-shrink-0" />
                     <span>{success}</span>
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="story-editor-form">
-                <div className="story-form-grid">
-                    <div className="story-form-group">
-                        <label htmlFor="title">Título do Capítulo</label>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <label htmlFor="title" className="block text-sm font-medium text-gray-700">Título do Capítulo</label>
                         <input
                             id="title"
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            className="story-input"
+                            className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent"
                             placeholder="Título do capítulo..."
                             required
                         />
                     </div>
 
-                    <div className="story-form-group">
-                        <label htmlFor="chapterNumber">
+                    <div className="space-y-2">
+                        <label htmlFor="chapterNumber" className="block text-sm font-medium text-gray-700">
                             Número do Capítulo
                         </label>
                         <input
@@ -270,9 +270,9 @@ export default function NewChapterPage() {
                                 setChapterNumber(parseInt(e.target.value) || 1)
                             }
                             min="1"
-                            className="story-input chapter-number-select"
+                            className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent"
                         />
-                        <p className="form-hint">
+                        <p className="text-xs text-gray-500">
                             Capítulo {chapterNumber} de{" "}
                             {maxChapterNumber === chapterNumber
                                 ? "uma nova série"
@@ -283,29 +283,29 @@ export default function NewChapterPage() {
                     </div>
                 </div>
 
-                <div className="story-form-group">
-                    <label htmlFor="content">Conteúdo do Capítulo</label>
-                    <div className="story-editor-wrapper">
+                <div className="space-y-2">
+                    <label htmlFor="content" className="block text-sm font-medium text-gray-700">Conteúdo do Capítulo</label>
+                    <div className="border border-[#E5E7EB] rounded-lg overflow-hidden">
                         <TipTapEditor
                             value={content}
                             onChange={setContent}
                             placeholder="Escreva seu capítulo aqui..."
                         />
                     </div>
-                    <div className="story-editor-stats">
-                        <div className="story-stat">
+                    <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-500">
+                        <div>
                             <span>{wordCount} palavras</span>
                         </div>
-                        <div className="story-stat">
+                        <div>
                             <span>{charCount} caracteres</span>
                         </div>
-                        <div className="story-stat">
+                        <div>
                             <span>{readingTime} min. de leitura</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="story-actions">
+                <div className="pt-4">
                     <button
                         type="submit"
                         disabled={
@@ -314,19 +314,23 @@ export default function NewChapterPage() {
                             !content.trim() ||
                             !formTouched
                         }
-                        className="story-btn story-btn-primary"
+                        className={`flex items-center justify-center px-6 py-3 rounded-lg font-medium text-white 
+                            ${saving || !title.trim() || !content.trim() || !formTouched
+                                ? 'bg-gray-400 cursor-not-allowed'
+                                : 'bg-[#484DB5] hover:bg-[#383aa3] transition-colors'
+                            }`}
                     >
                         {saving ? (
                             <>
                                 <Save
-                                    className="story-btn-icon btn-spinner"
+                                    className="mr-2 animate-spin"
                                     size={18}
                                 />
                                 <span>Salvando...</span>
                             </>
                         ) : (
                             <>
-                                <Save className="story-btn-icon" size={18} />
+                                <Save className="mr-2" size={18} />
                                 <span>Salvar Capítulo</span>
                             </>
                         )}
