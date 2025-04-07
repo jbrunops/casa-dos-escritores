@@ -168,29 +168,67 @@ export default function EditProfilePage() {
             let finalAvatarUrl = avatarUrl;
             if (avatarFile) {
                 try {
+                    // Detectar se é um dispositivo móvel
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+                        typeof navigator !== 'undefined' ? navigator.userAgent : ''
+                    );
+                    
                     // Criar nome de arquivo único
                     const fileExt = avatarFile.name.split(".").pop();
                     const fileName = `${user.id}-${Math.random()
                         .toString(36)
                         .substring(2)}.${fileExt}`;
-                    const filePath = `avatars/${fileName}`;
+                    
+                    let uploadSuccess = false;
+                    
+                    // Em dispositivos móveis, usar a API de proxy
+                    if (isMobile) {
+                        console.log("Detectado dispositivo móvel, usando API de upload");
+                        
+                        const formData = new FormData();
+                        formData.append("file", avatarFile);
+                        formData.append("userId", user.id);
+                        
+                        const response = await fetch("/api/upload", {
+                            method: "POST",
+                            body: formData,
+                        });
+                        
+                        if (response.ok) {
+                            const result = await response.json();
+                            finalAvatarUrl = result.url;
+                            uploadSuccess = true;
+                        } else {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error || "Erro no upload via API");
+                        }
+                    } 
+                    
+                    // Em desktop ou se a API falhar, usar o método direto
+                    if (!isMobile || !uploadSuccess) {
+                        const filePath = `avatars/${fileName}`;
+                        
+                        // Upload para o Storage
+                        const { error: uploadError } = await supabase.storage
+                            .from("mobile")
+                            .upload(filePath, avatarFile, {
+                                cacheControl: '3600',
+                                upsert: true,
+                                contentType: avatarFile.type
+                            });
 
-                    // Upload para o Storage
-                    const { error: uploadError } = await supabase.storage
-                        .from("mobile")
-                        .upload(filePath, avatarFile);
+                        if (uploadError) {
+                            console.error("Erro no upload direto:", uploadError);
+                            throw uploadError;
+                        }
 
-                    if (uploadError) {
-                        console.error("Erro no upload:", uploadError);
-                        throw uploadError;
+                        // Obter URL pública
+                        const { data } = supabase.storage
+                            .from("mobile")
+                            .getPublicUrl(filePath);
+
+                        finalAvatarUrl = data.publicUrl;
                     }
-
-                    // Obter URL pública
-                    const { data } = supabase.storage
-                        .from("mobile")
-                        .getPublicUrl(filePath);
-
-                    finalAvatarUrl = data.publicUrl;
                 } catch (uploadErr) {
                     console.error("Erro no upload do avatar:", uploadErr);
                     // Se houver erro no upload, manter a URL atual
