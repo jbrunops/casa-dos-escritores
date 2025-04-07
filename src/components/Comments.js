@@ -161,7 +161,7 @@ export default function Comments({
 
             // Preparar dados para a API
             const commentData = {
-                text: newComment,
+                text: newComment.trim(),
                 authorId: activeUserId,
                 parentId: replyTo ? replyTo.id : null,
             };
@@ -177,38 +177,62 @@ export default function Comments({
 
             console.log("Enviando para API:", commentData);
 
-            // Fazer requisição para a API
-            const response = await fetch("/api/comments", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(commentData),
-            });
+            try {
+                // Fazer requisição para a API
+                const response = await fetch("/api/comments", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(commentData),
+                });
 
-            const result = await response.json();
-            console.log("Resposta da API:", result);
+                if (!response) {
+                    throw new Error("Resposta vazia da API");
+                }
 
-            if (!response.ok) {
-                const errorMessage =
-                    result.error || "Erro ao adicionar comentário";
-                const errorDetails = result.details
-                    ? JSON.stringify(result.details)
-                    : "";
-                throw new Error(`${errorMessage} ${errorDetails}`);
+                // Verificar se temos uma resposta válida antes de tentar fazer parse do JSON
+                const contentType = response.headers.get("content-type");
+                if (!contentType || !contentType.includes("application/json")) {
+                    // Se não for JSON, tentar obter o texto bruto para informações adicionais
+                    const textResponse = await response.text();
+                    console.error("Resposta não-JSON recebida:", textResponse);
+                    throw new Error(`Resposta inesperada do servidor: ${response.status} ${response.statusText}`);
+                }
+                
+                let result;
+                try {
+                    result = await response.json();
+                    console.log("Resposta da API:", result);
+                } catch (jsonError) {
+                    console.error("Erro ao processar JSON da resposta:", jsonError);
+                    throw new Error("A resposta do servidor não contém JSON válido");
+                }
+
+                if (!response.ok) {
+                    const errorMessage =
+                        result?.error || "Erro ao adicionar comentário";
+                    const errorDetails = result?.details
+                        ? JSON.stringify(result.details)
+                        : "";
+                    throw new Error(`${errorMessage} ${errorDetails}`);
+                }
+
+                // Sucesso!
+                setNewComment("");
+                setReplyTo(null);
+                setSuccess(true);
+
+                // Recarregar comentários
+                await loadComments();
+
+                setTimeout(() => {
+                    setSuccess(false);
+                }, 3000);
+            } catch (apiError) {
+                console.error("Erro na chamada da API:", apiError);
+                throw new Error(apiError.message || "Erro na comunicação com o servidor");
             }
-
-            // Sucesso!
-            setNewComment("");
-            setReplyTo(null);
-            setSuccess(true);
-
-            // Recarregar comentários
-            await loadComments();
-
-            setTimeout(() => {
-                setSuccess(false);
-            }, 3000);
         } catch (err) {
             console.error("Erro detalhado:", err);
             setError(`Erro: ${err.message}`);

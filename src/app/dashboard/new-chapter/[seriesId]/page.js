@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import TipTapEditor from "@/components/TipTapEditor";
@@ -13,10 +13,22 @@ import {
     BookOpen,
 } from "lucide-react";
 
+// Detecta se estamos em ambiente de desenvolvimento
+const isDev = process.env.NODE_ENV === 'development';
+
 export default function NewChapterPage() {
     const router = useRouter();
     const params = useParams();
     const seriesId = params.seriesId;
+    const redirectTimeoutRef = useRef(null);
+    const mountedRef = useRef(true);
+    const isSavingRef = useRef(false);
+    
+    // Usar useRef para o cliente Supabase para evitar recriá-lo a cada renderização
+    const supabaseRef = useRef(null);
+    if (!supabaseRef.current) {
+        supabaseRef.current = createBrowserClient();
+    }
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
@@ -31,26 +43,39 @@ export default function NewChapterPage() {
     const [wordCount, setWordCount] = useState(0);
     const [charCount, setCharCount] = useState(0);
     const [readingTime, setReadingTime] = useState(0);
+    const [isRedirecting, setIsRedirecting] = useState(false);
 
-    const supabase = createBrowserClient();
+    // Resetar ref na desmontagem
+    useEffect(() => {
+        return () => {
+            mountedRef.current = false;
+            if (redirectTimeoutRef.current) {
+                clearTimeout(redirectTimeoutRef.current);
+            }
+        };
+    }, []);
 
     // Buscar informações da série e definir número do capítulo
     useEffect(() => {
         async function fetchSeriesInfo() {
+            // Se já estamos carregando ou redirecionando, não iniciar nova busca
+            if (!mountedRef.current || isRedirecting) return;
+            
             try {
                 setLoading(true);
 
                 // Verificar se usuário está autenticado
                 const {
                     data: { user },
-                } = await supabase.auth.getUser();
+                } = await supabaseRef.current.auth.getUser();
+                
                 if (!user) {
                     router.push("/login");
                     return;
                 }
 
                 // Buscar série
-                const { data: seriesData, error: seriesError } = await supabase
+                const { data: seriesData, error: seriesError } = await supabaseRef.current
                     .from("series")
                     .select("*")
                     .eq("id", seriesId)
@@ -73,10 +98,12 @@ export default function NewChapterPage() {
                     return;
                 }
 
-                setSeries(seriesData);
+                if (mountedRef.current) {
+                    setSeries(seriesData);
+                }
 
                 // Buscar maior número de capítulo existente
-                const { data: chapters, error: chaptersError } = await supabase
+                const { data: chapters, error: chaptersError } = await supabaseRef.current
                     .from("chapters")
                     .select("chapter_number")
                     .eq("series_id", seriesId)
@@ -91,20 +118,26 @@ export default function NewChapterPage() {
                         ? chapters[0].chapter_number + 1
                         : 1;
 
-                setChapterNumber(nextChapterNumber);
-                setMaxChapterNumber(nextChapterNumber);
+                if (mountedRef.current) {
+                    setChapterNumber(nextChapterNumber);
+                    setMaxChapterNumber(nextChapterNumber);
+                }
             } catch (error) {
                 console.error("Erro ao buscar informações da série:", error);
-                setError("Não foi possível carregar as informações da série");
+                if (mountedRef.current) {
+                    setError("Não foi possível carregar as informações da série");
+                }
             } finally {
-                setLoading(false);
+                if (mountedRef.current) {
+                    setLoading(false);
+                }
             }
         }
 
-        if (seriesId) {
+        if (seriesId && !isRedirecting) {
             fetchSeriesInfo();
         }
-    }, [seriesId, router, supabase]);
+    }, [seriesId, router, isRedirecting]);
 
     // Detectar mudanças no formulário
     useEffect(() => {
@@ -115,27 +148,55 @@ export default function NewChapterPage() {
 
     // Atualizar estatísticas de texto
     useEffect(() => {
-        if (content) {
-            // Remover tags HTML para contagem precisa
-            const plainText = content.replace(/<[^>]*>/g, "");
-            // Contagem de caracteres
-            setCharCount(plainText.length);
-
-            // Contagem de palavras
-            const words = plainText
-                .split(/\s+/)
-                .filter((word) => word.length > 0);
-            setWordCount(words.length);
-
-            // Tempo de leitura (200 palavras por minuto em média)
-            const minutes = Math.max(1, Math.ceil(words.length / 200));
-            setReadingTime(minutes);
-        } else {
+        if (!content) {
             setCharCount(0);
             setWordCount(0);
             setReadingTime(0);
+            return;
         }
+        
+        // Remover tags HTML para contagem precisa
+        const plainText = content.replace(/<[^>]*>/g, "");
+        // Contagem de caracteres
+        setCharCount(plainText.length);
+
+        // Contagem de palavras
+        const words = plainText
+            .split(/\s+/)
+            .filter((word) => word.length > 0);
+        setWordCount(words.length);
+
+        // Tempo de leitura (200 palavras por minuto em média)
+        const minutes = Math.max(1, Math.ceil(words.length / 200));
+        setReadingTime(minutes);
     }, [content]);
+
+    // Função para lidar com redirecionamento de forma compatível com dev/prod
+    const safeRedirect = (url) => {
+        if (!mountedRef.current) return;
+        
+        setIsRedirecting(true);
+        
+        if (isDev) {
+            // Em desenvolvimento, usar um timeout antes do redirecionamento
+            // para evitar problemas de estado e condições de corrida
+            console.log('Redirecionando em modo de desenvolvimento...');
+            redirectTimeoutRef.current = setTimeout(() => {
+                if (mountedRef.current) {
+                    try {
+                        window.location.href = url; // Forçar redirecionamento completo
+                    } catch (err) {
+                        console.error('Erro ao redirecionar:', err);
+                        setSaving(false);
+                        setIsRedirecting(false);
+                    }
+                }
+            }, 1000);
+        } else {
+            // Em produção, usar o router.push diretamente
+            router.push(url);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -150,6 +211,13 @@ export default function NewChapterPage() {
             return;
         }
 
+        if (saving || isRedirecting || isSavingRef.current) {
+            // Evita múltiplos cliques no botão de salvar ou submissões durante redirecionamento
+            return;
+        }
+
+        // Usar ref para evitar condições de corrida
+        isSavingRef.current = true;
         setSaving(true);
         setError(null);
         setSuccess(null);
@@ -157,12 +225,16 @@ export default function NewChapterPage() {
         try {
             const {
                 data: { user },
-            } = await supabase.auth.getUser();
+            } = await supabaseRef.current.auth.getUser();
 
-            if (!user) throw new Error("Você precisa estar logado");
+            if (!user) {
+                isSavingRef.current = false;
+                setSaving(false);
+                throw new Error("Você precisa estar logado");
+            }
 
             // Inserir novo capítulo
-            const { data, error } = await supabase
+            const { data, error } = await supabaseRef.current
                 .from("chapters")
                 .insert({
                     title,
@@ -181,7 +253,7 @@ export default function NewChapterPage() {
             }
 
             // Atualizar timestamp da série
-            const { error: updateError } = await supabase
+            const { error: updateError } = await supabaseRef.current
                 .from("series")
                 .update({ updated_at: new Date().toISOString() })
                 .eq("id", seriesId);
@@ -193,17 +265,20 @@ export default function NewChapterPage() {
                 );
             }
 
-            setSuccess("Capítulo criado com sucesso!");
-
-            // Redirecionar após uma breve pausa
-            setTimeout(() => {
-                router.push(`/series/${seriesId}`);
-            }, 1500);
+            if (mountedRef.current) {
+                setSuccess("Capítulo criado com sucesso!");
+                
+                // Usar método de redirecionamento seguro
+                const redirectUrl = `/series/${seriesId}`;
+                safeRedirect(redirectUrl);
+            }
         } catch (err) {
-            setError(err.message || "Ocorreu um erro ao salvar o capítulo");
-            console.error("Erro ao criar capítulo:", err);
-        } finally {
-            setSaving(false);
+            if (mountedRef.current) {
+                setError(err.message || "Ocorreu um erro ao salvar o capítulo");
+                console.error("Erro ao criar capítulo:", err);
+                setSaving(false);
+                isSavingRef.current = false;
+            }
         }
     };
 
@@ -255,6 +330,7 @@ export default function NewChapterPage() {
                             className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent"
                             placeholder="Título do capítulo..."
                             required
+                            disabled={saving || isRedirecting}
                         />
                     </div>
 
@@ -271,6 +347,7 @@ export default function NewChapterPage() {
                             }
                             min="1"
                             className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent"
+                            disabled={saving || isRedirecting}
                         />
                         <p className="text-xs text-gray-500">
                             Capítulo {chapterNumber} de{" "}
@@ -290,6 +367,7 @@ export default function NewChapterPage() {
                             value={content}
                             onChange={setContent}
                             placeholder="Escreva seu capítulo aqui..."
+                            disabled={saving || isRedirecting}
                         />
                     </div>
                     <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-500">
@@ -310,23 +388,24 @@ export default function NewChapterPage() {
                         type="submit"
                         disabled={
                             saving ||
+                            isRedirecting ||
                             !title.trim() ||
                             !content.trim() ||
                             !formTouched
                         }
                         className={`flex items-center justify-center px-6 py-3 rounded-lg font-medium text-white 
-                            ${saving || !title.trim() || !content.trim() || !formTouched
+                            ${saving || isRedirecting || !title.trim() || !content.trim() || !formTouched
                                 ? 'bg-gray-400 cursor-not-allowed'
                                 : 'bg-[#484DB5] hover:bg-[#383aa3] transition-colors'
                             }`}
                     >
-                        {saving ? (
+                        {saving || isRedirecting ? (
                             <>
                                 <Save
                                     className="mr-2 animate-spin"
                                     size={18}
                                 />
-                                <span>Salvando...</span>
+                                <span>{isRedirecting ? "Redirecionando..." : "Salvando..."}</span>
                             </>
                         ) : (
                             <>
