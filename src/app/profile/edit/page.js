@@ -177,7 +177,7 @@ export default function EditProfilePage() {
 
                     // Upload para o Storage
                     const { error: uploadError } = await supabase.storage
-                        .from("avatars")
+                        .from("mobile")
                         .upload(filePath, avatarFile);
 
                     if (uploadError) {
@@ -187,7 +187,7 @@ export default function EditProfilePage() {
 
                     // Obter URL pública
                     const { data } = supabase.storage
-                        .from("avatars")
+                        .from("mobile")
                         .getPublicUrl(filePath);
 
                     finalAvatarUrl = data.publicUrl;

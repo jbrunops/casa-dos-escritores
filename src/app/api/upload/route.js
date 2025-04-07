@@ -29,7 +29,7 @@ export async function POST(request) {
             console.log("Usando variáveis de ambiente para o Supabase");
         }
         
-        // Verificar se o bucket 'covers' existe
+        // Verificar se o bucket 'mobile' existe
         const { data: buckets, error: listError } = await supabase.storage.listBuckets();
         
         if (listError) {
@@ -37,12 +37,12 @@ export async function POST(request) {
             return NextResponse.json({ error: "Erro ao acessar storage" }, { status: 500 });
         }
         
-        // Criar o bucket se não existir
-        const bucketName = "covers";
+        // Usar o bucket mobile ao invés de covers
+        const bucketName = "mobile";
         let bucketExists = buckets.some(bucket => bucket.name === bucketName);
         
         if (!bucketExists) {
-            console.log("Bucket 'covers' não encontrado. Criando...");
+            console.log("Bucket 'mobile' não encontrado. Criando...");
             const { error: createError } = await supabase.storage.createBucket(bucketName, {
                 public: true
             });
@@ -54,7 +54,7 @@ export async function POST(request) {
             
             console.log("Bucket criado com sucesso");
         } else {
-            console.log("Bucket 'covers' já existe");
+            console.log("Bucket 'mobile' já existe");
         }
         
         // Verificar políticas de acesso
