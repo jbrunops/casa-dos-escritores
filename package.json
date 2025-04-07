@@ -25,6 +25,7 @@
     "date-fns": "^4.1.0",
     "dompurify": "^3.2.4",
     "lucide-react": "^0.484.0",
+    "nanoid": "^5.1.5",
     "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
@@ -33,6 +34,8 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/typography": "^0.5.16",
     "autoprefixer": "^10.4.21",
+    "chalk": "^4.1.2",
+    "dotenv": "^16.4.7",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
     "postcss": "^8.5.3",

@@ -1933,6 +1933,12 @@ textarea.form-input {
   border: 1px solid #bbf7d0;
 }
 
+.warning-message {
+  background-color: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -2153,4 +2159,235 @@ textarea.form-input {
   .categories-page h1 {
     font-size: 1.75rem;
   }
+}
+
+/* Estilos para o contador de visualizações na página de história */
+.story-tags .view-count {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #484DB5;
+  font-size: 0.9rem;
+  border: 1px solid #E5E7EB;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+}
+
+.story-tags .eye-icon {
+  color: #484DB5;
+}
+
+/* Estilos para a categoria na página de história */
+.story-category {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.6rem;
+  background-color: #f5f5ff;
+  color: #484DB5;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+  border: 1px solid #E5E7EB;
+}
+
+/* Estilos para os metadados de conteúdo (histórias e séries) */
+.content-meta-item {
+  display: flex;
+  align-items: center;
+  color: #484DB5;
+  font-size: 0.9rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 4px;
+}
+
+.content-meta-icon {
+  margin-right: 0.3rem;
+  color: #484DB5;
+}
+
+/* Estilos para capítulos na lista */
+.chapter-list-item {
+  border: 1px solid #E5E7EB;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.chapter-list-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.chapter-list-number {
+  background-color: #484DB5;
+  color: white;
+  font-weight: 500;
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+  text-align: center;
+}
+
+/* Estilos para a página medium-story */
+.medium-story {
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.story-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.story-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+}
+
+.author-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 1rem;
+  border: 1px solid #E5E7EB;
+}
+
+.author-avatar-placeholder {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: #f5f5ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #484DB5;
+  margin-right: 1rem;
+  border: 1px solid #E5E7EB;
+}
+
+.author-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #484DB5;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.author-name:hover {
+  text-decoration: underline;
+}
+
+.publication-info {
+  font-size: 0.875rem;
+  color: #6b7280;
+  display: flex;
+  gap: 1rem;
+}
+
+.story-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.story-category {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.6rem;
+  background-color: #f5f5ff;
+  color: #484DB5;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 4px;
+  text-decoration: none;
+  border: 1px solid #E5E7EB;
+}
+
+.view-count {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #484DB5;
+  font-size: 0.9rem;
+  border: 1px solid #E5E7EB;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+}
+
+.eye-icon {
+  color: #484DB5;
+}
+
+/* Estilo da seção de bio do autor */
+.author-bio-section {
+  margin: 3rem 0;
+  padding: 1.5rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.5rem;
+  background-color: #f9fafb;
+}
+
+.author-bio {
+  display: flex;
+  align-items: center;
+}
+
+.author-bio-avatar {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 1.5rem;
+  border: 2px solid #484DB5;
+}
+
+.author-bio-avatar-placeholder {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background-color: #f5f5ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #484DB5;
+  margin-right: 1.5rem;
+  border: 2px solid #484DB5;
+}
+
+.author-bio-content h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.author-bio-content p {
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.info-message {
+  background-color: #e6f0ff;
+  color: #0066cc;
+  border: 1px solid #b3d9ff;
 }

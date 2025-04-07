@@ -18,7 +18,10 @@ export default async function SeriesPage({ searchParams }) {
     try {
         console.log("Carregando página de séries");
         const supabase = await createServerSupabaseClient();
-        const page = searchParams.page ? parseInt(searchParams.page) : 1;
+        
+        // Aguardar searchParams antes de usar suas propriedades
+        const searchParamsPage = searchParams ? searchParams.page : null;
+        const page = searchParamsPage ? parseInt(searchParamsPage) : 1;
 
         // Calcular o offset para paginação
         const from = (page - 1) * PAGE_SIZE;
