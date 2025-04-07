@@ -91,67 +91,6 @@ casa-dos-escritores/
 └── package.json              # Dependências do projeto
 ```
 
-## 🚀 Instalação e Uso
-
-### Pré-requisitos
-- Node.js 18.x ou superior
-- NPM ou Yarn
-- Conta no Supabase
-
-### Configuração do Ambiente
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/casadosescritores.git
-   cd casadosescritores
-   ```
-
-2. Instale as dependências:
-   ```bash
-   npm install
-   # ou
-   yarn
-   ```
-
-3. Configure as variáveis de ambiente:
-   ```
-   # .env.local
-   NEXT_PUBLIC_SUPABASE_URL=sua_url_do_supabase
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anon_do_supabase
-   ```
-
-4. Execute o projeto localmente:
-   ```bash
-   npm run dev
-   # ou
-   yarn dev
-   ```
-
-5. Acesse `http://localhost:3000` no navegador
-
-### Estrutura do Banco de Dados (Supabase)
-
-O projeto utiliza as seguintes tabelas principais:
-
-- **auth.users**: Gerenciada pelo Supabase Auth
-- **profiles**: Informações complementares dos usuários
-- **stories**: Histórias individuais e capítulos
-- **series**: Agrupamento de histórias em séries
-- **comments**: Comentários nas histórias
-
-## 🎯 Guia de Contribuição
-
-1. Faça um fork do repositório
-2. Crie uma branch para sua feature: `git checkout -b minha-feature`
-3. Commit suas mudanças: `git commit -m 'Adiciona minha feature'`
-4. Push para a branch: `git push origin minha-feature`
-5. Abra um Pull Request
-
-### Padrões de Código
-- Utilize TypeScript para tipagem segura
-- Siga as práticas de componentização do React
-- Mantenha compatibilidade com dispositivos móveis
-- Documente novas funcionalidades
-
 ## 📝 Documentação de Estilos
 
 O projeto segue uma estrutura de CSS organizada:
