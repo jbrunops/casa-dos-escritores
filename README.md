@@ -1,10 +1,5 @@
 # Casa dos Escritores
 
-<div align="center">
-  <img src="public/images/logo.png" alt="Casa dos Escritores Logo" width="150">
-  <h3>Plataforma de Compartilhamento e Publicação de Conteúdo Literário</h3>
-</div>
-
 ## 📚 Visão Geral
 
 Casa dos Escritores é uma plataforma completa para escritores publicarem suas histórias, organizá-las em séries e conectarem-se com leitores. O projeto oferece um ambiente intuitivo para criação, gerenciamento e consumo de conteúdo literário em português, com foco em uma experiência fluida tanto para autores quanto para leitores.
