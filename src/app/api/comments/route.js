@@ -1,26 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { sanitizeText, isValidUUID } from "@/lib/utils";
 
 export async function POST(request) {
     try {
-        // Verificar cabeçalhos e origem 
-        const origin = request.headers.get('origin') || '';
-        const allowedOrigins = [
-            process.env.NEXT_PUBLIC_SITE_URL || '',
-            'http://localhost:3000',
-            'http://localhost:3001'
-        ].filter(Boolean);
-        
-        // Verificar se a origem está permitida (em produção)
-        if (process.env.NODE_ENV === 'production' && !allowedOrigins.includes(origin)) {
-            console.error(`Requisição de origem não permitida: ${origin}`);
-            return NextResponse.json(
-                { error: "Acesso negado" },
-                { status: 403 }
-            );
-        }
-
         // Criar cliente supabase
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -30,20 +12,17 @@ export async function POST(request) {
         // Obter dados da requisição
         const { text, authorId, storyId, seriesId, chapterId, parentId } = await request.json();
 
-        // Sanitização básica para evitar XSS
-        const sanitizedText = sanitizeText(text);
-
         // Verificar campos obrigatórios
-        if (!sanitizedText || !sanitizedText.trim()) {
+        if (!text || !text.trim()) {
             return NextResponse.json(
                 { error: "O texto do comentário é obrigatório" },
                 { status: 400 }
             );
         }
 
-        if (!authorId || !isValidUUID(authorId)) {
+        if (!authorId) {
             return NextResponse.json(
-                { error: "ID do autor inválido" },
+                { error: "O ID do autor é obrigatório" },
                 { status: 400 }
             );
         }
@@ -52,17 +31,6 @@ export async function POST(request) {
         if (!storyId && !seriesId && !chapterId) {
             return NextResponse.json(
                 { error: "É necessário especificar storyId, seriesId ou chapterId" },
-                { status: 400 }
-            );
-        }
-
-        // Validar UUIDs
-        if ((storyId && !isValidUUID(storyId)) || 
-            (seriesId && !isValidUUID(seriesId)) || 
-            (chapterId && !isValidUUID(chapterId)) || 
-            (parentId && !isValidUUID(parentId))) {
-            return NextResponse.json(
-                { error: "Um ou mais IDs fornecidos são inválidos" },
                 { status: 400 }
             );
         }
@@ -146,7 +114,7 @@ export async function POST(request) {
 
         // Inserir comentário
         const commentData = {
-            text: sanitizedText,
+            text,
             author_id: authorId,
             parent_id: parentId || null,
             created_at: new Date().toISOString(),

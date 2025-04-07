@@ -6,12 +6,10 @@ import StoryContent from "@/components/StoryContent";
 import { extractIdFromSlug, formatDate, calculateReadingTime } from "@/lib/utils";
 import { Eye } from "lucide-react";
 
-export async function generateMetadata(props) {
-    const params = await Promise.resolve(props.params);
+export async function generateMetadata({ params }) {
     try {
-        const slug = params?.id || '';
-        const id = extractIdFromSlug(slug) || slug;
-        
+        const slug = await Promise.resolve(params.id);
+        const id = extractIdFromSlug(slug) || slug; // Usar o slug diretamente se não conseguir extrair o ID
         const supabase = await createServerSupabaseClient();
 
         const { data: story, error } = await supabase
@@ -34,10 +32,9 @@ export async function generateMetadata(props) {
     }
 }
 
-export default async function StoryPage(props) {
-    const params = await Promise.resolve(props.params);
+export default async function StoryPage({ params }) {
     try {
-        const slug = params?.id || '';
+        const slug = await Promise.resolve(params.id);
         const id = extractIdFromSlug(slug) || slug;
         
         console.log("----- DIAGNÓSTICO DE HISTÓRIA -----");
@@ -85,7 +82,9 @@ export default async function StoryPage(props) {
         console.log("História encontrada com sucesso:", story.id, story.title);
 
         // Obter a sessão atual para verificar se o usuário está logado
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+            data: { session },
+        } = await supabase.auth.getSession();
 
         // Incrementar contador de visualizações
         try {
@@ -160,7 +159,7 @@ export default async function StoryPage(props) {
                         )}
 
                         <span className="view-count" title="Visualizações">
-                            <Eye size={16} strokeWidth={2} className="eye-icon" /> {story.view_count.toLocaleString("pt-BR")}
+                            <Eye size={16} className="text-[#484DB5]" /> {story.view_count.toLocaleString("pt-BR")}
                         </span>
                     </div>
                 </div>
@@ -205,7 +204,7 @@ export default async function StoryPage(props) {
 
                 <Comments
                     storyId={story.id}
-                    userId={user?.id}
+                    userId={session?.user?.id}
                     authorId={story.author_id}
                 />
             </div>

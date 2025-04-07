@@ -1,245 +1,109 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { createBrowserClient, resetSupabaseClient } from '@/lib/supabase-browser';
+import { createContext, useContext, useState, useEffect } from "react";
+import { createBrowserClient } from "@/lib/supabase-browser";
 
-// Contexto para autenticação
+// Criando o contexto
 const AuthContext = createContext();
 
-// Hook personalizado para usar o contexto de autenticação
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
-  }
-  return context;
-};
+// Hook personalizado para usar o contexto
+export function useAuth() {
+  return useContext(AuthContext);
+}
 
-// Estado inicial para usuário não autenticado
-const initialState = {
-  user: null,
-  profile: null,
-  isLoading: true,
-  isAuthenticated: false,
-};
-
+// Provedor do contexto
 export function AuthProvider({ children }) {
-  const [state, setState] = useState(initialState);
-  const [connectionState, setConnectionState] = useState('checking');
-  const [recoveryAttempt, setRecoveryAttempt] = useState(0);
-  
-  // Inicializar cliente Supabase
-  const initClient = () => {
-    try {
-      return createBrowserClient();
-    } catch (err) {
-      console.error('❌ Erro ao inicializar cliente Supabase:', err);
-      return null;
-    }
-  };
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const supabase = createBrowserClient();
 
-  // Gerenciar assinatura a eventos de autenticação
+  // Carregar usuário e perfil
   useEffect(() => {
-    console.log('Iniciando carregamento de sessão...');
-    
-    let dataSubscription = null;
-    
-    // Timeout de segurança para evitar bloqueio
-    const timeoutId = setTimeout(() => {
-      if (state.isLoading) {
-        console.warn('⚠️ Timeout de carregamento de sessão atingido');
-        setState(prev => ({ 
-          ...prev, 
-          isLoading: false,
-          connectionReady: false
-        }));
-        setConnectionState('error');
-      }
-    }, 5000);
-    
-    async function loadUserSession() {
+    async function loadUserAndProfile() {
       try {
-        const supabase = initClient();
+        // Verificar sessão
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (!supabase) {
-          console.error('❌ Cliente Supabase indisponível');
-          setState(prev => ({ ...prev, isLoading: false }));
-          setConnectionState('error');
-          return;
-        }
-        
-        // Verificar sessão atual
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('❌ Erro ao carregar sessão:', error.message);
-          setState(prev => ({ ...prev, isLoading: false }));
-          setConnectionState('error');
-          return;
-        }
-        
-        // Se temos uma sessão existente
-        if (data?.session) {
-          setConnectionState('connected');
+        if (session?.user) {
+          setUser(session.user);
           
-          // Obter perfil do usuário
-          const userResponse = await supabase.auth.getUser();
-          const user = userResponse?.data?.user;
-          
-          // Carregar dados de perfil se autenticado
-          if (user?.id) {
-            try {
-              const { data: profile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', user.id)
-                .single();
-                
-              setState({
-                user,
-                profile,
-                isAuthenticated: true,
-                isLoading: false,
-              });
-            } catch (profileError) {
-              console.warn('⚠️ Erro ao carregar perfil:', profileError);
-              setState({
-                user,
-                profile: null,
-                isAuthenticated: true,
-                isLoading: false,
-              });
-            }
-          } else {
-            setState({
-              user: null,
-              profile: null,
-              isAuthenticated: false,
-              isLoading: false,
-            });
+          // Buscar perfil
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+            
+          if (profileData) {
+            setProfile(profileData);
           }
         } else {
-          // Sem sessão existente
-          setState({
-            user: null,
-            profile: null,
-            isAuthenticated: false,
-            isLoading: false,
-          });
-          setConnectionState('connected');
+          setUser(null);
+          setProfile(null);
         }
-        
-        // Inscrever-se em eventos de alteração de autenticação
-        const subscription = supabase.auth.onAuthStateChange(
-          async (event, session) => {
-            console.log('Evento de autenticação:', event);
-            
-            // Quando um usuário faz login com sucesso
-            if (event === 'SIGNED_IN' && session?.user) {
-              try {
-                // Obter dados do perfil
-                const { data: profile } = await supabase
-                  .from('profiles')
-                  .select('*')
-                  .eq('id', session.user.id)
-                  .single();
-                  
-                setState({
-                  user: session.user,
-                  profile,
-                  isAuthenticated: true,
-                  isLoading: false,
-                });
-                setConnectionState('connected');
-              } catch (err) {
-                console.error('❌ Erro ao carregar perfil após login:', err);
-                setState({
-                  user: session.user,
-                  profile: null,
-                  isAuthenticated: true,
-                  isLoading: false,
-                });
-              }
-            } 
-            // Quando um usuário faz logout
-            else if (event === 'SIGNED_OUT') {
-              setState({
-                user: null,
-                profile: null,
-                isAuthenticated: false,
-                isLoading: false,
-              });
-            }
-          }
-        );
-        
-        dataSubscription = subscription;
-      } catch (err) {
-        console.error('❌ Erro crítico na inicialização da sessão:', err);
-        setState({ ...initialState, isLoading: false });
-        setConnectionState('error');
+      } catch (error) {
+        console.error("Erro ao carregar usuário:", error);
+        setUser(null);
+        setProfile(null);
+      } finally {
+        setLoading(false);
       }
     }
     
-    loadUserSession();
+    loadUserAndProfile();
+    
+    // Configurar o listener de autenticação
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+          setUser(session.user);
+          
+          // Buscar perfil atualizado
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+            
+          if (profileData) {
+            setProfile(profileData);
+          }
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+          setProfile(null);
+        }
+      }
+    );
     
     return () => {
-      // Limpar timeout e cancelar assinatura ao desmontar
-      clearTimeout(timeoutId);
-      if (dataSubscription && dataSubscription.data && dataSubscription.data.subscription) {
-        dataSubscription.data.subscription.unsubscribe();
-      } else if (dataSubscription && typeof dataSubscription.unsubscribe === 'function') {
-        dataSubscription.unsubscribe();
-      }
+      subscription?.unsubscribe();
     };
-  }, [recoveryAttempt]);
-
-  // Função para fazer login
-  const signIn = async (email, password) => {
-    const supabase = initClient();
-    if (!supabase) return { error: { message: 'Falha na conexão com o servidor' } };
-    
-    try {
-      return await supabase.auth.signInWithPassword({ email, password });
-    } catch (err) {
-      console.error('❌ Erro ao fazer login:', err);
-      return { error: { message: 'Falha ao processar o login, verifique sua conexão' } };
-    }
-  };
+  }, []);
 
   // Função para fazer logout
   const signOut = async () => {
-    const supabase = initClient();
-    if (!supabase) return false;
-    
     try {
-      const { error } = await supabase.auth.signOut();
-      return !error;
-    } catch (err) {
-      console.error('❌ Erro ao fazer logout:', err);
-      return false;
+      await supabase.auth.signOut();
+      setUser(null);
+      setProfile(null);
+      window.location.href = '/';
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
     }
   };
-  
-  // Função para recuperar conexão em caso de problemas
-  const recoverConnection = () => {
-    setConnectionState('checking');
-    setState(prev => ({ ...prev, isLoading: true }));
-    resetSupabaseClient();
-    setRecoveryAttempt(prev => prev + 1);
-  };
 
-  // Valor fornecido pelo contexto
-  const contextValue = {
-    ...state,
-    signIn,
+  // Valores a serem fornecidos pelo contexto
+  const value = {
+    user,
+    profile,
     signOut,
-    connectionState,
-    recoverConnection,
+    loading,
+    isAuthenticated: !!user
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

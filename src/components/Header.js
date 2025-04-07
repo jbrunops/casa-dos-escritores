@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Compass, BookOpen, Search, Menu, User, LogOut, LayoutDashboard, BookMarked, RefreshCw } from "lucide-react";
+import { ChevronDown, Compass, BookOpen, Search, Menu, User, LogOut, LayoutDashboard, BookMarked } from "lucide-react";
 import MobileMenu from "./MobileMenu";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -19,7 +19,7 @@ export default function Header() {
     const userDropdownRef = useRef(null);
     
     // Usar o contexto de autenticação
-    const { user, profile, isLoading, signOut, connectionState, recoverConnection } = useAuth();
+    const { user, profile, loading, signOut } = useAuth();
     
     // Fechar dropdown ao clicar fora
     useEffect(() => {
@@ -86,13 +86,6 @@ export default function Header() {
             window.removeEventListener('keydown', handleKeyDown);
         };
     }, []);
-
-    // Função para tentar reconectar
-    const handleReconnect = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        recoverConnection();
-    };
 
     return (
         <>
@@ -186,7 +179,7 @@ export default function Header() {
                     </div>
 
                     <div className="hidden md:flex items-center space-x-4">
-                        {!isLoading && (
+                        {!loading && (
                             <>
                                 {user ? (
                                     <div ref={userDropdownRef} className="relative">
@@ -268,22 +261,20 @@ export default function Header() {
                                         )}
                                     </div>
                                 ) : (
-                                    connectionState === 'error' ? (
-                                        <button
-                                            onClick={handleReconnect}
-                                            className="px-3 py-1.5 bg-[#484DB5] hover:bg-[#7A80FB] text-white font-medium text-[0.875rem] rounded-md flex items-center"
+                                    <>
+                                        <Link 
+                                            href="/signup"
+                                            className="text-[#484DB5] hover:text-[#7A80FB] text-[1rem] font-bold"
                                         >
-                                            <RefreshCw size={16} className="mr-1" />
-                                            Tentar conectar
-                                        </button>
-                                    ) : (
-                                        <Link
-                                            href="/login"
-                                            className="px-3 py-1.5 bg-[#484DB5] hover:bg-[#7A80FB] text-white font-medium text-[0.875rem] rounded-md"
-                                        >
-                                            Entrar / Cadastrar
+                                            Cadastre-se
                                         </Link>
-                                    )
+                                        <Link 
+                                            href="/login"
+                                            className="bg-[#484DB5] hover:bg-[#7A80FB] text-white max-h-[2.5rem] w-[7.5rem] flex items-center justify-center py-2 rounded-md transition-colors"
+                                        >
+                                            <span className="font-bold">Entrar</span>
+                                        </Link>
+                                    </>
                                 )}
                             </>
                         )}
