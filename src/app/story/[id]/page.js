@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import Comments from "@/components/Comments";
 import StoryContent from "@/components/StoryContent";
 import { extractIdFromSlug, formatDate, calculateReadingTime } from "@/lib/utils";
+import { Eye } from "lucide-react";
 
 export async function generateMetadata({ params }) {
     try {
@@ -158,7 +159,7 @@ export default async function StoryPage({ params }) {
                         )}
 
                         <span className="view-count" title="Visualizações">
-                            👁️ {story.view_count.toLocaleString("pt-BR")}
+                            <Eye size={16} className="inline-block mr-1" /> {story.view_count.toLocaleString("pt-BR")}
                         </span>
                     </div>
                 </div>
