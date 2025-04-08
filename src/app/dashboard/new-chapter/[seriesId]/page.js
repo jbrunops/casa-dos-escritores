@@ -64,40 +64,55 @@ export default function NewChapterPage() {
             console.log("Buscando informações da série:", seriesId);
             
             // Verificar se usuário está autenticado
-            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            const { data, error: authError } = await supabase.auth.getUser();
             
             if (authError) {
                 console.error("Erro de autenticação:", authError);
-                throw new Error("Erro de autenticação");
+                setLoading(false);
+                return setError("Erro de autenticação. Por favor, faça login novamente.");
             }
             
+            const user = data?.user;
+            
             if (!user) {
-                router.push("/login");
-                return;
+                console.log("Usuário não autenticado, redirecionando para login");
+                setLoading(false);
+                return router.push("/login");
             }
 
-            // Buscar série
-            const { data: seriesData, error: seriesError } = await supabase
+            // Buscar série - com tratamento de timeout
+            const seriesPromise = supabase
                 .from("series")
                 .select("*")
                 .eq("id", seriesId)
                 .single();
+                
+            // Adiciona um timeout para a requisição
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error("Tempo esgotado ao buscar série")), 10000)
+            );
+            
+            const { data: seriesData, error: seriesError } = await Promise.race([
+                seriesPromise,
+                timeoutPromise
+            ]);
 
             if (seriesError) {
                 console.error("Erro ao buscar série:", seriesError);
-                throw new Error(
-                    "Não foi possível encontrar a série especificada"
-                );
+                setLoading(false);
+                return setError("Não foi possível encontrar a série especificada");
             }
 
             if (!seriesData) {
-                throw new Error("Série não encontrada");
+                setLoading(false);
+                return setError("Série não encontrada");
             }
 
             // Verificar se o usuário é o autor da série
             if (seriesData.author_id !== user.id) {
-                router.push("/dashboard");
-                return;
+                console.log("Usuário não é autor da série, redirecionando para dashboard");
+                setLoading(false);
+                return router.push("/dashboard");
             }
 
             setSeries(seriesData);
@@ -111,6 +126,7 @@ export default function NewChapterPage() {
 
             if (chaptersError) {
                 console.error("Erro ao buscar capítulos:", chaptersError);
+                // Não falhar completamente, apenas logar o erro
             }
 
             const nextChapterNumber =
@@ -120,11 +136,15 @@ export default function NewChapterPage() {
 
             setChapterNumber(nextChapterNumber);
             setMaxChapterNumber(nextChapterNumber);
+            
+            // Importante: marcar como carregado ao final
+            setLoading(false);
+            
         } catch (error) {
             console.error("Erro ao buscar informações da série:", error);
-            setError("Não foi possível carregar as informações da série");
-        } finally {
+            
             if (mountedRef.current) {
+                setError("Não foi possível carregar as informações da série: " + (error.message || "Erro desconhecido"));
                 setLoading(false);
             }
         }
@@ -172,24 +192,23 @@ export default function NewChapterPage() {
         
         setIsRedirecting(true);
         
-        if (isDev) {
-            // Em desenvolvimento, usar um timeout antes do redirecionamento
-            // para evitar problemas de estado e condições de corrida
-            console.log('Redirecionando em modo de desenvolvimento...');
-            redirectTimeoutRef.current = setTimeout(() => {
-                if (mountedRef.current) {
-                    try {
-                        window.location.href = url; // Forçar redirecionamento completo
-                    } catch (err) {
-                        console.error('Erro ao redirecionar:', err);
-                        setSaving(false);
-                        setIsRedirecting(false);
-                    }
-                }
-            }, 1000);
-        } else {
-            // Em produção, usar o router.push diretamente
+        try {
+            // Abordagem híbrida mais confiável em todos os ambientes
+            // Primeiro tentamos com router push (que é o padrão do Next.js)
             router.push(url);
+            
+            // Como fallback, usamos uma abordagem mais direta após um pequeno delay
+            // para garantir que o redirecionamento aconteça mesmo que o router falhe
+            setTimeout(() => {
+                if (mountedRef.current && document.visibilityState !== 'hidden') {
+                    window.location.href = url;
+                }
+            }, 1500);
+        } catch (err) {
+            console.error('Erro ao redirecionar:', err);
+            setIsRedirecting(false);
+            setSaving(false);
+            isSavingRef.current = false;
         }
     };
 
@@ -218,26 +237,29 @@ export default function NewChapterPage() {
         setSuccess(null);
 
         try {
-            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            // Verificar autenticação
+            const { data, error: authError } = await supabase.auth.getUser();
+            const user = data?.user;
 
             if (authError || !user) {
-                isSavingRef.current = false;
-                setSaving(false);
                 throw new Error("Você precisa estar logado");
             }
 
+            // Preparar dados do capítulo
+            const chapterData = {
+                title: title.trim(),
+                content: content.trim(),
+                chapter_number: chapterNumber,
+                series_id: seriesId,
+                author_id: user.id,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            };
+
             // Inserir novo capítulo
-            const { data, error } = await supabase
+            const { data: newChapter, error } = await supabase
                 .from("chapters")
-                .insert({
-                    title,
-                    content,
-                    chapter_number: chapterNumber,
-                    series_id: seriesId,
-                    author_id: user.id,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                })
+                .insert(chapterData)
                 .select();
 
             if (error) {
@@ -245,30 +267,41 @@ export default function NewChapterPage() {
                 throw error;
             }
 
+            if (!newChapter || newChapter.length === 0) {
+                throw new Error("Falha ao criar capítulo: nenhum dado retornado");
+            }
+
+            console.log("Capítulo criado com sucesso:", newChapter[0].id);
+
             // Atualizar timestamp da série
-            const { error: updateError } = await supabase
-                .from("series")
-                .update({ updated_at: new Date().toISOString() })
-                .eq("id", seriesId);
-
-            if (updateError) {
-                console.error(
-                    "Erro ao atualizar timestamp da série:",
-                    updateError
-                );
+            try {
+                await supabase
+                    .from("series")
+                    .update({ updated_at: new Date().toISOString() })
+                    .eq("id", seriesId);
+                    
+                console.log("Timestamp da série atualizado");
+            } catch (updateError) {
+                // Continuar mesmo se falhar a atualização do timestamp
+                console.error("Erro ao atualizar timestamp da série:", updateError);
             }
 
-            if (mountedRef.current) {
-                setSuccess("Capítulo criado com sucesso!");
-                
-                // Usar método de redirecionamento seguro
-                const redirectUrl = `/series/${seriesId}`;
-                safeRedirect(redirectUrl);
-            }
+            // Mostrar mensagem de sucesso
+            setSuccess("Capítulo criado com sucesso!");
+            
+            // Esperar um pouco para o usuário ver a mensagem antes de redirecionar
+            setTimeout(() => {
+                if (mountedRef.current) {
+                    // Redirecionar para a página da série
+                    safeRedirect(`/series/${seriesId}`);
+                }
+            }, 800);
+            
         } catch (err) {
+            // Tratar erro e limpar estados
+            console.error("Erro ao criar capítulo:", err);
             if (mountedRef.current) {
                 setError(err.message || "Ocorreu um erro ao salvar o capítulo");
-                console.error("Erro ao criar capítulo:", err);
                 setSaving(false);
                 isSavingRef.current = false;
             }
