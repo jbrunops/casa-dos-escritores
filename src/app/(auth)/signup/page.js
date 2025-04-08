@@ -148,109 +148,114 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="auth-page">
-            <div className="auth-container">
-                <div className="auth-header">
-                    <h1>Criar Conta</h1>
-                    <p className="auth-subheading">Junte-se à nossa comunidade de escritores</p>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md border border-[#E5E7EB]">
+                <div className="text-center">
+                    <h1 className="text-3xl font-extrabold text-black">Criar Conta</h1>
+                    <p className="mt-2 text-gray-600">Junte-se à nossa comunidade de escritores</p>
                 </div>
 
                 {error && (
-                    <div className="alert error-message">
-                        <AlertCircle size={18} />
+                    <div className="flex items-center p-4 text-red-700 bg-red-50 rounded-lg">
+                        <AlertCircle size={18} className="mr-2" />
                         {error}
                     </div>
                 )}
                 
                 {warning && (
-                    <div className="alert warning-message">
-                        <AlertTriangle size={18} />
+                    <div className="flex items-center p-4 text-yellow-700 bg-yellow-50 rounded-lg">
+                        <AlertTriangle size={18} className="mr-2" />
                         {warning}
                     </div>
                 )}
                 
                 {success && (
-                    <div className="alert success-message">
-                        <CheckCircle size={18} />
+                    <div className="flex items-center p-4 text-green-700 bg-green-50 rounded-lg">
+                        <CheckCircle size={18} className="mr-2" />
                         Conta criada com sucesso!{" "}
                         {warning ? warning : "Redirecionando..."}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="form-group">
-                        <label htmlFor="username" className="input-label">
-                            Nome de usuário
-                        </label>
-                        <input
-                            id="username"
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            placeholder="Como você quer ser chamado"
-                            disabled={loading || success}
-                            required
-                            className="form-input"
-                        />
-                    </div>
+                <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+                    <div className="space-y-4">
+                        <div>
+                            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                                Nome de usuário
+                            </label>
+                            <input
+                                id="username"
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                placeholder="Como você quer ser chamado"
+                                disabled={loading || success}
+                                required
+                                className="mt-1 block w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-[#484DB5]"
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label htmlFor="email" className="input-label">
-                            E-mail
-                        </label>
-                        <input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            disabled={loading || success}
-                            required
-                            className="form-input"
-                            placeholder="seu@email.com"
-                        />
-                    </div>
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                                E-mail
+                            </label>
+                            <input
+                                id="email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                disabled={loading || success}
+                                required
+                                className="mt-1 block w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-[#484DB5]"
+                                placeholder="seu@email.com"
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label htmlFor="password" className="input-label">
-                            Senha
-                        </label>
-                        <input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            minLength="6"
-                            disabled={loading || success}
-                            required
-                            className="form-input"
-                            placeholder="Mínimo de 6 caracteres"
-                        />
-                        <small className="form-hint">
-                            A senha deve ter pelo menos 6 caracteres
-                        </small>
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                Senha
+                            </label>
+                            <input
+                                id="password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                minLength="6"
+                                disabled={loading || success}
+                                required
+                                className="mt-1 block w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-[#484DB5]"
+                                placeholder="Mínimo de 6 caracteres"
+                            />
+                            <p className="mt-1 text-sm text-gray-500">
+                                A senha deve ter pelo menos 6 caracteres
+                            </p>
+                        </div>
                     </div>
 
                     <button
                         type="submit"
                         disabled={loading || success}
-                        className="auth-button"
+                        className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-[#484DB5] hover:bg-[#484DB5]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#484DB5] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading ? (
                             <>
-                                <Loader size={18} className="spinner" />
+                                <Loader size={18} className="animate-spin mr-2" />
                                 <span>Criando conta...</span>
                             </>
                         ) : (
                             <>
-                                <UserPlus size={18} />
+                                <UserPlus size={18} className="mr-2" />
                                 <span>Criar conta</span>
                             </>
                         )}
                     </button>
                 </form>
 
-                <p className="auth-redirect">
-                    Já tem uma conta? <Link href="/login">Entrar</Link>
+                <p className="mt-4 text-center text-sm text-gray-600">
+                    Já tem uma conta?{" "}
+                    <Link href="/login" className="text-[#484DB5] hover:underline font-medium">
+                        Entrar
+                    </Link>
                 </p>
             </div>
         </div>
