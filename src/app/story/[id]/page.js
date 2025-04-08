@@ -106,19 +106,19 @@ export default async function StoryPage({ params }) {
         const readingTime = calculateReadingTime(story.content);
 
         return (
-            <div className="medium-story">
-                <h1 className="story-title">{story.title}</h1>
+            <div className="max-w-[75rem] mx-auto px-4 py-8">
+                <h1 className="text-4xl font-bold mb-6">{story.title}</h1>
 
-                <div className="story-meta">
-                    <div className="author-info">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div className="flex items-center gap-3">
                         {story.profiles?.avatar_url ? (
                             <img
                                 src={story.profiles.avatar_url}
                                 alt={story.profiles.username || "Autor"}
-                                className="author-avatar"
+                                className="w-12 h-12 rounded-full object-cover"
                             />
                         ) : (
-                            <div className="author-avatar-placeholder">
+                            <div className="w-12 h-12 rounded-full bg-[#484DB5] text-white flex items-center justify-center font-medium">
                                 {(story.profiles?.username || "A")
                                     .charAt(0)
                                     .toUpperCase()}
@@ -129,70 +129,73 @@ export default async function StoryPage({ params }) {
                                 href={`/profile/${encodeURIComponent(
                                     story.profiles?.username || ""
                                 )}`}
-                                className="author-name"
+                                className="font-medium text-gray-900 hover:underline transition-all duration-200"
                             >
                                 {story.profiles?.username ||
                                     "Autor desconhecido"}
                             </Link>
-                            <div className="publication-info">
-                                <span className="publication-date">
+                            <div className="flex text-sm text-gray-500 gap-2">
+                                <span>
                                     {formattedDate}
                                 </span>
-                                <span className="reading-time">
-                                    {readingTime} min de leitura
+                                <span>·</span>
+                                <span>
+                                    {readingTime} min para ler
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="story-tags">
+                    <div className="flex items-center gap-3">
                         {story.category && (
                             <Link
                                 href={`/categories/${story.category
                                     .toLowerCase()
                                     .replace(/\s+/g, "-")}`}
-                                className="story-category"
+                                className="px-3 py-1 rounded-full text-sm bg-gray-100 border border-[#E5E7EB] hover:bg-gray-200 transition-colors duration-200"
                             >
                                 {story.category}
                             </Link>
                         )}
 
-                        <span className="view-count" title="Visualizações">
+                        <span className="flex items-center gap-1 text-sm text-gray-500" title="Visualizações">
                             👁️ {story.view_count.toLocaleString("pt-BR")}
                         </span>
                     </div>
                 </div>
 
-                <StoryContent content={story.content} />
+                <div className="mb-12">
+                    <StoryContent content={story.content} />
+                </div>
 
                 {/* Informações do autor ao final do artigo */}
-                <div className="author-bio-section">
+                <div className="my-12 py-8 border-t border-b border-[#E5E7EB]">
                     <Link
                         href={`/profile/${encodeURIComponent(
                             story.profiles?.username || ""
                         )}`}
                     >
-                        <div className="author-bio">
+                        <div className="flex items-center gap-4 hover:bg-gray-50 p-4 rounded-lg transition-colors duration-200">
                             {story.profiles?.avatar_url ? (
                                 <img
                                     src={story.profiles.avatar_url}
                                     alt={story.profiles.username || "Autor"}
-                                    className="author-bio-avatar"
+                                    className="w-16 h-16 rounded-full object-cover"
                                 />
                             ) : (
-                                <div className="author-bio-avatar-placeholder">
+                                <div className="w-16 h-16 rounded-full bg-[#484DB5] text-white flex items-center justify-center text-xl font-medium">
                                     {(story.profiles?.username || "A")
                                         .charAt(0)
                                         .toUpperCase()}
                                 </div>
                             )}
-                            <div className="author-bio-content">
-                                <h3>
+                            <div>
+                                <h3 className="text-lg font-medium">
                                     Escrito por{" "}
                                     {story.profiles?.username ||
                                         "Autor desconhecido"}
                                 </h3>
-                                <p>
+                                <p className="text-gray-600">
                                     Veja mais histórias deste autor visitando
                                     seu perfil.
                                 </p>
@@ -201,11 +204,13 @@ export default async function StoryPage({ params }) {
                     </Link>
                 </div>
 
-                <Comments
-                    storyId={story.id}
-                    userId={session?.user?.id}
-                    authorId={story.author_id}
-                />
+                <div className="mt-12">
+                    <Comments
+                        storyId={story.id}
+                        userId={session?.user?.id}
+                        authorId={story.author_id}
+                    />
+                </div>
             </div>
         );
     } catch (error) {

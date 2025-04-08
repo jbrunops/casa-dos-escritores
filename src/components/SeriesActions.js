@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import Link from "next/link";
-import { Edit, Trash2, BookOpen, Plus } from "lucide-react";
+import { Edit, Trash2, BookOpen } from "lucide-react";
 
 export default function SeriesActions({ series, isAuthor }) {
     const [deleting, setDeleting] = useState(false);
@@ -61,18 +61,18 @@ export default function SeriesActions({ series, isAuthor }) {
     };
 
     return (
-        <div className="series-detail-actions">
+        <div className="flex flex-wrap gap-2 mt-4">
             {series.first_chapter ? (
                 <Link
                     href={`/chapter/${series.first_chapter}`}
-                    className="series-action-btn series-action-secondary"
+                    className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200"
                 >
-                    <BookOpen size={18} />
+                    <BookOpen size={18} className="mr-2" />
                     <span>Ver Série</span>
                 </Link>
             ) : (
-                <span className="series-action-btn series-action-secondary disabled">
-                    <BookOpen size={18} />
+                <span className="inline-flex items-center justify-center h-10 px-4 border border-[#E5E7EB] text-gray-400 rounded-md bg-gray-50 cursor-not-allowed">
+                    <BookOpen size={18} className="mr-2" />
                     <span>Sem Capítulos</span>
                 </span>
             )}
@@ -80,33 +80,25 @@ export default function SeriesActions({ series, isAuthor }) {
             {isAuthor && (
                 <>
                     <Link
-                        href={`/dashboard/new-chapter/${series.id}`}
-                        className="series-action-btn series-action-primary"
-                    >
-                        <Plus size={18} />
-                        <span>Adicionar Capítulo</span>
-                    </Link>
-
-                    <Link
                         href={`/dashboard/edit-series/${series.id}`}
-                        className="series-action-btn series-action-secondary"
+                        className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200"
                     >
-                        <Edit size={18} />
+                        <Edit size={18} className="mr-2" />
                         <span>Editar Série</span>
                     </Link>
 
                     <button
                         onClick={handleDelete}
                         disabled={deleting}
-                        className="series-action-btn series-action-danger"
+                        className="inline-flex items-center justify-center h-10 px-4 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        <Trash2 size={18} />
+                        <Trash2 size={18} className="mr-2" />
                         <span>{deleting ? "Excluindo..." : "Excluir"}</span>
                     </button>
                 </>
             )}
 
-            {error && <div className="error-message">{error}</div>}
+            {error && <div className="w-full mt-2 p-2 text-sm bg-red-50 text-red-600 rounded-md">{error}</div>}
         </div>
     );
 }

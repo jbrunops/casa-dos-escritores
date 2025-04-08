@@ -55,7 +55,7 @@ export default function StoryContent({ content }) {
     // Renderização com fallback
     return (
         <div
-            className="story-content prose medium-content"
+            className="prose prose-lg max-w-none text-gray-800 prose-headings:font-bold prose-a:text-[#484DB5] prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-blockquote:border-l-[#484DB5] prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic"
             dangerouslySetInnerHTML={{ __html: sanitizedContent || content }}
         />
     );
