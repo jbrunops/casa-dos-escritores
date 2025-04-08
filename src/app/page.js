@@ -217,27 +217,22 @@ export default async function HomePage() {
 
     return (
         <div className="home-page">
-            <section className="hero">
-                <h1>O lugar certo para nós!</h1>
-                <p>
+            <section className="bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] py-8 mt-0 mb-[1.875rem]">
+                <h1 className="text-4xl font-bold text-white text-center mb-4">O lugar certo para nós!</h1>
+                <p className="text-lg text-white text-center">
                     Um espaço para compartilhar suas histórias com o mundo,
                     <br />
                     comentar, conversar, seguir, favoritar e criar sem limites.
                     Seja você!
                 </p>
-                {/* <div className="hero-buttons">
-                    <Link href="/signup" className="btn primary">
-                        Cadastre-se
-                    </Link>
-                </div> */}
             </section>
 
             <section className="columns-section">
-                <div className="columns-grid">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[75rem] mx-auto">
                     {/* Coluna 1: Histórias Recentes */}
                     <div className="column">
-                        <h2>Histórias Recentes</h2>
-                        <div className="stories-list">
+                        <h2 className="text-2xl font-bold mb-4 border-b border-[#E5E7EB] pb-2 text-[#484DB5]">Histórias Recentes</h2>
+                        <div className="space-y-4">
                             {recentContent?.length === 0 ? (
                                 <p>Nenhuma história publicada ainda.</p>
                             ) : (
@@ -246,18 +241,18 @@ export default async function HomePage() {
                                         <Link
                                             href={`/story/${generateSlug(content.title, content.id)}`}
                                             key={`story-${content.id}`}
-                                            className="story-card"
+                                            className="block p-4 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow"
                                         >
-                                            <h3>{content.title}</h3>
-                                            <div className="story-meta-line">
-                                                <span className="author-name">
+                                            <h3 className="font-semibold text-lg">{content.title}</h3>
+                                            <div className="flex justify-between text-sm text-gray-600 mt-1 mb-2">
+                                                <span className="font-medium">
                                                     {content.type === 'chapter' ? content.author.username : content.profiles.username}
                                                 </span>
-                                                <span className="story-date">
+                                                <span>
                                                     {formatDate(content.created_at)}
                                                 </span>
                                             </div>
-                                            <p className="story-summary">
+                                            <p className="text-gray-700">
                                                 {createSummary(content.content)}
                                             </p>
                                         </Link>
@@ -265,31 +260,31 @@ export default async function HomePage() {
                                         <Link
                                             href={`/chapter/${generateSlug(content.title, content.id)}`}
                                             key={`chapter-${content.id}`}
-                                            className="chapter-card"
+                                            className="block p-4 rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
                                         >
-                                            <div className="chapter-card-badge">
+                                            <div className="inline-block px-2 py-1 bg-[#484DB5] text-white text-xs rounded mb-2">
                                                 Capítulo
                                             </div>
-                                            <h3>{content.title}</h3>
+                                            <h3 className="font-semibold text-lg">{content.title}</h3>
                                             
-                                            <div className="chapter-series-info">
-                                                <BookText size={15} />
-                                                <span>Série: {content.series?.title}</span>
-                                                <span className="chapter-number">
+                                            <div className="flex items-center text-sm text-gray-600 mt-1 mb-2">
+                                                <BookText size={15} className="mr-1" />
+                                                <span className="mr-2">Série: {content.series?.title}</span>
+                                                <span className="bg-gray-200 px-2 py-0.5 rounded-full text-xs">
                                                     Cap. {content.chapter_number}
                                                 </span>
                                             </div>
                                             
-                                            <div className="chapter-meta-line">
-                                                <span className="author-name">
+                                            <div className="flex justify-between text-sm text-gray-600 mt-1 mb-2">
+                                                <span className="font-medium">
                                                     {content.type === 'chapter' ? content.author?.username : content.profiles.username}
                                                 </span>
-                                                <span className="story-date">
+                                                <span>
                                                     {formatDate(content.created_at)}
                                                 </span>
                                             </div>
                                             
-                                            <p className="chapter-summary">
+                                            <p className="text-gray-700">
                                                 {createSummary(content.content)}
                                             </p>
                                         </Link>
@@ -301,8 +296,8 @@ export default async function HomePage() {
 
                     {/* Coluna 2: Mais Comentados */}
                     <div className="column">
-                        <h2>Mais Comentados</h2>
-                        <div className="stories-list">
+                        <h2 className="text-2xl font-bold mb-4 border-b border-[#E5E7EB] pb-2 text-[#484DB5]">Mais Comentados</h2>
+                        <div className="space-y-4">
                             {allContentWithComments?.length === 0 ? (
                                 <p>Nenhuma história comentada ainda.</p>
                             ) : (
@@ -311,32 +306,31 @@ export default async function HomePage() {
                                         <Link
                                             href={`/story/${generateSlug(content.title, content.id)}`}
                                             key={`story-${content.id}`}
-                                            className="story-card"
+                                            className="block p-4 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow"
                                         >
-                                            <h3>{content.title}</h3>
-                                            <div className="story-meta-line">
-                                                <span className="author-name">
+                                            <h3 className="font-semibold text-lg">{content.title}</h3>
+                                            <div className="flex justify-between text-sm text-gray-600 mt-1 mb-2">
+                                                <span className="font-medium">
                                                     {content.type === 'chapter' ? content.author.username : content.profiles.username}
                                                 </span>
-                                                <div className="meta-right">
-                                                    <span className="story-date">
+                                                <div className="flex items-center space-x-2">
+                                                    <span>
                                                         {formatDate(
                                                             content.created_at
                                                         )}
                                                     </span>
-                                                    <span className="comment-badge">
-                                                        <span className="comment-icon-container">
-                                                            <MessageSquare
-                                                                size={14}
-                                                            />
-                                                        </span>
+                                                    <span className="flex items-center bg-gray-100 px-2 py-0.5 rounded-full">
+                                                        <MessageSquare
+                                                            size={14}
+                                                            className="mr-1 text-[#484DB5]"
+                                                        />
                                                         <span>
                                                             {content.comment_count}
                                                         </span>
                                                     </span>
                                                 </div>
                                             </div>
-                                            <p className="story-summary">
+                                            <p className="text-gray-700">
                                                 {createSummary(content.content)}
                                             </p>
                                         </Link>
@@ -344,37 +338,36 @@ export default async function HomePage() {
                                         <Link
                                             href={`/chapter/${generateSlug(content.title, content.id)}`}
                                             key={`chapter-${content.id}`}
-                                            className="chapter-card"
+                                            className="block p-4 rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
                                         >
-                                            <div className="chapter-card-badge">
+                                            <div className="inline-block px-2 py-1 bg-[#484DB5] text-white text-xs rounded mb-2">
                                                 Capítulo
                                             </div>
-                                            <h3>{content.title}</h3>
+                                            <h3 className="font-semibold text-lg">{content.title}</h3>
                                             
-                                            <div className="chapter-series-info">
-                                                <BookText size={15} />
-                                                <span>Série: {content.series?.title}</span>
-                                                <span className="chapter-number">
+                                            <div className="flex items-center text-sm text-gray-600 mt-1 mb-2">
+                                                <BookText size={15} className="mr-1" />
+                                                <span className="mr-2">Série: {content.series?.title}</span>
+                                                <span className="bg-gray-200 px-2 py-0.5 rounded-full text-xs">
                                                     Cap. {content.chapter_number}
                                                 </span>
                                             </div>
                                             
-                                            <div className="chapter-meta-line">
-                                                <span className="author-name">
+                                            <div className="flex justify-between text-sm text-gray-600 mt-1 mb-2">
+                                                <span className="font-medium">
                                                     {content.type === 'chapter' ? content.author?.username : content.profiles.username}
                                                 </span>
-                                                <div className="meta-right">
-                                                    <span className="story-date">
+                                                <div className="flex items-center space-x-2">
+                                                    <span>
                                                         {formatDate(
                                                             content.created_at
                                                         )}
                                                     </span>
-                                                    <span className="comment-badge">
-                                                        <span className="comment-icon-container">
-                                                            <MessageSquare
-                                                                size={14}
-                                                            />
-                                                        </span>
+                                                    <span className="flex items-center bg-gray-100 px-2 py-0.5 rounded-full">
+                                                        <MessageSquare
+                                                            size={14}
+                                                            className="mr-1 text-[#484DB5]"
+                                                        />
                                                         <span>
                                                             {content.comment_count}
                                                         </span>
@@ -382,7 +375,7 @@ export default async function HomePage() {
                                                 </div>
                                             </div>
                                             
-                                            <p className="chapter-summary">
+                                            <p className="text-gray-700">
                                                 {createSummary(content.content)}
                                             </p>
                                         </Link>
@@ -394,36 +387,36 @@ export default async function HomePage() {
 
                     {/* Coluna 3: Top 10 Escritores */}
                     <div className="column">
-                        <h2>Top 10 Escritores</h2>
-                        <div className="writers-list">
+                        <h2 className="text-2xl font-bold mb-4 border-b border-[#E5E7EB] pb-2 text-[#484DB5]">Top 10 Escritores</h2>
+                        <div className="space-y-3">
                             {topWriters?.length === 0 ? (
                                 <p>Nenhum escritor ativo ainda.</p>
                             ) : (
                                 topWriters?.map((writer, index) => (
                                     <div
                                         key={writer.id}
-                                        className="writer-card"
+                                        className="flex items-center p-3 rounded-lg border border-[#E5E7EB] hover:shadow-sm transition-shadow"
                                     >
-                                        <div className="writer-rank">
-                                            #{index + 1}
+                                        <div className="w-6 h-6 flex items-center justify-center rounded-full bg-[#484DB5] text-white text-xs mr-3">
+                                            {index + 1}
                                         </div>
 
                                         {writer.avatar_url ? (
                                             <img
                                                 src={writer.avatar_url}
                                                 alt={writer.username}
-                                                className="writer-avatar"
+                                                className="w-10 h-10 rounded-full mr-3"
                                             />
                                         ) : (
-                                            <div className="writer-avatar-placeholder">
+                                            <div className="w-10 h-10 rounded-full bg-[#484DB5] text-white flex items-center justify-center mr-3">
                                                 {writer.username
                                                     .charAt(0)
                                                     .toUpperCase()}
                                             </div>
                                         )}
 
-                                        <div className="writer-info">
-                                            <h3>
+                                        <div className="flex flex-col">
+                                            <h3 className="font-medium">
                                                 <Link
                                                     href={`/profile/${encodeURIComponent(
                                                         writer.username
@@ -432,7 +425,7 @@ export default async function HomePage() {
                                                     {writer.username}
                                                 </Link>
                                             </h3>
-                                            <p className="writer-stats">
+                                            <p className="text-sm text-gray-600">
                                                 {writer.count}{" "}
                                                 {writer.count === 1
                                                     ? "história"

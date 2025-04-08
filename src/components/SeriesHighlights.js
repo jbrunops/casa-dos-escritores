@@ -126,9 +126,9 @@ export default function SeriesHighlights() {
 
     if (loading) {
         return (
-            <div className="series-highlights-loading">
-                <div className="loader-large"></div>
-                <p>Carregando séries populares...</p>
+            <div className="flex flex-col items-center justify-center py-8">
+                <div className="w-12 h-12 border-4 border-t-[#484DB5] border-r-[#E5E7EB] border-b-[#E5E7EB] border-l-[#E5E7EB] rounded-full animate-spin"></div>
+                <p className="mt-4 text-gray-600">Carregando séries populares...</p>
             </div>
         );
     }
@@ -138,70 +138,80 @@ export default function SeriesHighlights() {
     }
 
     return (
-        <section className="series-highlights-section">
-            <div className="section-header">
-                <h2>
-                    <Book className="section-icon" size={22} />
-                    <span>Séries em Destaque</span>
-                </h2>
-                <Link href="/series" className="view-all-link">
-                    <span>Ver Todas</span>
-                    <ChevronRight size={16} />
-                </Link>
-            </div>
+        <section className="py-8">
+            <div className="max-w-[75rem] mx-auto px-4">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold flex items-center text-[#484DB5]">
+                        <Book className="mr-2" size={22} />
+                        <span>Séries em Destaque</span>
+                    </h2>
+                    <Link href="/series" className="flex items-center text-[#484DB5] hover:underline">
+                        <span>Ver Todas</span>
+                        <ChevronRight size={16} className="ml-1" />
+                    </Link>
+                </div>
 
-            <div className="series-highlights-grid">
-                {series.map((serie) => (
-                    <Link
-                        href={`/series/${generateSlug(serie.title, serie.id)}`}
-                        key={serie.id}
-                        className="series-highlight-card"
-                    >
-                        <div className="series-card-image">
-                            {serie.cover_url ? (
-                                <img
-                                    src={serie.cover_url}
-                                    alt={serie.title}
-                                    className="series-cover-image"
-                                />
-                            ) : (
-                                <div className="series-cover-placeholder">
-                                    {serie.title.charAt(0).toUpperCase()}
-                                </div>
-                            )}
-                        </div>
-                        <div className="series-card-content">
-                            <h3 className="series-title">{serie.title}</h3>
-                            <p className="series-author">
-                                por {serie.author_name}
-                            </p>
-                            <div className="series-meta">
-                                <span className="series-chapters">
-                                    {serie.chapter_count}{" "}
-                                    {serie.chapter_count === 1
-                                        ? "capítulo"
-                                        : "capítulos"}
-                                </span>
-                                {serie.genre && (
-                                    <span className="series-genre">
-                                        {serie.genre}
-                                    </span>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+                    {series.map((serie, index) => (
+                        <Link
+                            href={`/series/${generateSlug(serie.title, serie.id)}`}
+                            key={serie.id}
+                            className="flex flex-col rounded-lg border border-[#E5E7EB] overflow-hidden hover:shadow-md transition-shadow bg-white"
+                        >
+                            <div className="relative w-full pt-[150%]">
+                                {index === 0 && (
+                                    <div className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 text-sm font-bold rounded z-10">
+                                        #1
+                                    </div>
+                                )}
+                                {serie.cover_url ? (
+                                    <img
+                                        src={serie.cover_url}
+                                        alt={serie.title}
+                                        className="absolute top-0 left-0 w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-[#484DB5] text-white text-4xl font-bold">
+                                        {serie.title.charAt(0).toUpperCase()}
+                                    </div>
                                 )}
                             </div>
-                            <div className="series-stats">
-                                <span className="series-views">
-                                    {serie.view_count.toLocaleString("pt-BR")}{" "}
-                                    visualizações
-                                </span>
-                                <span className="series-status">
-                                    {serie.is_completed
-                                        ? "Completa"
-                                        : "Em andamento"}
-                                </span>
+                            <div className="p-3 flex-grow">
+                                <h3 className="font-bold text-base line-clamp-2 mb-1">{serie.title}</h3>
+                                <p className="text-xs text-gray-600 mb-2">
+                                    de {serie.author_name}
+                                </p>
+                                {serie.genre && (
+                                    <div className="mb-2">
+                                        <span className="text-xs text-[#484DB5] font-medium">
+                                            › {serie.genre}
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="flex items-center justify-between text-xs text-gray-600 mt-auto">
+                                    <div className="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        {serie.view_count.toLocaleString("pt-BR")}
+                                    </div>
+                                    <div className="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        {serie.chapter_count}
+                                    </div>
+                                </div>
+                                <div className="mt-2">
+                                    <span className="inline-block bg-purple-100 text-[#484DB5] px-2 py-0.5 rounded text-xs">
+                                        {serie.is_completed ? "Completa" : "em andamento"}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                    </Link>
-                ))}
+                        </Link>
+                    ))}
+                </div>
             </div>
         </section>
     );
