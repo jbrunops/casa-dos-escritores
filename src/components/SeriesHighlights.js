@@ -141,9 +141,9 @@ export default function SeriesHighlights() {
         <section className="py-8">
             <div className="max-w-[75rem] mx-auto px-4">
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold flex items-center text-[#484DB5]">
-                        <Book className="mr-2" size={22} />
-                        <span>Séries em Destaque</span>
+                    <h2 className="text-3xl font-extrabold text-black relative">
+                        Séries em Destaque
+                        <span className="block h-1 w-64 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
                     </h2>
                     <Link href="/series" className="flex items-center text-[#484DB5] hover:underline">
                         <span>Ver Todas</span>

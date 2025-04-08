@@ -231,7 +231,10 @@ export default async function HomePage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[75rem] mx-auto">
                     {/* Coluna 1: Histórias Recentes */}
                     <div className="column">
-                        <h2 className="text-2xl font-bold mb-4 border-b border-[#E5E7EB] pb-2 text-[#484DB5]">Histórias Recentes</h2>
+                        <h2 className="text-2xl font-extrabold text-black mb-4 border-b border-[#E5E7EB] pb-2 relative">
+                            Histórias Recentes
+                            <span className="block h-1 w-32 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
+                        </h2>
                         <div className="space-y-4">
                             {recentContent?.length === 0 ? (
                                 <p>Nenhuma história publicada ainda.</p>
@@ -296,7 +299,10 @@ export default async function HomePage() {
 
                     {/* Coluna 2: Mais Comentados */}
                     <div className="column">
-                        <h2 className="text-2xl font-bold mb-4 border-b border-[#E5E7EB] pb-2 text-[#484DB5]">Mais Comentados</h2>
+                        <h2 className="text-2xl font-extrabold text-black mb-4 border-b border-[#E5E7EB] pb-2 relative">
+                            Mais Comentados
+                            <span className="block h-1 w-32 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
+                        </h2>
                         <div className="space-y-4">
                             {allContentWithComments?.length === 0 ? (
                                 <p>Nenhuma história comentada ainda.</p>
@@ -387,7 +393,10 @@ export default async function HomePage() {
 
                     {/* Coluna 3: Top 10 Escritores */}
                     <div className="column">
-                        <h2 className="text-2xl font-bold mb-4 border-b border-[#E5E7EB] pb-2 text-[#484DB5]">Top 10 Escritores</h2>
+                        <h2 className="text-2xl font-extrabold text-black mb-4 border-b border-[#E5E7EB] pb-2 relative">
+                            Top 10 Escritores
+                            <span className="block h-1 w-32 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
+                        </h2>
                         <div className="space-y-3">
                             {topWriters?.length === 0 ? (
                                 <p>Nenhum escritor ativo ainda.</p>
@@ -445,38 +454,41 @@ export default async function HomePage() {
                 <SeriesHighlights />
             </section>
 
-            <section className="features-section">
-                <h2>Como funciona</h2>
+            <section className="max-w-[75rem] mx-auto px-4 py-12 features-section">
+                <h2 className="text-3xl font-extrabold text-black mb-8 pb-2 relative">
+                    Como funciona
+                    <span className="block h-1 w-64 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
+                </h2>
 
-                <div className="features-grid">
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <Edit size={32} color="#4a4fbc" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 features-grid">
+                    <div className="bg-white p-6 rounded-lg shadow-md border border-[#E5E7EB] flex flex-col items-center text-center feature-card">
+                        <div className="bg-[#484DB5]/10 p-4 rounded-full mb-4 feature-icon">
+                            <Edit size={32} color="#484DB5" />
                         </div>
-                        <h3>1. Crie uma conta</h3>
-                        <p>
+                        <h3 className="text-xl font-semibold mb-3 text-[#484DB5]">1. Crie uma conta</h3>
+                        <p className="text-gray-700">
                             Registre-se gratuitamente para começar a
                             compartilhar suas histórias com outros leitores.
                         </p>
                     </div>
 
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <BookOpen size={32} color="#4a4fbc" />
+                    <div className="bg-white p-6 rounded-lg shadow-md border border-[#E5E7EB] flex flex-col items-center text-center feature-card">
+                        <div className="bg-[#484DB5]/10 p-4 rounded-full mb-4 feature-icon">
+                            <BookOpen size={32} color="#484DB5" />
                         </div>
-                        <h3>2. Escreva suas histórias</h3>
-                        <p>
+                        <h3 className="text-xl font-semibold mb-3 text-[#484DB5]">2. Escreva suas histórias</h3>
+                        <p className="text-gray-700">
                             Use nosso editor intuitivo para criar suas obras com
                             formatação profissional.
                         </p>
                     </div>
 
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <Share2 size={32} color="#4a4fbc" />
+                    <div className="bg-white p-6 rounded-lg shadow-md border border-[#E5E7EB] flex flex-col items-center text-center feature-card">
+                        <div className="bg-[#484DB5]/10 p-4 rounded-full mb-4 feature-icon">
+                            <Share2 size={32} color="#484DB5" />
                         </div>
-                        <h3>3. Compartilhe com o mundo</h3>
-                        <p>
+                        <h3 className="text-xl font-semibold mb-3 text-[#484DB5]">3. Compartilhe com o mundo</h3>
+                        <p className="text-gray-700">
                             Publique suas histórias e receba feedback valioso da
                             comunidade de leitores.
                         </p>
