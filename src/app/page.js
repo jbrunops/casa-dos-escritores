@@ -217,16 +217,6 @@ export default async function HomePage() {
 
     return (
         <div className="home-page">
-            <section className="bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] py-8 mt-0 mb-[1.875rem]">
-                <h1 className="text-4xl font-bold text-white text-center mb-4">O lugar certo para nós!</h1>
-                <p className="text-lg text-white text-center">
-                    Um espaço para compartilhar suas histórias com o mundo,
-                    <br />
-                    comentar, conversar, seguir, favoritar e criar sem limites.
-                    Seja você!
-                </p>
-            </section>
-
             <section className="columns-section">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[75rem] mx-auto">
                     {/* Coluna 1: Histórias Recentes */}
