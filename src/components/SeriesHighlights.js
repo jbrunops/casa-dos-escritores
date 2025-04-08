@@ -159,9 +159,13 @@ export default function SeriesHighlights() {
                             className="flex flex-col rounded-lg border border-[#E5E7EB] overflow-hidden hover:shadow-md transition-shadow bg-white"
                         >
                             <div className="relative w-full pt-[150%]">
-                                {index === 0 && (
+                                {index === 0 ? (
                                     <div className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 text-sm font-bold rounded z-10">
                                         #1
+                                    </div>
+                                ) : (
+                                    <div className="absolute top-2 left-2 bg-[#484DB5] text-white px-2 py-1 text-sm font-bold rounded z-10">
+                                        #{index + 1}
                                     </div>
                                 )}
                                 {serie.cover_url ? (
