@@ -232,117 +232,130 @@ export default function EditProfilePage() {
 
     if (loading) {
         return (
-            <div className="loading-container">
-                <div className="loader-large"></div>
-                <p>Carregando seu perfil...</p>
+            <div className="max-w-[75rem] mx-auto px-4 py-8">
+                <div className="flex flex-col items-center justify-center py-12">
+                    <div className="w-12 h-12 border-4 border-t-[#484DB5] border-r-[#E5E7EB] border-b-[#E5E7EB] border-l-[#E5E7EB] rounded-full animate-spin"></div>
+                    <p className="mt-4 text-gray-700">Carregando seu perfil...</p>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="edit-profile-page">
-            <div className="edit-profile-header">
-                <h1>Editar Perfil</h1>
-                <p className="edit-profile-subheading">Atualize suas informações pessoais e links de redes sociais</p>
+        <div className="max-w-[75rem] mx-auto px-4 py-8">
+            <div className="mb-6">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Editar Perfil</h1>
+                <p className="text-gray-600 mt-1">Atualize suas informações pessoais e links de redes sociais</p>
             </div>
 
             {error && (
-                <div className="alert error-message">
-                    <AlertCircle size={20} />
+                <div className="flex items-center p-4 mb-6 bg-red-50 text-red-700 rounded-md border border-red-200">
+                    <AlertCircle size={20} className="mr-2" />
                     <span>{error}</span>
                 </div>
             )}
             
             {success && (
-                <div className="alert success-message">
-                    <CheckCircle size={20} />
+                <div className="flex items-center p-4 mb-6 bg-green-50 text-green-700 rounded-md border border-green-200">
+                    <CheckCircle size={20} className="mr-2" />
                     <span>Perfil atualizado com sucesso!</span>
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="edit-profile-form">
-                <div className="edit-profile-card">
-                    <div className="card-header">
-                        <h2><User size={18} /> Informações Pessoais</h2>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div className="border-b border-[#E5E7EB] p-4 bg-gray-50">
+                        <h2 className="flex items-center text-lg font-medium text-gray-900">
+                            <User size={18} className="mr-2 text-[#484DB5]" /> 
+                            Informações Pessoais
+                        </h2>
                     </div>
                     
-                    <div className="card-content">
-                        <div className="avatar-section">
-                            <div className="current-avatar">
+                    <div className="p-6">
+                        <div className="flex flex-col md:flex-row gap-6 mb-6">
+                            <div className="flex-shrink-0">
                                 {avatarPreview ? (
                                     <div 
-                                        className="avatar-preview" 
+                                        className="w-32 h-32 rounded-full bg-cover bg-center"
                                         style={{
                                             backgroundImage: `url(${avatarPreview})`,
-                                            backgroundSize: 'cover',
-                                            backgroundPosition: 'center'
                                         }}
                                     ></div>
                                 ) : (
-                                    <div className="avatar-placeholder">
+                                    <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center text-2xl font-bold text-gray-500">
                                         {username.charAt(0).toUpperCase() || "U"}
                                     </div>
                                 )}
                             </div>
 
-                            <div className="avatar-upload">
-                                <label htmlFor="avatar" className="avatar-label">
-                                    <Upload size={16} /> Foto de Perfil
+                            <div className="flex-grow space-y-3">
+                                <label htmlFor="avatar" className="block text-sm font-medium text-gray-700">
+                                    <Upload size={16} className="inline mr-1" /> Foto de Perfil
                                 </label>
-                                <div className="file-input-wrapper">
+                                <div className="flex items-center">
+                                    <label htmlFor="avatar" className="inline-flex items-center justify-center h-10 px-4 bg-white border border-[#E5E7EB] text-gray-700 rounded-md hover:bg-gray-50 transition-all duration-200 cursor-pointer">
+                                        Escolher arquivo
+                                    </label>
                                     <input
                                         type="file"
                                         id="avatar"
                                         accept="image/jpeg, image/png, image/gif"
                                         onChange={handleAvatarChange}
-                                        className="avatar-input"
+                                        className="hidden"
                                     />
-                                    <label htmlFor="avatar" className="file-input-button">
-                                        Escolher arquivo
-                                    </label>
                                 </div>
-                                <p className="avatar-hint">
-                                    <Info size={14} /> Formatos aceitos: JPG, PNG e GIF (máx. 2MB)
+                                <p className="text-xs text-gray-500 flex items-center">
+                                    <Info size={14} className="mr-1" /> 
+                                    Formatos aceitos: JPG, PNG e GIF (máx. 2MB)
                                 </p>
                             </div>
                         </div>
 
-                        <div className="form-group">
-                            <label htmlFor="username">Nome de usuário*</label>
-                            <input
-                                id="username"
-                                type="text"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                                className="form-input"
-                                placeholder="Seu nome de usuário único"
-                            />
-                        </div>
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                                    Nome de usuário*
+                                </label>
+                                <input
+                                    id="username"
+                                    type="text"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    required
+                                    className="w-full p-2 border border-[#E5E7EB] rounded-md focus:ring-2 focus:ring-[#484DB5] focus:border-transparent outline-none transition-all duration-200"
+                                    placeholder="Seu nome de usuário único"
+                                />
+                            </div>
 
-                        <div className="form-group">
-                            <label htmlFor="bio">Biografia</label>
-                            <textarea
-                                id="bio"
-                                value={bio}
-                                onChange={(e) => setBio(e.target.value)}
-                                rows={4}
-                                className="form-input"
-                                placeholder="Conte um pouco sobre você..."
-                            />
+                            <div className="space-y-2">
+                                <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
+                                    Biografia
+                                </label>
+                                <textarea
+                                    id="bio"
+                                    value={bio}
+                                    onChange={(e) => setBio(e.target.value)}
+                                    rows={4}
+                                    className="w-full p-2 border border-[#E5E7EB] rounded-md focus:ring-2 focus:ring-[#484DB5] focus:border-transparent outline-none transition-all duration-200 resize-y"
+                                    placeholder="Conte um pouco sobre você..."
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="edit-profile-card">
-                    <div className="card-header">
-                        <h2><Globe size={18} /> Redes Sociais</h2>
+                <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div className="border-b border-[#E5E7EB] p-4 bg-gray-50">
+                        <h2 className="flex items-center text-lg font-medium text-gray-900">
+                            <Globe size={18} className="mr-2 text-[#484DB5]" /> 
+                            Redes Sociais
+                        </h2>
                     </div>
                     
-                    <div className="card-content">
-                        <div className="form-group">
-                            <label htmlFor="website" className="social-label">
-                                <Globe size={16} /> Website
+                    <div className="p-6 space-y-4">
+                        <div className="space-y-2">
+                            <label htmlFor="website" className="flex items-center text-sm font-medium text-gray-700">
+                                <Globe size={16} className="mr-1" /> Website
                             </label>
                             <input
                                 id="website"
@@ -350,13 +363,13 @@ export default function EditProfilePage() {
                                 value={websiteUrl}
                                 onChange={(e) => setWebsiteUrl(e.target.value)}
                                 placeholder="https://seusite.com"
-                                className="form-input"
+                                className="w-full p-2 border border-[#E5E7EB] rounded-md focus:ring-2 focus:ring-[#484DB5] focus:border-transparent outline-none transition-all duration-200"
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label htmlFor="twitter" className="social-label">
-                                <Twitter size={16} /> Twitter
+                        <div className="space-y-2">
+                            <label htmlFor="twitter" className="flex items-center text-sm font-medium text-gray-700">
+                                <Twitter size={16} className="mr-1" /> Twitter
                             </label>
                             <input
                                 id="twitter"
@@ -364,13 +377,13 @@ export default function EditProfilePage() {
                                 value={twitterUrl}
                                 onChange={(e) => setTwitterUrl(e.target.value)}
                                 placeholder="https://twitter.com/seuperfil"
-                                className="form-input"
+                                className="w-full p-2 border border-[#E5E7EB] rounded-md focus:ring-2 focus:ring-[#484DB5] focus:border-transparent outline-none transition-all duration-200"
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label htmlFor="facebook" className="social-label">
-                                <Facebook size={16} /> Facebook
+                        <div className="space-y-2">
+                            <label htmlFor="facebook" className="flex items-center text-sm font-medium text-gray-700">
+                                <Facebook size={16} className="mr-1" /> Facebook
                             </label>
                             <input
                                 id="facebook"
@@ -378,13 +391,13 @@ export default function EditProfilePage() {
                                 value={facebookUrl}
                                 onChange={(e) => setFacebookUrl(e.target.value)}
                                 placeholder="https://facebook.com/seuperfil"
-                                className="form-input"
+                                className="w-full p-2 border border-[#E5E7EB] rounded-md focus:ring-2 focus:ring-[#484DB5] focus:border-transparent outline-none transition-all duration-200"
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label htmlFor="instagram" className="social-label">
-                                <Instagram size={16} /> Instagram
+                        <div className="space-y-2">
+                            <label htmlFor="instagram" className="flex items-center text-sm font-medium text-gray-700">
+                                <Instagram size={16} className="mr-1" /> Instagram
                             </label>
                             <input
                                 id="instagram"
@@ -392,29 +405,31 @@ export default function EditProfilePage() {
                                 value={instagramUrl}
                                 onChange={(e) => setInstagramUrl(e.target.value)}
                                 placeholder="https://instagram.com/seuperfil"
-                                className="form-input"
+                                className="w-full p-2 border border-[#E5E7EB] rounded-md focus:ring-2 focus:ring-[#484DB5] focus:border-transparent outline-none transition-all duration-200"
                             />
                         </div>
                     </div>
                 </div>
 
-                <button
-                    type="submit"
-                    disabled={saving || !username.trim()}
-                    className="save-profile-btn"
-                >
-                    {saving ? (
-                        <>
-                            <span className="loader"></span>
-                            <span>Salvando...</span>
-                        </>
-                    ) : (
-                        <>
-                            <Save size={18} />
-                            <span>Salvar Perfil</span>
-                        </>
-                    )}
-                </button>
+                <div className="flex justify-end">
+                    <button
+                        type="submit"
+                        disabled={saving || !username.trim()}
+                        className="inline-flex items-center justify-center h-10 px-6 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {saving ? (
+                            <span className="flex items-center">
+                                <div className="w-4 h-4 border-2 border-t-white border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin mr-2"></div>
+                                Salvando...
+                            </span>
+                        ) : (
+                            <span className="flex items-center">
+                                <Save size={16} className="mr-2" />
+                                Salvar Perfil
+                            </span>
+                        )}
+                    </button>
+                </div>
             </form>
         </div>
     );

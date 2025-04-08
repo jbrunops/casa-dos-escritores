@@ -308,297 +308,219 @@ export default function AdminDashboard() {
         return date.toLocaleDateString('pt-BR', options);
     };
 
-    // Componente de card para mobile
-    const renderUserCard = (user) => {
-        return (
-            <div className="admin-card" key={user.id}>
-                <div className="admin-card-header">
-                    <h3 className="admin-card-title">{user.username}</h3>
-                    <div className={`role-badge ${user.role || 'user'}`}>
-                        {user.role === 'admin' ? 'Administrador' : 
-                         user.role === 'moderator' ? 'Moderador' : 'Usuário'}
-                    </div>
-                </div>
-                
-                <div className="admin-card-content">
-                    <div className="admin-card-field">
-                        <Mail size={16} className="admin-card-icon" />
-                        <span>{user.email}</span>
-                    </div>
-                    <div className="admin-card-field">
-                        <Calendar size={16} className="admin-card-icon" />
-                        <span>{formatDate(user.created_at)}</span>
-                    </div>
-                </div>
-                
-                <div className="admin-card-actions">
-                    <div className="admin-card-select">
-                        <label htmlFor={`role-${user.id}`}>Função:</label>
-                        <select
-                            id={`role-${user.id}`}
-                            value={user.role || "user"}
-                            onChange={(e) => setUserRole(user.id, e.target.value)}
-                            disabled={actionLoading}
-                            className="role-select"
-                        >
-                            <option value="user">Usuário</option>
-                            <option value="moderator">Moderador</option>
-                            <option value="admin">Administrador</option>
-                        </select>
-                    </div>
-                    
-                    <div className="admin-action-buttons">
-                        <Link
-                            href={`/profile/${encodeURIComponent(user.username)}`}
-                            className="view-btn"
-                        >
-                            <Eye size={16} />
-                            <span>Ver</span>
-                        </Link>
-                        
-                        <button
-                            onClick={() => deleteUser(user.id, user.username)}
-                            className="delete-btn"
-                            disabled={actionLoading || user.role === "admin"}
-                            title={user.role === "admin" ? "Não é possível excluir um administrador" : "Excluir usuário"}
-                        >
-                            <Trash2 size={16} />
-                            <span>Excluir</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    const renderStoryCard = (story) => {
-        return (
-            <div className="admin-card" key={story.id}>
-                <div className="admin-card-header">
-                    <h3 className="admin-card-title">{story.title}</h3>
-                    <div className={`status-badge ${story.is_published ? "published" : "draft"}`}>
-                        {story.is_published ? "Publicado" : "Rascunho"}
-                    </div>
-                </div>
-                
-                <div className="admin-card-content">
-                    <div className="admin-card-field">
-                        <Users size={16} className="admin-card-icon" />
-                        <span>Autor: {story.profiles.username}</span>
-                    </div>
-                    <div className="admin-card-field">
-                        <Calendar size={16} className="admin-card-icon" />
-                        <span>{formatDate(story.created_at)}</span>
-                    </div>
-                </div>
-                
-                <div className="admin-card-actions">
-                    <Link
-                        href={`/story/${story.id}`}
-                        className="view-btn"
-                    >
-                        <Eye size={16} />
-                        <span>Ver</span>
-                    </Link>
-                    
-                    <Link
-                        href={`/dashboard/edit/${story.id}`}
-                        className="edit-btn"
-                    >
-                        <Edit size={16} />
-                        <span>Editar</span>
-                    </Link>
-                    
-                    <button
-                        onClick={() => deleteContent("stories", story.id)}
-                        className="delete-btn"
-                        disabled={actionLoading}
-                    >
-                        <Trash2 size={16} />
-                        <span>Excluir</span>
-                    </button>
-                </div>
-            </div>
-        );
-    };
-
-    const renderCommentCard = (comment) => {
-        return (
-            <div className="admin-card" key={comment.id}>
-                <div className="admin-card-header">
-                    <div className="admin-card-comment">
-                        {comment.text.length > 100 ? comment.text.substring(0, 100) + "..." : comment.text}
-                    </div>
-                </div>
-                
-                <div className="admin-card-content">
-                    <div className="admin-card-field">
-                        <Users size={16} className="admin-card-icon" />
-                        <span>Autor: {comment.profiles.username}</span>
-                    </div>
-                    <div className="admin-card-field">
-                        <BookOpen size={16} className="admin-card-icon" />
-                        <span>História: {comment.stories?.title || "História removida"}</span>
-                    </div>
-                    <div className="admin-card-field">
-                        <Calendar size={16} className="admin-card-icon" />
-                        <span>{formatDate(comment.created_at)}</span>
-                    </div>
-                </div>
-                
-                <div className="admin-card-actions">
-                    <button
-                        onClick={() => deleteContent("comments", comment.id)}
-                        className="delete-btn"
-                        disabled={actionLoading}
-                    >
-                        <Trash2 size={16} />
-                        <span>Excluir</span>
-                    </button>
-                </div>
-            </div>
-        );
-    };
-
     if (loading) {
         return (
-            <div className="admin-loading">
-                <RefreshCw size={40} className="admin-loading-icon" />
-                <p>Carregando painel administrativo...</p>
+            <div className="flex items-center justify-center h-screen flex-col">
+                <RefreshCw size={40} className="animate-spin text-[#484DB5] mb-4" />
+                <p className="text-gray-700 font-medium">Carregando painel administrativo...</p>
             </div>
         );
     }
 
     return (
-        <div className="admin-dashboard">
-            <div className="admin-header">
-                <div className="admin-header-left">
+        <div className="max-w-[75rem] mx-auto px-4 py-8">
+            <div className="flex justify-between items-center mb-6 border-b border-[#E5E7EB] pb-4">
+                <div className="flex items-center gap-2">
                     <button 
                         onClick={() => router.back()} 
-                        className="admin-back-button" 
+                        className="h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200" 
                         aria-label="Voltar para página anterior"
                     >
                         <ArrowLeft size={20} />
                     </button>
-                    <h1 className="admin-title">Painel Administrativo</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">Painel Administrativo</h1>
                 </div>
                 
                 <button 
                     onClick={loadData} 
-                    className="admin-refresh-button" 
+                    className="h-[2.5rem] px-4 flex items-center gap-2 bg-white border border-[#E5E7EB] rounded-md hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={actionLoading || loading}
                 >
-                    <RefreshCw size={18} className={actionLoading ? "spin" : ""} />
+                    <RefreshCw size={18} className={actionLoading ? "animate-spin" : ""} />
                     {!isMobile && <span>Atualizar</span>}
                 </button>
             </div>
 
             {statusMessage.type && (
-                <div className={`admin-message ${statusMessage.type}`}>
+                <div className={`flex items-center gap-2 p-4 mb-6 rounded-md ${
+                    statusMessage.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                }`}>
                     {statusMessage.type === "success" ? (
-                        <CheckCircle2 size={20} className="admin-message-icon" />
+                        <CheckCircle2 size={20} />
                     ) : (
-                        <AlertTriangle size={20} className="admin-message-icon" />
+                        <AlertTriangle size={20} />
                     )}
                     <span>{statusMessage.message}</span>
                 </div>
             )}
 
-            <div className="admin-tabs">
+            <div className="flex border-b border-[#E5E7EB] mb-6">
                 <button
-                    className={`admin-tab ${activeTab === "users" ? "active" : ""}`}
+                    className={`flex items-center gap-2 px-4 py-3 font-medium ${
+                        activeTab === "users" 
+                            ? "text-[#484DB5] border-b-2 border-[#484DB5]" 
+                            : "text-gray-500 hover:text-gray-800 transition-colors duration-200"
+                    }`}
                     onClick={() => setActiveTab("users")}
                 >
-                    <Users size={18} className="admin-tab-icon" />
+                    <Users size={18} />
                     <span>Usuários</span>
-                    <span className="admin-tab-count">{users.length}</span>
+                    <span className="ml-2 bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs">{users.length}</span>
                 </button>
                 
                 <button
-                    className={`admin-tab ${activeTab === "stories" ? "active" : ""}`}
+                    className={`flex items-center gap-2 px-4 py-3 font-medium ${
+                        activeTab === "stories" 
+                            ? "text-[#484DB5] border-b-2 border-[#484DB5]" 
+                            : "text-gray-500 hover:text-gray-800 transition-colors duration-200"
+                    }`}
                     onClick={() => setActiveTab("stories")}
                 >
-                    <BookOpen size={18} className="admin-tab-icon" />
+                    <BookOpen size={18} />
                     <span>Histórias</span>
-                    <span className="admin-tab-count">{stories.length}</span>
+                    <span className="ml-2 bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs">{stories.length}</span>
                 </button>
                 
                 <button
-                    className={`admin-tab ${activeTab === "comments" ? "active" : ""}`}
+                    className={`flex items-center gap-2 px-4 py-3 font-medium ${
+                        activeTab === "comments" 
+                            ? "text-[#484DB5] border-b-2 border-[#484DB5]" 
+                            : "text-gray-500 hover:text-gray-800 transition-colors duration-200"
+                    }`}
                     onClick={() => setActiveTab("comments")}
                 >
-                    <MessageSquare size={18} className="admin-tab-icon" />
+                    <MessageSquare size={18} />
                     <span>Comentários</span>
-                    <span className="admin-tab-count">{comments.length}</span>
+                    <span className="ml-2 bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs">{comments.length}</span>
                 </button>
             </div>
 
-            <div className="admin-content">
+            <div className="w-full">
                 {/* Conteúdo de usuários */}
                 {activeTab === "users" && (
-                    <div className="admin-section">
+                    <div>
                         {users.length === 0 ? (
-                            <div className="admin-empty">
-                                <Shield size={40} />
+                            <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+                                <Shield size={40} className="mb-2" />
                                 <p>Nenhum usuário encontrado</p>
                             </div>
                         ) : (
                             <>
                                 {/* Versão mobile - exibe cards */}
-                                <div className="admin-cards">
-                                    {users.map(user => renderUserCard(user))}
+                                <div className="grid gap-4 md:hidden">
+                                    {users.map(user => (
+                                        <div className="bg-white border border-[#E5E7EB] rounded-lg shadow-sm p-4" key={user.id}>
+                                            <div className="flex justify-between items-start mb-3">
+                                                <h3 className="font-medium text-gray-900">{user.username}</h3>
+                                                <div className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                                    user.role === 'admin' ? 'bg-purple-100 text-purple-700' : 
+                                                    user.role === 'moderator' ? 'bg-blue-100 text-blue-700' : 
+                                                    'bg-gray-100 text-gray-700'
+                                                }`}>
+                                                    {user.role === 'admin' ? 'Administrador' : 
+                                                     user.role === 'moderator' ? 'Moderador' : 'Usuário'}
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="space-y-2 mb-4">
+                                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                    <Mail size={16} />
+                                                    <span>{user.email}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                    <Calendar size={16} />
+                                                    <span>{formatDate(user.created_at)}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="border-t border-[#E5E7EB] pt-3">
+                                                <div className="flex items-center gap-2 mb-3">
+                                                    <label htmlFor={`role-${user.id}`} className="text-sm text-gray-700">Função:</label>
+                                                    <select
+                                                        id={`role-${user.id}`}
+                                                        value={user.role || "user"}
+                                                        onChange={(e) => setUserRole(user.id, e.target.value)}
+                                                        disabled={actionLoading}
+                                                        className="flex-1 h-[2.5rem] px-2 border border-[#E5E7EB] rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#484DB5]/20 focus:border-[#484DB5]"
+                                                    >
+                                                        <option value="user">Usuário</option>
+                                                        <option value="moderator">Moderador</option>
+                                                        <option value="admin">Administrador</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <div className="flex gap-2 mt-2">
+                                                    <Link
+                                                        href={`/profile/${encodeURIComponent(user.username)}`}
+                                                        className="flex-1 h-[2.5rem] flex items-center justify-center gap-1 bg-gray-50 border border-[#E5E7EB] rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                                                    >
+                                                        <Eye size={16} />
+                                                        <span>Ver</span>
+                                                    </Link>
+                                                    
+                                                    <button
+                                                        onClick={() => deleteUser(user.id, user.username)}
+                                                        className="flex-1 h-[2.5rem] flex items-center justify-center gap-1 bg-red-50 border border-red-200 rounded-md text-red-600 hover:bg-red-100 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        disabled={actionLoading || user.role === "admin"}
+                                                        title={user.role === "admin" ? "Não é possível excluir um administrador" : "Excluir usuário"}
+                                                    >
+                                                        <Trash2 size={16} />
+                                                        <span>Excluir</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                                 
                                 {/* Versão desktop - exibe tabela */}
-                                <div className="admin-table-container">
-                                    <table className="admin-table">
+                                <div className="hidden md:block overflow-x-auto">
+                                    <table className="w-full border-collapse">
                                         <thead>
-                                            <tr>
-                                                <th>Usuário</th>
-                                                <th>E-mail</th>
-                                                <th>Criado em</th>
-                                                <th>Função</th>
-                                                <th>Ações</th>
+                                            <tr className="bg-gray-50 text-left">
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB]">Usuário</th>
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB]">E-mail</th>
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB]">Criado em</th>
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB]">Função</th>
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB]">Ações</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {users.map((user) => (
-                                                <tr key={user.id}>
-                                                    <td data-label="Usuário">
+                                                <tr key={user.id} className="border-b border-[#E5E7EB] hover:bg-gray-50">
+                                                    <td className="px-4 py-3 text-sm text-gray-900">
                                                         {user.username}
                                                     </td>
-                                                    <td data-label="E-mail">
+                                                    <td className="px-4 py-3 text-sm text-gray-500">
                                                         {user.email}
                                                     </td>
-                                                    <td data-label="Criado em">
+                                                    <td className="px-4 py-3 text-sm text-gray-500">
                                                         {formatDate(user.created_at)}
                                                     </td>
-                                                    <td data-label="Função">
-                                                        <div className="role-selector">
-                                                            <select
-                                                                value={user.role || "user"}
-                                                                onChange={(e) => setUserRole(user.id, e.target.value)}
-                                                                disabled={actionLoading}
-                                                                className="role-select"
-                                                            >
-                                                                <option value="user">Usuário</option>
-                                                                <option value="moderator">Moderador</option>
-                                                                <option value="admin">Administrador</option>
-                                                            </select>
-                                                        </div>
+                                                    <td className="px-4 py-3">
+                                                        <select
+                                                            value={user.role || "user"}
+                                                            onChange={(e) => setUserRole(user.id, e.target.value)}
+                                                            disabled={actionLoading}
+                                                            className="h-[2.5rem] w-full px-2 border border-[#E5E7EB] rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#484DB5]/20 focus:border-[#484DB5]"
+                                                        >
+                                                            <option value="user">Usuário</option>
+                                                            <option value="moderator">Moderador</option>
+                                                            <option value="admin">Administrador</option>
+                                                        </select>
                                                     </td>
-                                                    <td data-label="Ações">
-                                                        <div className="admin-actions">
+                                                    <td className="px-4 py-3">
+                                                        <div className="flex items-center gap-2">
                                                             <Link
                                                                 href={`/profile/${encodeURIComponent(user.username)}`}
-                                                                className="view-btn"
+                                                                className="h-[2.5rem] px-3 flex items-center justify-center gap-1 bg-gray-50 border border-[#E5E7EB] rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                                                             >
                                                                 <Eye size={16} />
                                                                 <span>Ver</span>
                                                             </Link>
                                                             <button
                                                                 onClick={() => deleteUser(user.id, user.username)}
-                                                                className="delete-btn"
+                                                                className="h-[2.5rem] px-3 flex items-center justify-center gap-1 bg-red-50 border border-red-200 rounded-md text-red-600 hover:bg-red-100 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                                                 disabled={actionLoading || user.role === "admin"}
                                                                 title={
                                                                     user.role === "admin"
@@ -623,67 +545,122 @@ export default function AdminDashboard() {
 
                 {/* Conteúdo de histórias */}
                 {activeTab === "stories" && (
-                    <div className="admin-section">
+                    <div>
                         {stories.length === 0 ? (
-                            <div className="admin-empty">
-                                <BookOpen size={40} />
+                            <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+                                <BookOpen size={40} className="mb-2" />
                                 <p>Nenhuma história encontrada</p>
                             </div>
                         ) : (
                             <>
                                 {/* Versão mobile - exibe cards */}
-                                <div className="admin-cards">
-                                    {stories.map(story => renderStoryCard(story))}
+                                <div className="grid gap-4 md:hidden">
+                                    {stories.map(story => (
+                                        <div className="bg-white border border-[#E5E7EB] rounded-lg shadow-sm p-4" key={story.id}>
+                                            <div className="flex justify-between items-start mb-3">
+                                                <h3 className="font-medium text-gray-900">{story.title}</h3>
+                                                <div className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                                    story.is_published 
+                                                        ? 'bg-green-100 text-green-700' 
+                                                        : 'bg-yellow-100 text-yellow-700'
+                                                }`}>
+                                                    {story.is_published ? "Publicado" : "Rascunho"}
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="space-y-2 mb-4">
+                                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                    <Users size={16} />
+                                                    <span>Autor: {story.profiles.username}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                    <Calendar size={16} />
+                                                    <span>{formatDate(story.created_at)}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="flex flex-wrap gap-2 mt-3">
+                                                <Link
+                                                    href={`/story/${story.id}`}
+                                                    className="flex-1 h-[2.5rem] flex items-center justify-center gap-1 bg-gray-50 border border-[#E5E7EB] rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                                                >
+                                                    <Eye size={16} />
+                                                    <span>Ver</span>
+                                                </Link>
+                                                
+                                                <Link
+                                                    href={`/dashboard/edit/${story.id}`}
+                                                    className="flex-1 h-[2.5rem] flex items-center justify-center gap-1 bg-[#484DB5]/10 border border-[#484DB5]/20 rounded-md text-[#484DB5] hover:bg-[#484DB5]/20 transition-colors duration-200"
+                                                >
+                                                    <Edit size={16} />
+                                                    <span>Editar</span>
+                                                </Link>
+                                                
+                                                <button
+                                                    onClick={() => deleteContent("stories", story.id)}
+                                                    className="flex-1 h-[2.5rem] flex items-center justify-center gap-1 bg-red-50 border border-red-200 rounded-md text-red-600 hover:bg-red-100 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    disabled={actionLoading}
+                                                >
+                                                    <Trash2 size={16} />
+                                                    <span>Excluir</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                                 
                                 {/* Versão desktop - exibe tabela */}
-                                <div className="admin-table-container">
-                                    <table className="admin-table">
+                                <div className="hidden md:block overflow-x-auto">
+                                    <table className="w-full border-collapse">
                                         <thead>
-                                            <tr>
-                                                <th>Título</th>
-                                                <th>Autor</th>
-                                                <th>Status</th>
-                                                <th>Criado em</th>
-                                                <th>Ações</th>
+                                            <tr className="bg-gray-50 text-left">
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB]">Título</th>
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB]">Autor</th>
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB]">Status</th>
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB]">Criado em</th>
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB]">Ações</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {stories.map((story) => (
-                                                <tr key={story.id}>
-                                                    <td data-label="Título">
+                                                <tr key={story.id} className="border-b border-[#E5E7EB] hover:bg-gray-50">
+                                                    <td className="px-4 py-3 text-sm text-gray-900">
                                                         {story.title}
                                                     </td>
-                                                    <td data-label="Autor">
+                                                    <td className="px-4 py-3 text-sm text-gray-500">
                                                         {story.profiles.username}
                                                     </td>
-                                                    <td data-label="Status">
-                                                        <span className={`status-badge ${story.is_published ? "published" : "draft"}`}>
+                                                    <td className="px-4 py-3">
+                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                            story.is_published 
+                                                                ? 'bg-green-100 text-green-700' 
+                                                                : 'bg-yellow-100 text-yellow-700'
+                                                        }`}>
                                                             {story.is_published ? "Publicado" : "Rascunho"}
                                                         </span>
                                                     </td>
-                                                    <td data-label="Criado em">
+                                                    <td className="px-4 py-3 text-sm text-gray-500">
                                                         {formatDate(story.created_at)}
                                                     </td>
-                                                    <td data-label="Ações">
-                                                        <div className="admin-actions">
+                                                    <td className="px-4 py-3">
+                                                        <div className="flex items-center gap-2">
                                                             <Link
                                                                 href={`/story/${story.id}`}
-                                                                className="view-btn"
+                                                                className="h-[2.5rem] px-3 flex items-center justify-center gap-1 bg-gray-50 border border-[#E5E7EB] rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                                                             >
                                                                 <Eye size={16} />
                                                                 <span>Ver</span>
                                                             </Link>
                                                             <Link
                                                                 href={`/dashboard/edit/${story.id}`}
-                                                                className="edit-btn"
+                                                                className="h-[2.5rem] px-3 flex items-center justify-center gap-1 bg-[#484DB5]/10 border border-[#484DB5]/20 rounded-md text-[#484DB5] hover:bg-[#484DB5]/20 transition-colors duration-200"
                                                             >
                                                                 <Edit size={16} />
                                                                 <span>Editar</span>
                                                             </Link>
                                                             <button
                                                                 onClick={() => deleteContent("stories", story.id)}
-                                                                className="delete-btn"
+                                                                className="h-[2.5rem] px-3 flex items-center justify-center gap-1 bg-red-50 border border-red-200 rounded-md text-red-600 hover:bg-red-100 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                                                 disabled={actionLoading}
                                                             >
                                                                 <Trash2 size={16} />
@@ -703,54 +680,88 @@ export default function AdminDashboard() {
 
                 {/* Conteúdo de comentários */}
                 {activeTab === "comments" && (
-                    <div className="admin-section">
+                    <div>
                         {comments.length === 0 ? (
-                            <div className="admin-empty">
-                                <MessageSquare size={40} />
+                            <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+                                <MessageSquare size={40} className="mb-2" />
                                 <p>Nenhum comentário encontrado</p>
                             </div>
                         ) : (
                             <>
                                 {/* Versão mobile - exibe cards */}
-                                <div className="admin-cards">
-                                    {comments.map(comment => renderCommentCard(comment))}
+                                <div className="grid gap-4 md:hidden">
+                                    {comments.map(comment => (
+                                        <div className="bg-white border border-[#E5E7EB] rounded-lg shadow-sm p-4" key={comment.id}>
+                                            <div className="mb-3">
+                                                <p className="text-gray-800 text-sm">
+                                                    {comment.text.length > 100 ? comment.text.substring(0, 100) + "..." : comment.text}
+                                                </p>
+                                            </div>
+                                            
+                                            <div className="space-y-2 mb-4">
+                                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                    <Users size={16} />
+                                                    <span>Autor: {comment.profiles.username}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                    <BookOpen size={16} />
+                                                    <span>História: {comment.stories?.title || "História removida"}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                    <Calendar size={16} />
+                                                    <span>{formatDate(comment.created_at)}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="pt-3 border-t border-[#E5E7EB]">
+                                                <button
+                                                    onClick={() => deleteContent("comments", comment.id)}
+                                                    className="w-full h-[2.5rem] flex items-center justify-center gap-1 bg-red-50 border border-red-200 rounded-md text-red-600 hover:bg-red-100 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    disabled={actionLoading}
+                                                >
+                                                    <Trash2 size={16} />
+                                                    <span>Excluir</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                                 
                                 {/* Versão desktop - exibe tabela */}
-                                <div className="admin-table-container">
-                                    <table className="admin-table">
+                                <div className="hidden md:block overflow-x-auto">
+                                    <table className="w-full border-collapse">
                                         <thead>
-                                            <tr>
-                                                <th>Comentário</th>
-                                                <th>Autor</th>
-                                                <th>História</th>
-                                                <th>Criado em</th>
-                                                <th>Ações</th>
+                                            <tr className="bg-gray-50 text-left">
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB] w-1/3">Comentário</th>
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB]">Autor</th>
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB]">História</th>
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB]">Criado em</th>
+                                                <th className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-[#E5E7EB]">Ações</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {comments.map((comment) => (
-                                                <tr key={comment.id}>
-                                                    <td data-label="Comentário">
-                                                        <div className="comment-preview">
+                                                <tr key={comment.id} className="border-b border-[#E5E7EB] hover:bg-gray-50">
+                                                    <td className="px-4 py-3 text-sm text-gray-800">
+                                                        <div className="max-w-md truncate">
                                                             {comment.text.length > 100
                                                                 ? comment.text.substring(0, 100) + "..."
                                                                 : comment.text}
                                                         </div>
                                                     </td>
-                                                    <td data-label="Autor">
+                                                    <td className="px-4 py-3 text-sm text-gray-500">
                                                         {comment.profiles.username}
                                                     </td>
-                                                    <td data-label="História">
+                                                    <td className="px-4 py-3 text-sm text-gray-500">
                                                         {comment.stories?.title || "História removida"}
                                                     </td>
-                                                    <td data-label="Criado em">
+                                                    <td className="px-4 py-3 text-sm text-gray-500">
                                                         {formatDate(comment.created_at)}
                                                     </td>
-                                                    <td data-label="Ações">
+                                                    <td className="px-4 py-3">
                                                         <button
                                                             onClick={() => deleteContent("comments", comment.id)}
-                                                            className="delete-btn"
+                                                            className="h-[2.5rem] px-3 flex items-center justify-center gap-1 bg-red-50 border border-red-200 rounded-md text-red-600 hover:bg-red-100 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                                             disabled={actionLoading}
                                                         >
                                                             <Trash2 size={16} />
