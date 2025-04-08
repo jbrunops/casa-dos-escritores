@@ -109,7 +109,9 @@ export default function NewSeriesPage() {
         setSuccess(null);
 
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
 
             console.log("Usuário autenticado:", user);
 
@@ -119,47 +121,32 @@ export default function NewSeriesPage() {
             let coverUrl = null;
             if (coverFile) {
                 try {
-                    console.log("Iniciando upload da imagem");
-                    
-                    // Criar um FormData para enviar o arquivo
+                    // Usar o service client para ignorar RLS
+                    // Vamos fazer upload via API route em vez do cliente do browser
                     const formData = new FormData();
                     formData.append('file', coverFile);
                     formData.append('userId', user.id);
                     
-                    // Usar fetch para enviar o arquivo para a API
-                    const uploadResponse = await fetch('/api/upload', {
+                    const response = await fetch('/api/upload', {
                         method: 'POST',
                         body: formData
                     });
                     
-                    // Log detalhado do resultado
-                    console.log("Status da resposta:", uploadResponse.status);
-                    
-                    if (!uploadResponse.ok) {
-                        // Tentar extrair mensagem de erro da resposta
-                        let errorMessage = "Erro no upload da imagem";
-                        try {
-                            const errorData = await uploadResponse.json();
-                            errorMessage = errorData.error || errorMessage;
-                        } catch (e) {
-                            console.error("Erro ao processar resposta de erro:", e);
-                        }
-                        throw new Error(errorMessage);
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Erro no upload da imagem');
                     }
                     
-                    // Processar resposta de sucesso
-                    const uploadData = await uploadResponse.json();
-                    coverUrl = uploadData.url;
-                    
-                    console.log("URL da imagem:", coverUrl);
+                    const data = await response.json();
+                    coverUrl = data.url;
                     
                     if (!coverUrl) {
                         throw new Error("Não foi possível obter URL da imagem");
                     }
                     
-                    console.log("Upload de imagem bem-sucedido");
+                    console.log("Upload de imagem bem-sucedido:", coverUrl);
                 } catch (uploadErr) {
-                    console.error("Erro detalhado no upload da capa:", uploadErr);
+                    console.error("Erro no upload da capa:", uploadErr);
                     setError(`Erro no upload da imagem: ${uploadErr.message}`);
                     setSaving(false);
                     return;
@@ -219,74 +206,68 @@ export default function NewSeriesPage() {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-5xl">
-            <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">Criar Nova Série</h1>
+        <div className="series-editor-container">
+            <div className="series-editor-header">
+                <h1>Criar Nova Série</h1>
             </div>
 
-            <div className="mb-6">
-                <Link href="/dashboard" className="inline-flex items-center text-[#484DB5] hover:text-[#3a3e9f]">
-                    <ArrowLeft size={16} className="mr-2" />
+            <div className="back-dashboard">
+                <Link href="/dashboard" className="back-link">
+                    <ArrowLeft size={16} />
                     <span>Voltar ao Dashboard</span>
                 </Link>
             </div>
 
             {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mb-6 flex items-center">
-                    <AlertTriangle size={20} className="mr-2 flex-shrink-0" />
+                <div className="series-message error">
+                    <AlertTriangle size={20} />
                     <span>{error}</span>
                 </div>
             )}
 
             {success && (
-                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded relative mb-6 flex items-center">
-                    <CheckCircle2 size={20} className="mr-2 flex-shrink-0" />
+                <div className="series-message success">
+                    <CheckCircle2 size={20} />
                     <span>{success}</span>
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] overflow-hidden">
-                <div className="grid md:grid-cols-2 gap-8 p-6">
-                    <div className="space-y-6">
-                        <div className="space-y-2">
-                            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                                Título da Série*
-                            </label>
+            <form onSubmit={handleSubmit} className="series-editor-form">
+                <div className="series-form-grid">
+                    <div className="series-form-column">
+                        <div className="series-form-group">
+                            <label htmlFor="title">Título da Série*</label>
                             <input
                                 id="title"
                                 type="text"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="w-full px-3 py-2 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#484DB5] focus:border-[#484DB5]"
+                                className="series-input"
                                 placeholder="Um título cativante para sua série..."
                                 required
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                                Sinopse
-                            </label>
+                        <div className="series-form-group">
+                            <label htmlFor="description">Sinopse</label>
                             <textarea
                                 id="description"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="w-full px-3 py-2 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#484DB5] focus:border-[#484DB5]"
+                                className="series-textarea"
                                 placeholder="Descreva sua série em algumas linhas..."
                                 rows={5}
                             />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label htmlFor="genre" className="block text-sm font-medium text-gray-700">
-                                    Gênero
-                                </label>
+                        <div className="series-form-row">
+                            <div className="series-form-group">
+                                <label htmlFor="genre">Gênero</label>
                                 <select
                                     id="genre"
                                     value={genre}
                                     onChange={(e) => setGenre(e.target.value)}
-                                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#484DB5] focus:border-[#484DB5]"
+                                    className="series-select"
                                 >
                                     <option value="">
                                         Selecione um gênero
@@ -299,10 +280,8 @@ export default function NewSeriesPage() {
                                 </select>
                             </div>
 
-                            <div className="space-y-2">
-                                <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
-                                    Tags (max. 5)
-                                </label>
+                            <div className="series-form-group">
+                                <label htmlFor="tags">Tags (max. 5)</label>
                                 <input
                                     id="tags"
                                     type="text"
@@ -311,22 +290,22 @@ export default function NewSeriesPage() {
                                         setTagInput(e.target.value)
                                     }
                                     onKeyDown={handleAddTag}
-                                    className="w-full px-3 py-2 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-1 focus:ring-[#484DB5] focus:border-[#484DB5]"
+                                    className="series-input"
                                     placeholder="Digite e pressione Enter..."
                                     disabled={tags.length >= 5}
                                 />
-                                <p className="text-xs text-gray-500">
+                                <div className="form-hint">
                                     Adicione tags para ajudar leitores a
                                     encontrar sua série
-                                </p>
+                                </div>
                                 {tags.length > 0 && (
-                                    <div className="flex flex-wrap gap-2 mt-2">
+                                    <div className="tags-container">
                                         {tags.map((tag, index) => (
-                                            <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f5f5ff] text-[#484DB5]">
+                                            <span key={index} className="tag">
                                                 {tag}
                                                 <button
                                                     type="button"
-                                                    className="ml-1.5 text-[#484DB5] hover:text-[#3a3e9f]"
+                                                    className="tag-remove"
                                                     onClick={() =>
                                                         handleRemoveTag(tag)
                                                     }
@@ -341,31 +320,29 @@ export default function NewSeriesPage() {
                         </div>
                     </div>
 
-                    <div>
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">
-                                Capa da Série
-                            </label>
-                            <div className="border-2 border-dashed border-[#E5E7EB] rounded-lg overflow-hidden">
+                    <div className="series-form-column">
+                        <div className="series-form-group">
+                            <label>Capa da Série</label>
+                            <div className="cover-upload-container">
                                 {coverPreview ? (
-                                    <div className="relative">
+                                    <div className="cover-preview-container">
                                         <img
                                             src={coverPreview}
                                             alt="Preview da capa"
-                                            className="w-full h-auto object-contain"
+                                            className="cover-preview"
                                             key={coverPreview}
                                         />
-                                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-3 flex justify-between">
+                                        <div className="cover-actions">
                                             <button
                                                 type="button"
-                                                className="px-3 py-1 bg-white text-gray-800 text-sm rounded hover:bg-gray-100"
+                                                className="cover-change-btn"
                                                 onClick={() => document.getElementById('coverFileInput').click()}
                                             >
                                                 Trocar imagem
                                             </button>
                                             <button
                                                 type="button"
-                                                className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
+                                                className="cover-remove-btn"
                                                 onClick={() => {
                                                     setCoverFile(null);
                                                     setCoverPreview("");
@@ -379,61 +356,55 @@ export default function NewSeriesPage() {
                                             type="file"
                                             accept="image/jpeg, image/png, image/gif"
                                             onChange={handleCoverChange}
-                                            className="hidden"
+                                            className="cover-input hidden"
+                                            style={{ display: 'none' }}
                                         />
                                     </div>
                                 ) : (
-                                    <div className="relative">
-                                        <div className="p-8 text-center cursor-pointer" onClick={() => document.getElementById('cover').click()}>
-                                            <Image className="mx-auto h-12 w-12 text-gray-400" />
-                                            <div className="mt-2 text-sm text-gray-600">
-                                                <span className="font-medium text-[#484DB5] hover:text-[#3a3e9f]">
-                                                    Clique para enviar uma imagem
-                                                </span>
-                                                <p className="mt-1 text-xs text-gray-500">
-                                                    JPG, PNG ou GIF • Máx 2MB
-                                                </p>
-                                            </div>
+                                    <div className="cover-upload">
+                                        <div className="cover-placeholder">
+                                            <Image size={48} opacity={0.3} />
+                                            <span>
+                                                Clique para enviar uma imagem
+                                                <br />
+                                                <small>JPG, PNG ou GIF • Máx 2MB</small>
+                                            </span>
                                         </div>
                                         <input
                                             type="file"
                                             id="cover"
                                             accept="image/jpeg, image/png, image/gif"
                                             onChange={handleCoverChange}
-                                            className="hidden"
+                                            className="cover-input"
                                         />
                                     </div>
                                 )}
                             </div>
-                            <p className="text-xs text-gray-500">
+                            <div className="form-hint">
                                 Arquivos JPG, PNG ou GIF de até 2MB. Proporção
                                 ideal: 2:3 (como capas de livros)
-                            </p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="px-6 py-4 bg-gray-50 border-t border-[#E5E7EB] text-right">
+                <div className="series-actions">
                     <button
                         type="submit"
                         disabled={saving || !title.trim() || !formTouched}
-                        className={`inline-flex items-center px-4 py-2 rounded-md text-white ${
-                            saving || !title.trim() || !formTouched
-                                ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-[#484DB5] hover:bg-[#3a3e9f]"
-                        } transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#484DB5]`}
+                        className="series-btn series-btn-primary"
                     >
                         {saving ? (
                             <>
-                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
+                                <Save
+                                    className="series-btn-icon btn-spinner"
+                                    size={18}
+                                />
                                 <span>Criando série...</span>
                             </>
                         ) : (
                             <>
-                                <Save className="mr-2 h-4 w-4" />
+                                <Save className="series-btn-icon" size={18} />
                                 <span>Criar Série e Adicionar Capítulos</span>
                             </>
                         )}

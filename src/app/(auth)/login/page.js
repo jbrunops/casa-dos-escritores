@@ -5,7 +5,7 @@ import { useState } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogIn, Mail, Lock, Loader, AlertCircle, CheckCircle, BookOpen } from "lucide-react";
+import { LogIn, Mail, Lock, Loader, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -125,14 +125,9 @@ export default function LoginPage() {
                     </div>
 
                     <div className="form-group">
-                        <div className="flex items-center justify-between">
-                            <label htmlFor="password" className="input-label">
-                                Senha
-                            </label>
-                            <Link href="/forgot-password" className="text-sm text-[#484DB5] hover:text-[#7A80FB] font-medium">
-                                Esqueceu?
-                            </Link>
-                        </div>
+                        <label htmlFor="password" className="input-label">
+                            Senha
+                        </label>
                         <input
                             id="password"
                             type="password"
@@ -148,7 +143,7 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="btn-primary btn-full"
+                        className="auth-button"
                     >
                         {loading ? (
                             <>

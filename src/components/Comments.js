@@ -161,7 +161,7 @@ export default function Comments({
 
             // Preparar dados para a API
             const commentData = {
-                text: newComment.trim(),
+                text: newComment,
                 authorId: activeUserId,
                 parentId: replyTo ? replyTo.id : null,
             };
@@ -177,62 +177,38 @@ export default function Comments({
 
             console.log("Enviando para API:", commentData);
 
-            try {
-                // Fazer requisição para a API
-                const response = await fetch("/api/comments", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(commentData),
-                });
+            // Fazer requisição para a API
+            const response = await fetch("/api/comments", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(commentData),
+            });
 
-                if (!response) {
-                    throw new Error("Resposta vazia da API");
-                }
+            const result = await response.json();
+            console.log("Resposta da API:", result);
 
-                // Verificar se temos uma resposta válida antes de tentar fazer parse do JSON
-                const contentType = response.headers.get("content-type");
-                if (!contentType || !contentType.includes("application/json")) {
-                    // Se não for JSON, tentar obter o texto bruto para informações adicionais
-                    const textResponse = await response.text();
-                    console.error("Resposta não-JSON recebida:", textResponse);
-                    throw new Error(`Resposta inesperada do servidor: ${response.status} ${response.statusText}`);
-                }
-                
-                let result;
-                try {
-                    result = await response.json();
-                    console.log("Resposta da API:", result);
-                } catch (jsonError) {
-                    console.error("Erro ao processar JSON da resposta:", jsonError);
-                    throw new Error("A resposta do servidor não contém JSON válido");
-                }
-
-                if (!response.ok) {
-                    const errorMessage =
-                        result?.error || "Erro ao adicionar comentário";
-                    const errorDetails = result?.details
-                        ? JSON.stringify(result.details)
-                        : "";
-                    throw new Error(`${errorMessage} ${errorDetails}`);
-                }
-
-                // Sucesso!
-                setNewComment("");
-                setReplyTo(null);
-                setSuccess(true);
-
-                // Recarregar comentários
-                await loadComments();
-
-                setTimeout(() => {
-                    setSuccess(false);
-                }, 3000);
-            } catch (apiError) {
-                console.error("Erro na chamada da API:", apiError);
-                throw new Error(apiError.message || "Erro na comunicação com o servidor");
+            if (!response.ok) {
+                const errorMessage =
+                    result.error || "Erro ao adicionar comentário";
+                const errorDetails = result.details
+                    ? JSON.stringify(result.details)
+                    : "";
+                throw new Error(`${errorMessage} ${errorDetails}`);
             }
+
+            // Sucesso!
+            setNewComment("");
+            setReplyTo(null);
+            setSuccess(true);
+
+            // Recarregar comentários
+            await loadComments();
+
+            setTimeout(() => {
+                setSuccess(false);
+            }, 3000);
         } catch (err) {
             console.error("Erro detalhado:", err);
             setError(`Erro: ${err.message}`);
@@ -282,49 +258,49 @@ export default function Comments({
         const renderComment = (comment, level = 0) => (
             <div
                 key={comment.id}
-                className={`mb-4 ${
-                    level > 0 ? "pl-4 md:pl-6 border-l-2 border-[#E5E7EB]" : ""
+                className={`comment-container ${
+                    level > 0 ? "nested-comment" : ""
                 }`}
             >
                 <div
-                    className="bg-white rounded-lg p-4 shadow-sm border border-[#E5E7EB]"
-                    style={{ marginLeft: `${level * 8}px` }}
+                    className="comment"
+                    style={{ marginLeft: `${level * 20}px` }}
                 >
-                    <div className="flex justify-between items-center mb-2">
-                        <div className="flex items-center">
+                    <div className="comment-header">
+                        <div className="comment-author-info">
                             {comment.profiles?.avatar_url ? (
                                 <img
                                     src={comment.profiles.avatar_url}
                                     alt={
                                         comment.profiles?.username || "Usuário"
                                     }
-                                    className="w-8 h-8 rounded-full mr-2 object-cover"
+                                    className="comment-avatar"
                                 />
                             ) : (
-                                <div className="w-8 h-8 rounded-full mr-2 bg-[#484DB5] text-white flex items-center justify-center">
+                                <div className="comment-avatar-placeholder">
                                     {(comment.profiles?.username || "A")
                                         .charAt(0)
                                         .toUpperCase()}
                                 </div>
                             )}
-                            <span className="font-medium text-gray-800">
+                            <span className="comment-author">
                                 {comment.profiles?.username || "Usuário"}
                             </span>
                         </div>
-                        <span className="text-sm text-gray-500">
+                        <span className="comment-date">
                             {new Date(comment.created_at).toLocaleDateString(
                                 "pt-BR"
                             )}
                         </span>
                     </div>
-                    <p className="text-gray-700 mb-2">{comment.text}</p>
+                    <p className="comment-text">{comment.text}</p>
                     {currentUserId && (
-                        <div className="flex justify-end mt-2">
+                        <div className="comment-actions">
                             <button
                                 onClick={() => handleReply(comment)}
-                                className="flex items-center text-sm text-gray-600 hover:text-[#484DB5] transition-colors"
+                                className="reply-button"
                             >
-                                <Reply size={16} className="mr-1" />
+                                <Reply size={16} />
                                 <span>Responder</span>
                             </button>
                         </div>
@@ -333,7 +309,7 @@ export default function Comments({
 
                 {/* Renderizar respostas recursivamente */}
                 {comment.replies && comment.replies.length > 0 && (
-                    <div className="mt-2 pl-4">
+                    <div className="comment-replies">
                         {comment.replies.map((reply) =>
                             renderComment(reply, level + 1)
                         )}
@@ -346,37 +322,37 @@ export default function Comments({
     };
 
     return (
-        <div className="bg-white rounded-lg p-6 mb-6">
-            <h3 className="text-xl font-semibold mb-4 flex items-center text-gray-800">
-                <span className="flex items-center justify-center mr-2 text-[#484DB5]">
+        <div className="comments-section">
+            <h3>
+                <span className="comment-icon-container mr-1">
                     <MessageSquare size={20} />
                 </span>
                 Comentários ({comments.length})
             </h3>
 
             {currentUserId ? (
-                <form onSubmit={handleSubmitComment} className="mb-6">
+                <form onSubmit={handleSubmitComment} className="comment-form">
                     {error && (
-                        <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4">
+                        <div className="error-message comment-error">
                             {error}
                         </div>
                     )}
                     {success && (
-                        <div className="bg-green-50 text-green-600 p-3 rounded-md mb-4">
+                        <div className="success-message">
                             Comentário publicado com sucesso!
                         </div>
                     )}
 
                     {replyTo && (
-                        <div className="flex items-center justify-between bg-gray-50 p-2 rounded-md mb-2 border border-[#E5E7EB]">
-                            <span className="text-sm text-gray-600">
+                        <div className="reply-indicator">
+                            <span>
                                 Respondendo para{" "}
-                                <span className="font-medium">{replyTo.profiles?.username || "Usuário"}</span>
+                                {replyTo.profiles?.username || "Usuário"}
                             </span>
                             <button
                                 type="button"
                                 onClick={cancelReply}
-                                className="text-gray-500 hover:text-red-500 transition-colors"
+                                className="cancel-reply-button"
                                 title="Cancelar resposta"
                             >
                                 <X size={16} />
@@ -391,16 +367,15 @@ export default function Comments({
                         placeholder="Escreva seu comentário..."
                         disabled={submitting}
                         required
-                        className="w-full p-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent mb-3 min-h-[100px]"
                     />
                     <button
                         type="submit"
                         disabled={submitting || !newComment.trim()}
-                        className="bg-[#484DB5] text-white px-4 py-2 rounded-md hover:bg-[#3a3e9f] focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        className="comment-submit-btn"
                     >
                         {submitting ? (
                             <>
-                                <span className="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                                <span className="loader"></span>
                                 <span>Enviando...</span>
                             </>
                         ) : (
@@ -409,14 +384,14 @@ export default function Comments({
                     </button>
                 </form>
             ) : (
-                <p className="text-gray-700 mb-6">
-                    <Link href="/login" className="text-[#484DB5] hover:text-[#3a3e9f] font-medium">Faça login</Link> para comentar
+                <p className="login-prompt">
+                    <Link href="/login">Faça login</Link> para comentar
                 </p>
             )}
 
-            <div className="mb-4">
+            <div className="comments-list">
                 {comments.length === 0 ? (
-                    <p className="text-gray-500 text-center py-6 bg-gray-50 rounded-md border border-[#E5E7EB]">
+                    <p className="no-comments">
                         Nenhum comentário ainda. Seja o primeiro a comentar!
                     </p>
                 ) : (
@@ -424,8 +399,10 @@ export default function Comments({
                 )}
             </div>
 
-            <button onClick={loadComments} className="flex items-center text-gray-600 hover:text-[#484DB5] transition-colors">
-                <RefreshCw size={16} className="mr-1" />
+            <button onClick={loadComments} className="reload-comments-btn">
+                <span className="mr-1">
+                    <RefreshCw size={16} />
+                </span>
                 Atualizar comentários
             </button>
         </div>

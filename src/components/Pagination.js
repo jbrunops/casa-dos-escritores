@@ -41,28 +41,26 @@ export default function Pagination({ currentPage, totalPages, baseUrl }) {
     const pageNumbers = getPageNumbers();
 
     return (
-        <div className="flex flex-wrap items-center justify-center my-8 px-4">
+        <div className="pagination">
             {/* Botão Anterior */}
             {currentPage > 1 ? (
                 <Link
                     href={`${baseUrl}?page=${currentPage - 1}`}
-                    className="px-3 py-2 my-1 mx-1 rounded bg-white border border-[#E5E7EB] text-gray-700 hover:bg-gray-50 hover:text-[#484DB5] transition-colors text-sm"
+                    className="pagination-btn prev"
                 >
                     Anterior
                 </Link>
             ) : (
-                <span className="px-3 py-2 my-1 mx-1 rounded bg-gray-100 border border-[#E5E7EB] text-gray-400 cursor-not-allowed text-sm">
-                    Anterior
-                </span>
+                <span className="pagination-btn prev disabled">Anterior</span>
             )}
 
             {/* Números das páginas */}
-            <div className="flex flex-wrap mx-1 justify-center">
+            <div className="pagination-numbers">
                 {pageNumbers.map((page, index) =>
                     page === "..." ? (
                         <span
                             key={`ellipsis-${index}`}
-                            className="px-3 py-2 mx-1 my-1 text-gray-600 text-sm"
+                            className="pagination-ellipsis"
                         >
                             ...
                         </span>
@@ -70,11 +68,9 @@ export default function Pagination({ currentPage, totalPages, baseUrl }) {
                         <Link
                             key={page}
                             href={`${baseUrl}?page=${page}`}
-                            className={`px-3 py-2 mx-1 my-1 rounded text-sm ${
-                                currentPage === page 
-                                ? "bg-[#484DB5] text-white" 
-                                : "bg-white border border-[#E5E7EB] text-gray-700 hover:bg-gray-50 hover:text-[#484DB5]"
-                            } transition-colors`}
+                            className={`pagination-number ${
+                                currentPage === page ? "active" : ""
+                            }`}
                         >
                             {page}
                         </Link>
@@ -86,14 +82,12 @@ export default function Pagination({ currentPage, totalPages, baseUrl }) {
             {currentPage < totalPages ? (
                 <Link
                     href={`${baseUrl}?page=${currentPage + 1}`}
-                    className="px-3 py-2 my-1 mx-1 rounded bg-white border border-[#E5E7EB] text-gray-700 hover:bg-gray-50 hover:text-[#484DB5] transition-colors text-sm"
+                    className="pagination-btn next"
                 >
                     Próximo
                 </Link>
             ) : (
-                <span className="px-3 py-2 my-1 mx-1 rounded bg-gray-100 border border-[#E5E7EB] text-gray-400 cursor-not-allowed text-sm">
-                    Próximo
-                </span>
+                <span className="pagination-btn next disabled">Próximo</span>
             )}
         </div>
     );

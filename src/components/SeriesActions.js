@@ -61,19 +61,19 @@ export default function SeriesActions({ series, isAuthor }) {
     };
 
     return (
-        <div className="flex flex-wrap items-center gap-3 mt-6">
+        <div className="series-detail-actions">
             {series.first_chapter ? (
                 <Link
                     href={`/chapter/${series.first_chapter}`}
-                    className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 hover:text-purple-600 transition-colors"
+                    className="series-action-btn series-action-secondary"
                 >
-                    <BookOpen size={18} className="mr-2" />
-                    <span className="font-medium">Ver Série</span>
+                    <BookOpen size={18} />
+                    <span>Ver Série</span>
                 </Link>
             ) : (
-                <span className="inline-flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-500 cursor-not-allowed">
-                    <BookOpen size={18} className="mr-2" />
-                    <span className="font-medium">Sem Capítulos</span>
+                <span className="series-action-btn series-action-secondary disabled">
+                    <BookOpen size={18} />
+                    <span>Sem Capítulos</span>
                 </span>
             )}
 
@@ -81,36 +81,32 @@ export default function SeriesActions({ series, isAuthor }) {
                 <>
                     <Link
                         href={`/dashboard/new-chapter/${series.id}`}
-                        className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                        className="series-action-btn series-action-primary"
                     >
-                        <Plus size={18} className="mr-2" />
-                        <span className="font-medium">Adicionar Capítulo</span>
+                        <Plus size={18} />
+                        <span>Adicionar Capítulo</span>
                     </Link>
 
                     <Link
                         href={`/dashboard/edit-series/${series.id}`}
-                        className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 hover:text-purple-600 transition-colors"
+                        className="series-action-btn series-action-secondary"
                     >
-                        <Edit size={18} className="mr-2" />
-                        <span className="font-medium">Editar Série</span>
+                        <Edit size={18} />
+                        <span>Editar Série</span>
                     </Link>
 
                     <button
                         onClick={handleDelete}
                         disabled={deleting}
-                        className={`inline-flex items-center px-4 py-2 rounded-md transition-colors ${
-                            deleting 
-                            ? "bg-red-200 text-red-800 cursor-not-allowed" 
-                            : "bg-red-600 text-white hover:bg-red-700"
-                        }`}
+                        className="series-action-btn series-action-danger"
                     >
-                        <Trash2 size={18} className="mr-2" />
-                        <span className="font-medium">{deleting ? "Excluindo..." : "Excluir"}</span>
+                        <Trash2 size={18} />
+                        <span>{deleting ? "Excluindo..." : "Excluir"}</span>
                     </button>
                 </>
             )}
 
-            {error && <div className="w-full mt-4 p-3 bg-red-100 text-red-700 rounded-md">{error}</div>}
+            {error && <div className="error-message">{error}</div>}
         </div>
     );
 }

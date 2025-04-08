@@ -2,7 +2,7 @@ import Link from "next/link";
 import Comments from "@/components/Comments";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import StoryContent from "@/components/StoryContent";
-import { ArrowLeft, ArrowRight, BookOpen, ListOrdered, User, Calendar } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, ListOrdered } from "lucide-react";
 import Script from "next/script";
 import { extractIdFromSlug, generateSlug } from "@/lib/utils";
 
@@ -58,12 +58,12 @@ export default async function ChapterPage({ params }) {
     if (error) {
         console.error(`Erro ao buscar capítulo com ID '${id}':`, error?.message);
         return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-md mb-4">
+            <div className="content-wrapper">
+                <div className="message-banner error">
                     Capítulo não encontrado.
                 </div>
                 <div className="text-center mt-4">
-                    <Link href="/series" className="inline-flex items-center px-4 py-2 bg-[#484DB5] text-white rounded-md hover:bg-[#3a3e9f] transition-colors">
+                    <Link href="/series" className="btn primary">
                         Voltar para séries
                     </Link>
                 </div>
@@ -74,12 +74,12 @@ export default async function ChapterPage({ params }) {
     if (!chapter) {
         console.error(`Capítulo não encontrado para o ID: '${id}'`);
         return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-md mb-4">
+            <div className="content-wrapper">
+                <div className="message-banner error">
                     Capítulo não encontrado.
                 </div>
                 <div className="text-center mt-4">
-                    <Link href="/series" className="inline-flex items-center px-4 py-2 bg-[#484DB5] text-white rounded-md hover:bg-[#3a3e9f] transition-colors">
+                    <Link href="/series" className="btn primary">
                         Voltar para séries
                     </Link>
                 </div>
@@ -138,7 +138,7 @@ export default async function ChapterPage({ params }) {
     };
 
     return (
-        <div className="container mx-auto px-4 py-4 md:py-8">
+        <div className="chapter-page">
             {/* Script para incrementar a contagem de visualização do lado do cliente */}
             <Script id="increment-view">{`
                 (async function() {
@@ -153,124 +153,102 @@ export default async function ChapterPage({ params }) {
                 })();
             `}</Script>
             
-            <div className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] mb-6">
-                {/* Barra de navegação superior */}
-                <div className="flex justify-between items-center p-3 border-b border-[#E5E7EB] bg-gray-50">
-                    <Link 
-                        href={`/series/${generateSlug(series.title, chapter.series_id)}`} 
-                        className="flex items-center text-gray-600 hover:text-[#484DB5] transition-colors"
+            <div className="chapter-navbar">
+                <Link href={`/series/${generateSlug(series.title, chapter.series_id)}`} className="chapter-series-link">
+                    <ArrowLeft size={16} />
+                    <span>{series.title}</span>
+                </Link>
+                
+                <div className="chapter-nav-controls">
+                    {prevChapter ? (
+                        <Link
+                            href={`/chapter/${generateSlug(prevChapter.title, prevChapter.id)}`}
+                            className="chapter-nav-link prev"
+                            title={`Capítulo ${prevChapter.chapter_number}: ${prevChapter.title}`}
+                        >
+                            <ArrowLeft size={16} />
+                            <span>Cap. {prevChapter.chapter_number}</span>
+                        </Link>
+                    ) : (
+                        <span className="chapter-nav-link disabled">
+                            <ArrowLeft size={16} />
+                            <span>Primeiro</span>
+                        </span>
+                    )}
+                    
+                    <Link
+                        href={`/series/${generateSlug(series.title, chapter.series_id)}`}
+                        className="chapter-nav-link"
+                        title="Ver todos os capítulos"
                     >
-                        <ArrowLeft size={16} className="mr-1" />
-                        <span className="font-medium">Voltar para a série</span>
+                        <ListOrdered size={16} />
+                        <span>Índice</span>
                     </Link>
                     
-                    <div className="flex items-center space-x-2">
-                        {prevChapter ? (
-                            <Link
-                                href={`/chapter/${generateSlug(prevChapter.title, prevChapter.id)}`}
-                                className="flex items-center px-2 py-1 text-sm text-gray-600 hover:text-[#484DB5] transition-colors"
-                                title={`Capítulo ${prevChapter.chapter_number}: ${prevChapter.title}`}
-                            >
-                                <ArrowLeft size={14} className="mr-1" />
-                                <span>Cap. {prevChapter.chapter_number}</span>
-                            </Link>
-                        ) : (
-                            <span className="flex items-center px-2 py-1 text-sm text-gray-400 cursor-not-allowed">
-                                <ArrowLeft size={14} className="mr-1" />
-                                <span>Primeiro</span>
-                            </span>
-                        )}
-                        
+                    {nextChapter ? (
                         <Link
-                            href={`/series/${generateSlug(series.title, chapter.series_id)}`}
-                            className="flex items-center px-2 py-1 text-sm text-gray-600 hover:text-[#484DB5] transition-colors"
-                            title="Ver todos os capítulos"
+                            href={`/chapter/${generateSlug(nextChapter.title, nextChapter.id)}`}
+                            className="chapter-nav-link next"
+                            title={`Capítulo ${nextChapter.chapter_number}: ${nextChapter.title}`}
                         >
-                            <ListOrdered size={14} className="mr-1" />
-                            <span>Índice</span>
+                            <span>Cap. {nextChapter.chapter_number}</span>
+                            <ArrowRight size={16} />
                         </Link>
-                        
-                        {nextChapter ? (
-                            <Link
-                                href={`/chapter/${generateSlug(nextChapter.title, nextChapter.id)}`}
-                                className="flex items-center px-2 py-1 text-sm text-gray-600 hover:text-[#484DB5] transition-colors"
-                                title={`Capítulo ${nextChapter.chapter_number}: ${nextChapter.title}`}
-                            >
-                                <span>Cap. {nextChapter.chapter_number}</span>
-                                <ArrowRight size={14} className="ml-1" />
-                            </Link>
-                        ) : (
-                            <span className="flex items-center px-2 py-1 text-sm text-gray-400 cursor-not-allowed">
-                                <span>Último</span>
-                                <ArrowRight size={14} className="ml-1" />
-                            </span>
-                        )}
-                    </div>
+                    ) : (
+                        <span className="chapter-nav-link disabled">
+                            <span>Último</span>
+                            <ArrowRight size={16} />
+                        </span>
+                    )}
                 </div>
-                
-                {/* Cabeçalho do capítulo */}
-                <div className="p-6 border-b border-[#E5E7EB]">
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+            </div>
+            
+            <div className="chapter-container">
+                <div className="chapter-header">
+                    <h1 className="chapter-title">
                         Capítulo {chapter.chapter_number}: {chapter.title}
                     </h1>
-                    <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                        <span className="flex items-center">
-                            <User size={16} className="mr-1" />
-                            Por {author.username}
-                        </span>
-                        <span className="flex items-center">
-                            <Calendar size={16} className="mr-1" />
-                            {formatDate(chapter.created_at)}
-                        </span>
+                    <div className="chapter-meta">
+                        <span className="chapter-author">Por {author.username}</span>
+                        <span className="chapter-date">{formatDate(chapter.created_at)}</span>
                     </div>
                 </div>
 
-                {/* Conteúdo do capítulo */}
-                <div className="p-6 md:p-8 prose prose-lg max-w-none">
+                <div className="chapter-content">
                     <StoryContent content={chapter.content} />
                 </div>
 
-                {/* Navegação inferior */}
-                <div className="px-6 py-4 border-t border-[#E5E7EB] flex flex-col md:flex-row gap-4 justify-between">
-                    <div className="w-full md:w-auto">
-                        {prevChapter && (
-                            <Link
-                                href={`/chapter/${generateSlug(prevChapter.title, prevChapter.id)}`}
-                                className="w-full md:w-auto inline-flex items-center px-4 py-2 bg-white border border-[#E5E7EB] text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
-                            >
-                                <ArrowLeft size={16} className="mr-2" />
-                                <span className="truncate">Capítulo {prevChapter.chapter_number}: {prevChapter.title}</span>
-                            </Link>
-                        )}
-                    </div>
+                <div className="chapter-navigation-bottom">
+                    {prevChapter && (
+                        <Link
+                            href={`/chapter/${generateSlug(prevChapter.title, prevChapter.id)}`}
+                            className="chapter-nav-button prev"
+                        >
+                            <ArrowLeft size={16} />
+                            <span>Capítulo {prevChapter.chapter_number}: {prevChapter.title}</span>
+                        </Link>
+                    )}
 
-                    <div className="w-full md:w-auto text-right">
-                        {nextChapter && (
-                            <Link
-                                href={`/chapter/${generateSlug(nextChapter.title, nextChapter.id)}`}
-                                className="w-full md:w-auto inline-flex items-center justify-center md:justify-start px-4 py-2 bg-[#484DB5] text-white rounded-md hover:bg-[#3a3e9f] transition-colors"
-                            >
-                                <span className="truncate">Capítulo {nextChapter.chapter_number}: {nextChapter.title}</span>
-                                <ArrowRight size={16} className="ml-2" />
-                            </Link>
-                        )}
-                    </div>
+                    {nextChapter && (
+                        <Link
+                            href={`/chapter/${generateSlug(nextChapter.title, nextChapter.id)}`}
+                            className="chapter-nav-button next"
+                        >
+                            <span>Capítulo {nextChapter.chapter_number}: {nextChapter.title}</span>
+                            <ArrowRight size={16} />
+                        </Link>
+                    )}
                 </div>
-                
-                <div className="px-6 py-4 text-center border-t border-[#E5E7EB] bg-gray-50">
-                    <Link 
-                        href={`/series/${generateSlug(series.title, chapter.series_id)}`} 
-                        className="inline-flex items-center text-[#484DB5] hover:text-[#3a3e9f] transition-colors"
-                    >
-                        <ListOrdered size={16} className="mr-2" />
-                        <span>Ver todos os capítulos</span>
-                    </Link>
-                </div>
-            </div>
 
-            {/* Comentários */}
-            <div className="mb-8">
-                <Comments contentId={id} contentType="chapter" userId={userId} />
+                <Link href={`/series/${generateSlug(series.title, chapter.series_id)}`} className="view-all-chapters">
+                    <ListOrdered size={16} />
+                    <span>Ver todos os capítulos</span>
+                </Link>
+
+                <div className="chapter-comments">
+                    <h3 className="comments-title">Comentários</h3>
+                    <Comments contentId={id} contentType="chapter" userId={userId} />
+                </div>
             </div>
         </div>
     );

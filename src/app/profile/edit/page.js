@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import { 
     User, 
@@ -14,8 +13,7 @@ import {
     Upload, 
     Info, 
     CheckCircle, 
-    AlertCircle,
-    ArrowLeft
+    AlertCircle
 } from "lucide-react";
 
 export default function EditProfilePage() {
@@ -168,67 +166,29 @@ export default function EditProfilePage() {
             let finalAvatarUrl = avatarUrl;
             if (avatarFile) {
                 try {
-                    // Detectar se é um dispositivo móvel
-                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-                        typeof navigator !== 'undefined' ? navigator.userAgent : ''
-                    );
-                    
                     // Criar nome de arquivo único
                     const fileExt = avatarFile.name.split(".").pop();
                     const fileName = `${user.id}-${Math.random()
                         .toString(36)
                         .substring(2)}.${fileExt}`;
-                    
-                    let uploadSuccess = false;
-                    
-                    // Em dispositivos móveis, usar a API de proxy
-                    if (isMobile) {
-                        console.log("Detectado dispositivo móvel, usando API de upload");
-                        
-                        const formData = new FormData();
-                        formData.append("file", avatarFile);
-                        formData.append("userId", user.id);
-                        
-                        const response = await fetch("/api/upload", {
-                            method: "POST",
-                            body: formData,
-                        });
-                        
-                        if (response.ok) {
-                            const result = await response.json();
-                            finalAvatarUrl = result.url;
-                            uploadSuccess = true;
-                        } else {
-                            const errorData = await response.json();
-                            throw new Error(errorData.error || "Erro no upload via API");
-                        }
-                    } 
-                    
-                    // Em desktop ou se a API falhar, usar o método direto
-                    if (!isMobile || !uploadSuccess) {
-                        const filePath = `avatars/${fileName}`;
-                        
-                        // Upload para o Storage
-                        const { error: uploadError } = await supabase.storage
-                            .from("mobile")
-                            .upload(filePath, avatarFile, {
-                                cacheControl: '3600',
-                                upsert: true,
-                                contentType: avatarFile.type
-                            });
+                    const filePath = `avatars/${fileName}`;
 
-                        if (uploadError) {
-                            console.error("Erro no upload direto:", uploadError);
-                            throw uploadError;
-                        }
+                    // Upload para o Storage
+                    const { error: uploadError } = await supabase.storage
+                        .from("avatars")
+                        .upload(filePath, avatarFile);
 
-                        // Obter URL pública
-                        const { data } = supabase.storage
-                            .from("mobile")
-                            .getPublicUrl(filePath);
-
-                        finalAvatarUrl = data.publicUrl;
+                    if (uploadError) {
+                        console.error("Erro no upload:", uploadError);
+                        throw uploadError;
                     }
+
+                    // Obter URL pública
+                    const { data } = supabase.storage
+                        .from("avatars")
+                        .getPublicUrl(filePath);
+
+                    finalAvatarUrl = data.publicUrl;
                 } catch (uploadErr) {
                     console.error("Erro no upload do avatar:", uploadErr);
                     // Se houver erro no upload, manter a URL atual
@@ -282,14 +242,8 @@ export default function EditProfilePage() {
     return (
         <div className="edit-profile-page">
             <div className="edit-profile-header">
-                <Link href={`/profile/${username}`} className="back-link">
-                    <ArrowLeft size={18} />
-                    <span>Voltar ao perfil</span>
-                </Link>
                 <h1>Editar Perfil</h1>
-                <p className="edit-profile-subheading">
-                    Atualize suas informações pessoais e links de redes sociais
-                </p>
+                <p className="edit-profile-subheading">Atualize suas informações pessoais e links de redes sociais</p>
             </div>
 
             {error && (

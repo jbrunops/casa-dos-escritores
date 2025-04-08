@@ -33,19 +33,19 @@ export default function TipTapEditor({
             StarterKit.configure({
                 paragraph: {
                     HTMLAttributes: {
-                        class: "my-4",
+                        class: "paragraph",
                     },
                 },
                 blockquote: {
                     HTMLAttributes: {
-                        class: "border-l-4 border-[#E5E7EB] pl-4 italic my-4",
+                        class: "", // Permite adicionar classes personalizadas
                     },
                 },
             }),
             Underline,
             Placeholder.configure({
                 placeholder,
-                emptyEditorClass: "before:content-[attr(data-placeholder)] before:text-gray-400 before:float-left before:pointer-events-none",
+                emptyEditorClass: "is-editor-empty",
             }),
             Typography,
             TextAlign.configure({
@@ -55,12 +55,12 @@ export default function TipTapEditor({
                 openOnClick: true,
                 HTMLAttributes: {
                     rel: "noopener noreferrer",
-                    class: "text-[#484DB5] underline hover:text-[#383aa3]",
+                    class: "text-link",
                 },
             }),
             Image.configure({
                 HTMLAttributes: {
-                    class: "max-w-full h-auto rounded-md my-4",
+                    class: "editor-image",
                 },
             }),
             // Nova extensão para suporte a atributos personalizados em blockquote
@@ -87,7 +87,7 @@ export default function TipTapEditor({
         },
         editorProps: {
             attributes: {
-                class: "prose max-w-none focus:outline-none font-sans p-4",
+                class: "prose medium-style focus:outline-none font-poppins p-4",
             },
         },
     });
@@ -161,7 +161,7 @@ export default function TipTapEditor({
     // Renderização do editor com base no modo selecionado
     const renderEditor = () => {
         return (
-            <div className="w-full h-full bg-white">
+            <div className="editor-content medium-content">
                 <EditorContent editor={editor} spellCheck={spellCheck} />
             </div>
         );
@@ -171,7 +171,7 @@ export default function TipTapEditor({
     const renderPreview = () => {
         return (
             <div
-                className="w-full h-full p-4 bg-white prose max-w-none overflow-auto"
+                className="preview-content medium-story story-content prose medium-content"
                 dangerouslySetInnerHTML={{ __html: editor.getHTML() }}
             />
         );
@@ -195,50 +195,22 @@ export default function TipTapEditor({
     };
 
     return (
-        <div className="w-full border border-[#E5E7EB] rounded-md shadow-sm bg-white">
-            <div className="flex flex-wrap items-center gap-1 p-2 border-b border-[#E5E7EB] bg-gray-50">
-                <div className="flex space-x-1 mr-3 border-r border-[#E5E7EB] pr-3">
+        <div className="editor-container medium-style">
+            <div className="editor-toolbar">
+                <div className="toolbar-group">
                     <button
                         type="button"
-                        onClick={() => editor.chain().focus().toggleBold().run()}
-                        className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-                            editor.isActive("bold") ? "bg-gray-200 text-[#484DB5]" : "text-gray-700"
-                        }`}
-                        title="Negrito"
-                        disabled={viewMode === "preview"}
-                    >
-                        <span className="font-bold">B</span>
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => editor.chain().focus().toggleItalic().run()}
-                        className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-                            editor.isActive("italic") ? "bg-gray-200 text-[#484DB5]" : "text-gray-700"
-                        }`}
-                        title="Itálico"
-                        disabled={viewMode === "preview"}
-                    >
-                        <span className="italic">I</span>
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => editor.chain().focus().toggleUnderline().run()}
-                        className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-                            editor.isActive("underline") ? "bg-gray-200 text-[#484DB5]" : "text-gray-700"
-                        }`}
-                        title="Sublinhado"
-                        disabled={viewMode === "preview"}
-                    >
-                        <span className="underline">U</span>
-                    </button>
-                </div>
-
-                <div className="flex space-x-1 mr-3 border-r border-[#E5E7EB] pr-3">
-                    <button
-                        type="button"
-                        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-                        className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-                            editor.isActive("heading", { level: 1 }) ? "bg-gray-200 text-[#484DB5]" : "text-gray-700"
+                        onClick={() =>
+                            editor
+                                .chain()
+                                .focus()
+                                .toggleHeading({ level: 1 })
+                                .run()
+                        }
+                        className={`toolbar-button ${
+                            editor.isActive("heading", { level: 1 })
+                                ? "is-active"
+                                : ""
                         }`}
                         title="Título 1"
                         disabled={viewMode === "preview"}
@@ -247,34 +219,88 @@ export default function TipTapEditor({
                     </button>
                     <button
                         type="button"
-                        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                        className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-                            editor.isActive("heading", { level: 2 }) ? "bg-gray-200 text-[#484DB5]" : "text-gray-700"
+                        onClick={() =>
+                            editor
+                                .chain()
+                                .focus()
+                                .toggleHeading({ level: 2 })
+                                .run()
+                        }
+                        className={`toolbar-button ${
+                            editor.isActive("heading", { level: 2 })
+                                ? "is-active"
+                                : ""
                         }`}
                         title="Título 2"
                         disabled={viewMode === "preview"}
                     >
                         H2
                     </button>
+                </div>
+
+                <div className="toolbar-group">
                     <button
                         type="button"
-                        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-                        className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-                            editor.isActive("heading", { level: 3 }) ? "bg-gray-200 text-[#484DB5]" : "text-gray-700"
+                        onClick={() =>
+                            editor.chain().focus().toggleBold().run()
+                        }
+                        className={`toolbar-button ${
+                            editor.isActive("bold") ? "is-active" : ""
                         }`}
-                        title="Título 3"
+                        title="Negrito"
                         disabled={viewMode === "preview"}
                     >
-                        H3
+                        <span className="font-bold">B</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() =>
+                            editor.chain().focus().toggleItalic().run()
+                        }
+                        className={`toolbar-button ${
+                            editor.isActive("italic") ? "is-active" : ""
+                        }`}
+                        title="Itálico"
+                        disabled={viewMode === "preview"}
+                    >
+                        <span className="italic">I</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() =>
+                            editor.chain().focus().toggleUnderline().run()
+                        }
+                        className={`toolbar-button ${
+                            editor.isActive("underline") ? "is-active" : ""
+                        }`}
+                        title="Sublinhado"
+                        disabled={viewMode === "preview"}
+                    >
+                        <span className="underline">U</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() =>
+                            editor.chain().focus().toggleStrike().run()
+                        }
+                        className={`toolbar-button ${
+                            editor.isActive("strike") ? "is-active" : ""
+                        }`}
+                        title="Tachado"
+                        disabled={viewMode === "preview"}
+                    >
+                        <span className="line-through">S</span>
                     </button>
                 </div>
 
-                <div className="flex space-x-1 mr-3 border-r border-[#E5E7EB] pr-3">
+                <div className="toolbar-group">
                     <button
                         type="button"
-                        onClick={() => editor.chain().focus().toggleBulletList().run()}
-                        className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-                            editor.isActive("bulletList") ? "bg-gray-200 text-[#484DB5]" : "text-gray-700"
+                        onClick={() =>
+                            editor.chain().focus().toggleBulletList().run()
+                        }
+                        className={`toolbar-button ${
+                            editor.isActive("bulletList") ? "is-active" : ""
                         }`}
                         title="Lista com marcadores"
                         disabled={viewMode === "preview"}
@@ -283,9 +309,11 @@ export default function TipTapEditor({
                     </button>
                     <button
                         type="button"
-                        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                        className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-                            editor.isActive("orderedList") ? "bg-gray-200 text-[#484DB5]" : "text-gray-700"
+                        onClick={() =>
+                            editor.chain().focus().toggleOrderedList().run()
+                        }
+                        className={`toolbar-button ${
+                            editor.isActive("orderedList") ? "is-active" : ""
                         }`}
                         title="Lista numerada"
                         disabled={viewMode === "preview"}
@@ -294,9 +322,11 @@ export default function TipTapEditor({
                     </button>
                     <button
                         type="button"
-                        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                        className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-                            editor.isActive("blockquote") ? "bg-gray-200 text-[#484DB5]" : "text-gray-700"
+                        onClick={() =>
+                            editor.chain().focus().toggleBlockquote().run()
+                        }
+                        className={`toolbar-button ${
+                            editor.isActive("blockquote") ? "is-active" : ""
                         }`}
                         title="Citação"
                         disabled={viewMode === "preview"}
@@ -305,12 +335,16 @@ export default function TipTapEditor({
                     </button>
                 </div>
 
-                <div className="flex space-x-1 mr-3 border-r border-[#E5E7EB] pr-3">
+                <div className="toolbar-group">
                     <button
                         type="button"
-                        onClick={() => editor.chain().focus().setTextAlign("left").run()}
-                        className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-                            editor.isActive({ textAlign: "left" }) ? "bg-gray-200 text-[#484DB5]" : "text-gray-700"
+                        onClick={() =>
+                            editor.chain().focus().setTextAlign("left").run()
+                        }
+                        className={`toolbar-button ${
+                            editor.isActive({ textAlign: "left" })
+                                ? "is-active"
+                                : ""
                         }`}
                         title="Alinhar à esquerda"
                         disabled={viewMode === "preview"}
@@ -319,9 +353,13 @@ export default function TipTapEditor({
                     </button>
                     <button
                         type="button"
-                        onClick={() => editor.chain().focus().setTextAlign("center").run()}
-                        className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-                            editor.isActive({ textAlign: "center" }) ? "bg-gray-200 text-[#484DB5]" : "text-gray-700"
+                        onClick={() =>
+                            editor.chain().focus().setTextAlign("center").run()
+                        }
+                        className={`toolbar-button ${
+                            editor.isActive({ textAlign: "center" })
+                                ? "is-active"
+                                : ""
                         }`}
                         title="Centralizar"
                         disabled={viewMode === "preview"}
@@ -330,24 +368,45 @@ export default function TipTapEditor({
                     </button>
                     <button
                         type="button"
-                        onClick={() => editor.chain().focus().setTextAlign("right").run()}
-                        className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-                            editor.isActive({ textAlign: "right" }) ? "bg-gray-200 text-[#484DB5]" : "text-gray-700"
+                        onClick={() =>
+                            editor.chain().focus().setTextAlign("right").run()
+                        }
+                        className={`toolbar-button ${
+                            editor.isActive({ textAlign: "right" })
+                                ? "is-active"
+                                : ""
                         }`}
                         title="Alinhar à direita"
                         disabled={viewMode === "preview"}
                     >
                         →
                     </button>
+                    <button
+                        type="button"
+                        onClick={() =>
+                            editor.chain().focus().setTextAlign("justify").run()
+                        }
+                        className={`toolbar-button ${
+                            editor.isActive({ textAlign: "justify" })
+                                ? "is-active"
+                                : ""
+                        }`}
+                        title="Justificar"
+                        disabled={viewMode === "preview"}
+                    >
+                        ↔↔
+                    </button>
                 </div>
 
-                <div className="flex space-x-1 mr-3 border-r border-[#E5E7EB] pr-3">
-                    <div className="relative">
+                <div className="toolbar-divider"></div>
+
+                <div className="toolbar-group">
+                    <div className="dropdown">
                         <button
                             type="button"
                             onClick={() => setShowLinkMenu(!showLinkMenu)}
-                            className={`p-2 rounded hover:bg-gray-200 transition-colors flex items-center ${
-                                editor.isActive("link") ? "bg-gray-200 text-[#484DB5]" : "text-gray-700"
+                            className={`toolbar-button ${
+                                editor.isActive("link") ? "is-active" : ""
                             }`}
                             title="Adicionar link"
                             disabled={viewMode === "preview"}
@@ -355,28 +414,32 @@ export default function TipTapEditor({
                             🔗 Link
                         </button>
                         {showLinkMenu && (
-                            <div className="absolute left-0 top-full mt-2 w-64 bg-white border border-[#E5E7EB] rounded shadow-lg z-10 p-3">
-                                <div className="space-y-2">
+                            <div className="dropdown-menu">
+                                <div className="link-menu">
                                     <input
                                         type="url"
                                         placeholder="https://exemplo.com"
                                         value={linkUrl}
-                                        onChange={(e) => setLinkUrl(e.target.value)}
-                                        className="w-full p-2 border border-[#E5E7EB] rounded"
+                                        onChange={(e) =>
+                                            setLinkUrl(e.target.value)
+                                        }
+                                        className="link-input"
                                     />
-                                    <div className="flex justify-between space-x-2">
+                                    <div className="link-buttons">
                                         <button
                                             type="button"
                                             onClick={addLink}
-                                            className="bg-[#484DB5] text-white px-3 py-1 rounded hover:bg-[#383aa3] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                            className="link-button"
                                             disabled={!linkUrl}
                                         >
                                             Adicionar
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => setShowLinkMenu(false)}
-                                            className="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 transition-colors"
+                                            onClick={() =>
+                                                setShowLinkMenu(false)
+                                            }
+                                            className="link-button cancel"
                                         >
                                             Cancelar
                                         </button>
@@ -390,7 +453,7 @@ export default function TipTapEditor({
                         <button
                             type="button"
                             onClick={removeLink}
-                            className="p-2 rounded hover:bg-gray-200 transition-colors text-gray-700"
+                            className="toolbar-button"
                             title="Remover link"
                             disabled={viewMode === "preview"}
                         >
@@ -398,39 +461,43 @@ export default function TipTapEditor({
                         </button>
                     )}
 
-                    <div className="relative">
+                    <div className="dropdown">
                         <button
                             type="button"
                             onClick={() => setShowImageMenu(!showImageMenu)}
-                            className="p-2 rounded hover:bg-gray-200 transition-colors text-gray-700 flex items-center"
+                            className="toolbar-button"
                             title="Adicionar imagem"
                             disabled={viewMode === "preview"}
                         >
                             🖼️ Imagem
                         </button>
                         {showImageMenu && (
-                            <div className="absolute left-0 top-full mt-2 w-64 bg-white border border-[#E5E7EB] rounded shadow-lg z-10 p-3">
-                                <div className="space-y-2">
+                            <div className="dropdown-menu">
+                                <div className="link-menu">
                                     <input
                                         type="url"
                                         placeholder="https://example.com/imagem.jpg"
                                         value={imageUrl}
-                                        onChange={(e) => setImageUrl(e.target.value)}
-                                        className="w-full p-2 border border-[#E5E7EB] rounded"
+                                        onChange={(e) =>
+                                            setImageUrl(e.target.value)
+                                        }
+                                        className="link-input"
                                     />
-                                    <div className="flex justify-between space-x-2">
+                                    <div className="link-buttons">
                                         <button
                                             type="button"
                                             onClick={addImage}
-                                            className="bg-[#484DB5] text-white px-3 py-1 rounded hover:bg-[#383aa3] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                            className="link-button"
                                             disabled={!imageUrl}
                                         >
                                             Adicionar
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => setShowImageMenu(false)}
-                                            className="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 transition-colors"
+                                            onClick={() =>
+                                                setShowImageMenu(false)
+                                            }
+                                            className="link-button cancel"
                                         >
                                             Cancelar
                                         </button>
@@ -441,61 +508,68 @@ export default function TipTapEditor({
                     </div>
                 </div>
 
-                <div className="flex space-x-1 mr-3 border-r border-[#E5E7EB] pr-3">
+                {/* Botão para verificação ortográfica */}
+                <div className="toolbar-divider"></div>
+                <div className="toolbar-group">
                     <button
                         type="button"
                         onClick={() => setSpellCheck(!spellCheck)}
-                        className={`p-2 rounded hover:bg-gray-200 transition-colors flex items-center ${
-                            spellCheck ? "bg-gray-200 text-[#484DB5]" : "text-gray-700"
+                        className={`toolbar-button ${
+                            spellCheck ? "is-active" : ""
                         }`}
-                        title={spellCheck ? "Desativar verificação ortográfica" : "Ativar verificação ortográfica"}
+                        title={
+                            spellCheck
+                                ? "Desativar verificação ortográfica"
+                                : "Ativar verificação ortográfica"
+                        }
                         disabled={viewMode === "preview"}
                     >
                         <span>ABC</span>
-                        <span className={spellCheck ? "text-green-500 ml-1" : "text-gray-400 ml-1"}>
+                        <span
+                            className={
+                                spellCheck ? "check-active" : "check-inactive"
+                            }
+                        >
                             ✓
                         </span>
                     </button>
                 </div>
 
-                <div className="flex ml-auto">
+                <div className="toolbar-divider"></div>
+
+                {/* Botões de modo de visualização */}
+                <div className="view-mode-buttons">
                     <button
                         type="button"
                         onClick={() => toggleViewMode("edit")}
-                        className={`flex items-center p-2 rounded ${
-                            viewMode === "edit" 
-                            ? "bg-[#f0f1ff] text-[#484DB5]" 
-                            : "text-gray-700 hover:bg-gray-200"
-                        } transition-colors mr-1`}
+                        className={`view-mode-button ${
+                            viewMode === "edit" ? "active" : ""
+                        }`}
                         title="Modo de edição"
                     >
-                        <Edit2 size={16} className="mr-1" />
+                        <Edit2 size={16} />
                         <span>Editar</span>
                     </button>
                     <button
                         type="button"
                         onClick={() => toggleViewMode("preview")}
-                        className={`flex items-center p-2 rounded ${
-                            viewMode === "preview" 
-                            ? "bg-[#f0f1ff] text-[#484DB5]" 
-                            : "text-gray-700 hover:bg-gray-200"
-                        } transition-colors mr-1`}
+                        className={`view-mode-button ${
+                            viewMode === "preview" ? "active" : ""
+                        }`}
                         title="Visualização prévia"
                     >
-                        <Eye size={16} className="mr-1" />
+                        <Eye size={16} />
                         <span>Visualizar</span>
                     </button>
                     <button
                         type="button"
                         onClick={() => toggleViewMode("split")}
-                        className={`flex items-center p-2 rounded ${
-                            viewMode === "split" 
-                            ? "bg-[#f0f1ff] text-[#484DB5]" 
-                            : "text-gray-700 hover:bg-gray-200"
-                        } transition-colors`}
+                        className={`view-mode-button ${
+                            viewMode === "split" ? "active" : ""
+                        }`}
                         title="Visualização dividida"
                     >
-                        <Columns size={16} className="mr-1" />
+                        <Columns size={16} />
                         <span>Dividido</span>
                     </button>
                 </div>
@@ -516,14 +590,14 @@ export default function TipTapEditor({
                         // Exibir o menu de bolha apenas quando texto for selecionado e estiver no modo de edição
                         return from !== to && viewMode !== "preview";
                     }}
-                    className="flex bg-white rounded shadow-md border border-[#E5E7EB] overflow-hidden"
+                    className="bubble-menu"
                 >
                     <button
                         onClick={() =>
                             editor.chain().focus().toggleBold().run()
                         }
-                        className={`p-1.5 ${
-                            editor.isActive("bold") ? "bg-gray-100 text-[#484DB5]" : "text-gray-700 hover:bg-gray-100"
+                        className={`bubble-button ${
+                            editor.isActive("bold") ? "is-active" : ""
                         }`}
                     >
                         <span className="font-bold">B</span>
@@ -532,8 +606,8 @@ export default function TipTapEditor({
                         onClick={() =>
                             editor.chain().focus().toggleItalic().run()
                         }
-                        className={`p-1.5 ${
-                            editor.isActive("italic") ? "bg-gray-100 text-[#484DB5]" : "text-gray-700 hover:bg-gray-100"
+                        className={`bubble-button ${
+                            editor.isActive("italic") ? "is-active" : ""
                         }`}
                     >
                         <span className="italic">I</span>
@@ -542,20 +616,38 @@ export default function TipTapEditor({
                         onClick={() =>
                             editor.chain().focus().toggleUnderline().run()
                         }
-                        className={`p-1.5 ${
-                            editor.isActive("underline") ? "bg-gray-100 text-[#484DB5]" : "text-gray-700 hover:bg-gray-100"
+                        className={`bubble-button ${
+                            editor.isActive("underline") ? "is-active" : ""
                         }`}
                     >
                         <span className="underline">U</span>
                     </button>
+                    <button
+                        onClick={() => {
+                            const url = window.prompt("Digite a URL do link:");
+                            if (url) {
+                                editor
+                                    .chain()
+                                    .focus()
+                                    .extendMarkRange("link")
+                                    .setLink({ href: url })
+                                    .run();
+                            }
+                        }}
+                        className={`bubble-button ${
+                            editor.isActive("link") ? "is-active" : ""
+                        }`}
+                    >
+                        🔗
+                    </button>
                 </BubbleMenu>
             )}
 
-            <div className={`${viewMode === "split" ? "flex border-t border-[#E5E7EB]" : ""}`}>
+            <div className={`editor-preview-container ${viewMode}`}>
                 {(viewMode === "edit" || viewMode === "split") && (
                     <div
-                        className={`${
-                            viewMode === "split" ? "w-1/2 border-r border-[#E5E7EB]" : "w-full"
+                        className={`editor-pane ${
+                            viewMode === "split" ? "split" : ""
                         }`}
                     >
                         {renderEditor()}
@@ -564,8 +656,8 @@ export default function TipTapEditor({
 
                 {(viewMode === "preview" || viewMode === "split") && (
                     <div
-                        className={`${
-                            viewMode === "split" ? "w-1/2" : "w-full"
+                        className={`preview-pane ${
+                            viewMode === "split" ? "split" : ""
                         }`}
                     >
                         {renderPreview()}
@@ -573,15 +665,9 @@ export default function TipTapEditor({
                 )}
             </div>
 
-            <div className="flex justify-end items-center px-4 py-2 bg-gray-50 border-t border-[#E5E7EB] text-xs text-gray-500">
-                <div className="flex space-x-4">
-                    <span title="Contagem de palavras">
-                        {countWords(editor.getHTML())} palavras
-                    </span>
-                    <span title="Tempo estimado de leitura">
-                        {estimateReadingTime(countWords(editor.getHTML()))} min de leitura
-                    </span>
-                </div>
+            {/* Exibição de estatísticas do texto */}
+            <div className="editor-stats">
+                {/* Estatísticas são exibidas pelo componente pai */}
             </div>
         </div>
     );

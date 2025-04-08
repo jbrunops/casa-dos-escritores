@@ -15,7 +15,6 @@ import {
     Award,
     Calendar 
 } from "lucide-react";
-import Image from "next/image";
 
 export async function generateMetadata({ params }) {
     const username = await Promise.resolve(params.username);
@@ -115,15 +114,30 @@ export default async function ProfilePage({ params }) {
                     {/* Avatar */}
                     <div className="profile-avatar-wrapper">
                         {profile.avatar_url ? (
-                            <Image
-                                src={profile.avatar_url}
-                                alt={`${profile.username} avatar`}
-                                width={112}
-                                height={112}
-                                className="profile-avatar"
-                            />
+                            <div 
+                                className="profile-avatar" 
+                                style={{
+                                    backgroundImage: `url(${profile.avatar_url})`,
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                    width: '150px',
+                                    height: '150px',
+                                    borderRadius: '50%',
+                                    border: '4px solid var(--color-primary)',
+                                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
+                                }}
+                            ></div>
                         ) : (
-                            <div className="avatar-placeholder">
+                            <div 
+                                className="profile-avatar avatar-placeholder"
+                                style={{
+                                    width: '150px',
+                                    height: '150px',
+                                    borderRadius: '50%',
+                                    border: '4px solid var(--color-primary)',
+                                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
+                                }}
+                            >
                                 {profile.username.charAt(0).toUpperCase()}
                             </div>
                         )}
@@ -135,13 +149,15 @@ export default async function ProfilePage({ params }) {
                         
                         {/* Membro desde */}
                         <div className="join-date">
-                            <Clock className="w-4 h-4" />
-                            <span>Entrou em {joinDate}</span>
+                            <Calendar size={16} />
+                            <span>Membro desde {joinDate}</span>
                         </div>
 
                         {/* Bio */}
                         {profile.bio && (
-                            <p className="profile-bio">{profile.bio}</p>
+                            <div className="profile-bio">
+                                <p>{profile.bio}</p>
+                            </div>
                         )}
 
                         {/* Links sociais */}
@@ -149,28 +165,34 @@ export default async function ProfilePage({ params }) {
                             {profile.website_url && (
                                 <a
                                     href={formatUrl(profile.website_url)}
+                                    className="social-link website"
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    aria-label="Website"
                                 >
-                                    <Globe className="w-4 h-4" />
-                                    <span>Site</span>
+                                    <Globe size={18} />
+                                    <span>Website</span>
                                 </a>
                             )}
                             {profile.twitter_url && (
                                 <a
                                     href={formatUrl(profile.twitter_url)}
+                                    className="social-link twitter"
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    aria-label="Twitter"
                                 >
-                                    <Twitter className="w-4 h-4" />
+                                    <Twitter size={18} />
                                     <span>Twitter</span>
                                 </a>
                             )}
                             {profile.facebook_url && (
                                 <a
                                     href={formatUrl(profile.facebook_url)}
+                                    className="social-link facebook"
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    aria-label="Facebook"
                                 >
                                     <Facebook size={18} />
                                     <span>Facebook</span>
@@ -179,10 +201,12 @@ export default async function ProfilePage({ params }) {
                             {profile.instagram_url && (
                                 <a
                                     href={formatUrl(profile.instagram_url)}
+                                    className="social-link instagram"
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    aria-label="Instagram"
                                 >
-                                    <Instagram className="w-4 h-4" />
+                                    <Instagram size={18} />
                                     <span>Instagram</span>
                                 </a>
                             )}
@@ -193,7 +217,7 @@ export default async function ProfilePage({ params }) {
                             <div className="profile-actions">
                                 <Link
                                     href="/profile/edit"
-                                    className="btn-primary"
+                                    className="edit-profile-btn"
                                 >
                                     <Edit size={18} />
                                     <span>Editar Perfil</span>
@@ -201,32 +225,41 @@ export default async function ProfilePage({ params }) {
                             </div>
                         )}
                     </div>
+                </div>
+                
+                {/* Stats Cards */}
+                <div className="profile-stats-cards">
+                    <div className="profile-stat-card">
+                        <div className="stat-card-icon">
+                            <BookText size={24} />
+                        </div>
+                        <div className="stat-card-info">
+                            <div className="stat-card-value">{stories?.length || 0}</div>
+                            <div className="stat-card-label">Histórias</div>
+                        </div>
+                    </div>
                     
-                    {/* Stats Cards */}
-                    <div className="profile-stats-cards">
-                        <div className="profile-stat-card">
-                            <div className="stat-card-info">
-                                <div className="stat-card-value">{stories?.length || 0}</div>
-                                <div className="stat-card-label">Histórias</div>
-                            </div>
+                    <div className="profile-stat-card">
+                        <div className="stat-card-icon">
+                            <Eye size={24} />
                         </div>
-                        
-                        <div className="profile-stat-card">
-                            <div className="stat-card-info">
-                                <div className="stat-card-value">{totalViews}</div>
-                                <div className="stat-card-label">Visualizações</div>
-                            </div>
+                        <div className="stat-card-info">
+                            <div className="stat-card-value">{totalViews}</div>
+                            <div className="stat-card-label">Visualizações</div>
                         </div>
-                        
-                        <div className="profile-stat-card">
-                            <div className="stat-card-info">
-                                <div className="stat-card-value">{favoriteCategory || "-"}</div>
-                                <div className="stat-card-label">Categoria Favorita</div>
-                            </div>
+                    </div>
+                    
+                    <div className="profile-stat-card">
+                        <div className="stat-card-icon">
+                            <Award size={24} />
+                        </div>
+                        <div className="stat-card-info">
+                            <div className="stat-card-value">{favoriteCategory}</div>
+                            <div className="stat-card-label">Categoria Favorita</div>
                         </div>
                     </div>
                 </div>
-                
+
                 {/* Histórias organizadas por categoria */}
                 <div className="profile-content">
                     <div className="profile-content-header">
@@ -289,7 +322,7 @@ export default async function ProfilePage({ params }) {
             <div className="profile-page">
                 <h1>Erro ao carregar perfil</h1>
                 <p>Não foi possível carregar os dados do perfil.</p>
-                <Link href="/" className="btn-primary">
+                <Link href="/" className="btn primary">
                     Voltar para a página inicial
                 </Link>
             </div>

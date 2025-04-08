@@ -1,48 +1,23 @@
 // src/components/SeriesHighlights.js
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createBrowserClient } from "@/lib/supabase-browser";
-import { Book, Eye, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
+import { Book, ChevronRight } from "lucide-react";
 import { generateSlug } from "@/lib/utils";
 
 export default function SeriesHighlights() {
     const [series, setSeries] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const carouselRef = useRef(null);
     const supabase = createBrowserClient();
-
-    // Número de cards visíveis dependendo do tamanho da tela
-    const getVisibleCards = () => {
-        if (typeof window === 'undefined') return 1;
-        if (window.innerWidth < 640) return 1;
-        if (window.innerWidth < 1024) return 2;
-        if (window.innerWidth < 1280) return 3;
-        return 4;
-    };
-
-    const [visibleCards, setVisibleCards] = useState(1);
-
-    useEffect(() => {
-        const handleResize = () => {
-            setVisibleCards(getVisibleCards());
-        };
-        
-        handleResize();
-        window.addEventListener('resize', handleResize);
-        
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
 
     useEffect(() => {
         async function fetchPopularSeries() {
             try {
                 setLoading(true);
-                // Buscar até 10 séries mais visualizadas
+                console.log("Buscando séries populares");
+                // Buscar as 5 séries mais visualizadas
                 const { data, error } = await supabase
                     .from("series")
                     .select(
@@ -53,12 +28,11 @@ export default function SeriesHighlights() {
                         genre,
                         view_count,
                         is_completed,
-                        author_id,
-                        created_at
+                        author_id
                       `
                     )
                     .order("view_count", { ascending: false })
-                    .limit(10);
+                    .limit(5);
 
                 if (error) {
                     console.error("Erro na consulta das séries:", error);
@@ -73,31 +47,72 @@ export default function SeriesHighlights() {
                     return;
                 }
 
-                // Buscar autores e contagem de capítulos
-                const seriesWithDetails = await Promise.all(
+                console.log("Séries encontradas:", data.length);
+
+                // Buscar autores para cada série
+                const seriesWithAuthors = await Promise.all(
                     data.map(async (serie) => {
-                        // Buscar autor
-                        const { data: author } = await supabase
-                            .from("profiles")
-                            .select("username")
-                            .eq("id", serie.author_id)
-                            .single();
+                        try {
+                            const { data: author } = await supabase
+                                .from("profiles")
+                                .select("username")
+                                .eq("id", serie.author_id)
+                                .single();
 
-                        // Buscar contagem de capítulos
-                        const { count } = await supabase
-                            .from("chapters")
-                            .select("*", { count: "exact" })
-                            .eq("series_id", serie.id);
-
-                        return {
-                            ...serie,
-                            author_name: author?.username || "Autor desconhecido",
-                            chapter_count: count || 0,
-                        };
+                            return {
+                                ...serie,
+                                author_name:
+                                    author?.username || "Autor desconhecido",
+                            };
+                        } catch (err) {
+                            console.warn(
+                                "Erro ao buscar autor para série:",
+                                serie.id,
+                                err
+                            );
+                            return {
+                                ...serie,
+                                author_name: "Autor desconhecido",
+                            };
+                        }
                     })
                 );
 
-                setSeries(seriesWithDetails);
+                // Para cada série, buscar contagem de capítulos
+                const seriesWithChapters = await Promise.all(
+                    seriesWithAuthors.map(async (serie) => {
+                        try {
+                            const { count, error: countError } = await supabase
+                                .from("chapters") // Mudado de stories para chapters
+                                .select("*", { count: "exact" })
+                                .eq("series_id", serie.id);
+
+                            if (countError) {
+                                console.warn(
+                                    "Erro ao contar capítulos:",
+                                    countError
+                                );
+                                return {
+                                    ...serie,
+                                    chapter_count: 0,
+                                };
+                            }
+
+                            return {
+                                ...serie,
+                                chapter_count: count || 0,
+                            };
+                        } catch (err) {
+                            console.warn("Exceção ao contar capítulos:", err);
+                            return {
+                                ...serie,
+                                chapter_count: 0,
+                            };
+                        }
+                    })
+                );
+
+                setSeries(seriesWithChapters);
             } catch (error) {
                 console.error("Erro ao buscar séries populares:", error);
                 setSeries([]);
@@ -109,150 +124,84 @@ export default function SeriesHighlights() {
         fetchPopularSeries();
     }, []);
 
-    const nextSlide = () => {
-        if (currentIndex < series.length - visibleCards) {
-            setCurrentIndex(prevIndex => prevIndex + 1);
-        }
-    };
-
-    const prevSlide = () => {
-        if (currentIndex > 0) {
-            setCurrentIndex(prevIndex => prevIndex - 1);
-        }
-    };
-
-    // Formatar contagem em formato legível (ex: 1.2k)
-    const formatCount = (count) => {
-        if (count >= 1000000) {
-            return `${(count / 1000000).toFixed(1).replace('.0', '')}M`;
-        }
-        if (count >= 1000) {
-            return `${(count / 1000).toFixed(1).replace('.0', '')}k`;
-        }
-        return count.toString();
-    };
-
-    // Se está carregando, mostrar spinner
     if (loading) {
         return (
-            <div className="flex items-center justify-center py-12">
-                <div className="w-10 h-10 border-4 border-gray-200 border-t-[#484DB5] rounded-full animate-spin"></div>
+            <div className="series-highlights-loading">
+                <div className="loader-large"></div>
+                <p>Carregando séries populares...</p>
             </div>
         );
     }
 
-    // Se não há séries, não mostrar nada
     if (series.length === 0) {
-        return null;
+        return null; // Não mostrar seção se não houver séries
     }
 
     return (
-        <section className="py-8">
-            <div className="flex items-center justify-between max-w-[75rem] mx-auto px-4 mb-6">
-                <h2 className="text-[1.8rem] font-bold mb-4 relative">
-                    Séries em Destaque
-                    <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
+        <section className="series-highlights-section">
+            <div className="section-header">
+                <h2>
+                    <Book className="section-icon" size={22} />
+                    <span>Séries em Destaque</span>
                 </h2>
-                <Link href="/series" className="flex items-center text-[#484DB5] hover:text-[#7A80FB] font-medium">
+                <Link href="/series" className="view-all-link">
                     <span>Ver Todas</span>
-                    <ChevronRight size={16} className="ml-1" />
+                    <ChevronRight size={16} />
                 </Link>
             </div>
 
-            <div className="series-carousel-container px-4">
-                {currentIndex > 0 && (
-                    <button 
-                        onClick={prevSlide} 
-                        className="carousel-button carousel-button-prev"
-                        aria-label="Anterior"
+            <div className="series-highlights-grid">
+                {series.map((serie) => (
+                    <Link
+                        href={`/series/${generateSlug(serie.title, serie.id)}`}
+                        key={serie.id}
+                        className="series-highlight-card"
                     >
-                        <ChevronLeft size={20} />
-                    </button>
-                )}
-                
-                <div 
-                    className="series-carousel" 
-                    ref={carouselRef}
-                    style={{ 
-                        transform: `translateX(-${currentIndex * (100 / visibleCards)}%)`,
-                        width: `${(series.length / visibleCards) * 100}%` 
-                    }}
-                >
-                    {series.map((serie, index) => (
-                        <Link
-                            key={serie.id}
-                            href={`/series/${generateSlug(serie.title, serie.id)}`}
-                            className="series-card"
-                        >
-                            <div className="series-card-rank">
-                                #{index + 1}
-                            </div>
-                            <div className="series-card-image">
-                                {serie.cover_url ? (
-                                    <img 
-                                        src={serie.cover_url} 
-                                        alt={serie.title} 
-                                        loading="lazy"
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full bg-[#f8f9fe] flex items-center justify-center">
-                                        <span className="text-5xl font-bold text-[#484DB5]">
-                                            {serie.title.charAt(0).toUpperCase()}
-                                        </span>
-                                    </div>
-                                )}
-                                {serie.is_completed && (
-                                    <span className="absolute top-2 right-2 bg-green-500 text-white text-xs font-medium px-2 py-1 rounded">
-                                        Completa
+                        <div className="series-card-image">
+                            {serie.cover_url ? (
+                                <img
+                                    src={serie.cover_url}
+                                    alt={serie.title}
+                                    className="series-cover-image"
+                                />
+                            ) : (
+                                <div className="series-cover-placeholder">
+                                    {serie.title.charAt(0).toUpperCase()}
+                                </div>
+                            )}
+                        </div>
+                        <div className="series-card-content">
+                            <h3 className="series-title">{serie.title}</h3>
+                            <p className="series-author">
+                                por {serie.author_name}
+                            </p>
+                            <div className="series-meta">
+                                <span className="series-chapters">
+                                    {serie.chapter_count}{" "}
+                                    {serie.chapter_count === 1
+                                        ? "capítulo"
+                                        : "capítulos"}
+                                </span>
+                                {serie.genre && (
+                                    <span className="series-genre">
+                                        {serie.genre}
                                     </span>
                                 )}
                             </div>
-                            
-                            <div className="p-4 flex-grow flex flex-col">
-                                <h3 className="text-base font-semibold text-gray-800 mb-1 line-clamp-2">{serie.title}</h3>
-                                <div className="text-xs text-gray-500 mb-1">{serie.author_name}</div>
-                                
-                                {serie.genre && (
-                                    <div className="mb-4">
-                                        <span className="text-xs text-[#484DB5]">
-                                            {serie.genre}
-                                        </span>
-                                    </div>
-                                )}
-                                
-                                <div className="flex justify-between items-center mt-auto text-xs text-gray-600">
-                                    <div className="flex space-x-4">
-                                        <div className="flex items-center">
-                                            <Eye className="w-4 h-4 mr-1" />
-                                            <span>{formatCount(serie.view_count)}</span>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <Book className="w-4 h-4 mr-1" />
-                                            <span>{serie.chapter_count}</span>
-                                        </div>
-                                    </div>
-                                    
-                                    {!serie.is_completed && (
-                                        <span className="bg-[#484DB5] text-white text-xs px-2 py-0.5 rounded">
-                                            em andamento
-                                        </span>
-                                    )}
-                                </div>
+                            <div className="series-stats">
+                                <span className="series-views">
+                                    {serie.view_count.toLocaleString("pt-BR")}{" "}
+                                    visualizações
+                                </span>
+                                <span className="series-status">
+                                    {serie.is_completed
+                                        ? "Completa"
+                                        : "Em andamento"}
+                                </span>
                             </div>
-                        </Link>
-                    ))}
-                </div>
-                
-                {currentIndex < series.length - visibleCards && (
-                    <button 
-                        onClick={nextSlide} 
-                        className="carousel-button carousel-button-next"
-                        aria-label="Próximo"
-                    >
-                        <ChevronRight size={20} />
-                    </button>
-                )}
+                        </div>
+                    </Link>
+                ))}
             </div>
         </section>
     );

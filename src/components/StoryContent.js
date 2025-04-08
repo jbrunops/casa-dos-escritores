@@ -55,15 +55,7 @@ export default function StoryContent({ content }) {
     // Renderização com fallback
     return (
         <div
-            className="prose prose-purple max-w-none py-4 story-content"
-            style={{
-                '--tw-prose-headings': '#111827',
-                '--tw-prose-links': '#484DB5',
-                '--tw-prose-counters': '#484DB5',
-                '--tw-prose-bullets': '#484DB5',
-                '--tw-prose-quote-borders': '#E5E7EB',
-                '--tw-prose-hr': '#E5E7EB',
-            }}
+            className="story-content prose medium-content"
             dangerouslySetInnerHTML={{ __html: sanitizedContent || content }}
         />
     );

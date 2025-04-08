@@ -472,30 +472,25 @@ export default function AdminDashboard() {
     return (
         <div className="admin-dashboard">
             <div className="admin-header">
-                <div>
-                    <Link href="/dashboard" className="admin-back-link">
-                        <ArrowLeft size={16} />
-                        <span>Voltar para o Dashboard</span>
-                    </Link>
-                    <h1 className="admin-title">Painel de Administração</h1>
-                    <p className="admin-subtitle">
-                        Gerencie usuários, histórias e comentários
-                    </p>
-                </div>
-
-                <div className="admin-actions-top">
-                    <button
-                        className="admin-refresh-btn"
-                        onClick={loadData}
-                        disabled={loading}
+                <div className="admin-header-left">
+                    <button 
+                        onClick={() => router.back()} 
+                        className="admin-back-button" 
+                        aria-label="Voltar para página anterior"
                     >
-                        <RefreshCw
-                            size={16}
-                            className={loading ? "spin" : ""}
-                        />
-                        <span>Atualizar dados</span>
+                        <ArrowLeft size={20} />
                     </button>
+                    <h1 className="admin-title">Painel Administrativo</h1>
                 </div>
+                
+                <button 
+                    onClick={loadData} 
+                    className="admin-refresh-button" 
+                    disabled={actionLoading || loading}
+                >
+                    <RefreshCw size={18} className={actionLoading ? "spin" : ""} />
+                    {!isMobile && <span>Atualizar</span>}
+                </button>
             </div>
 
             {statusMessage.type && (

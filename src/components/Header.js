@@ -1,54 +1,43 @@
 "use client";
 
+import MobileSeries from "./MobileSeries";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Compass, BookOpen, Search, Menu, User, LogOut, LayoutDashboard, BookMarked } from "lucide-react";
-import MobileMenu from "./MobileMenu";
-import { useAuth } from "@/contexts/AuthContext";
+import { createBrowserClient } from "@/lib/supabase-browser";
+import { useEffect, useState, useRef, useCallback } from "react";
+import {
+    ChevronDown,
+    User,
+    LogOut,
+    Settings,
+    LayoutDashboard,
+    Menu,
+    Compass,
+    BookOpen,
+    LogIn,
+    UserPlus,
+    Bell
+} from "lucide-react";
+import NotificationBell from "./NotificationBell";
 
 export default function Header() {
     const pathname = usePathname();
     const router = useRouter();
+    const [user, setUser] = useState(null);
+    const [username, setUsername] = useState("");
+    const [avatarUrl, setAvatarUrl] = useState("");
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-    const [showMobileMenu, setShowMobileMenu] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
-    const categoryDropdownRef = useRef(null);
-    const searchInputRef = useRef(null);
     const [showUserDropdown, setShowUserDropdown] = useState(false);
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
     const userDropdownRef = useRef(null);
-    
-    // Usar o contexto de autenticação
-    const { user, profile, loading, signOut } = useAuth();
-    
-    // Fechar dropdown ao clicar fora
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target)) {
-                setShowCategoryDropdown(false);
-            }
-        }
-        
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
-    
-    // Fechar user dropdown ao clicar fora
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
-                setShowUserDropdown(false);
-            }
-        }
-        
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
-    
+    const categoryDropdownRef = useRef(null);
+    const mobileMenuRef = useRef(null);
+    const supabase = createBrowserClient();
+
     // Lista de categorias
     const categories = [
         "Fantasia",
@@ -61,247 +50,394 @@ export default function Header() {
         "Brasileiro",
         "Outros",
     ];
-    
-    // Lidar com o envio do formulário de pesquisa
-    const handleSearchSubmit = (e) => {
-        e.preventDefault();
-        if (searchQuery.trim()) {
-            router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-            setSearchQuery(""); // Limpar o campo após pesquisa
-        }
-    };
-    
-    // Lidar com atalho de teclado para pesquisa
+
+    // Verificar se é dispositivo móvel (480px ou menos)
     useEffect(() => {
-        const handleKeyDown = (e) => {
-            // Detectar Ctrl+K ou Cmd+K
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                searchInputRef.current?.focus();
-            }
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 480);
         };
-        
-        window.addEventListener('keydown', handleKeyDown);
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-        };
+
+        // Verificar no carregamento inicial
+        checkMobile();
+
+        // Adicionar listener para redimensionamento
+        window.addEventListener("resize", checkMobile);
+
+        // Limpar listener
+        return () => window.removeEventListener("resize", checkMobile);
     }, []);
 
+    useEffect(() => {
+        async function getUser() {
+            try {
+                setLoading(true);
+                const {
+                    data: { session },
+                } = await supabase.auth.getSession();
+
+                if (session?.user) {
+                    setUser(session.user);
+
+                    // Buscar perfil do usuário com tratamento de erro
+                    const { data, error } = await supabase
+                        .from("profiles")
+                        .select("username, role, avatar_url")
+                        .eq("id", session.user.id)
+                        .single();
+
+                    if (error) {
+                        console.error("Erro ao buscar perfil:", error);
+                        return;
+                    }
+
+                    if (data) {
+                        setUsername(data.username);
+                        setIsAdmin(data.role === "admin");
+                        setAvatarUrl(data.avatar_url);
+                    }
+                }
+            } catch (error) {
+                console.error("Erro ao buscar usuário:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        getUser();
+
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === "SIGNED_IN") {
+                getUser();
+            } else if (event === "SIGNED_OUT") {
+                setUser(null);
+                setUsername("");
+                setIsAdmin(false);
+                setAvatarUrl("");
+            }
+        });
+
+        // Fechar dropdowns quando clicar fora deles
+        const handleClickOutside = (event) => {
+            if (
+                userDropdownRef.current &&
+                !userDropdownRef.current.contains(event.target)
+            ) {
+                setShowUserDropdown(false);
+            }
+            if (
+                categoryDropdownRef.current &&
+                !categoryDropdownRef.current.contains(event.target)
+            ) {
+                setShowCategoryDropdown(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            subscription.unsubscribe();
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isMobile]);
+
+    // Buscar notificações não lidas - Adicionado para contar notificações
+    const fetchUnreadCount = useCallback(async () => {
+        try {
+            if (!user) return;
+            
+            const { data, error } = await supabase
+                .from("notifications")
+                .select("id")
+                .eq("user_id", user.id)
+                .eq("is_read", false);
+                
+            if (error) {
+                console.error("Erro ao buscar notificações:", error);
+                return;
+            }
+            
+            setUnreadCount(data.length);
+        } catch (error) {
+            console.error("Erro ao buscar contagem de notificações:", error);
+        }
+    }, [user, supabase]);
+    
+    useEffect(() => {
+        if (user) {
+            fetchUnreadCount();
+        }
+    }, [user, fetchUnreadCount]);
+
+    const handleSignOut = async () => {
+        await supabase.auth.signOut();
+        setShowMobileMenu(false);
+        router.push("/");
+    };
+
+    // Ir para categorias (versão mobile)
+    const navigateToExplore = () => {
+        router.push("/categories");
+    };
+
+    // Toggle menu mobile
+    const toggleMobileMenu = () => {
+        setShowMobileMenu(!showMobileMenu);
+    };
+
     return (
-        <>
-            <header className="w-full border-b border-gray-200 bg-white">
-                <div className="mx-auto max-w-[75rem] px-4 flex items-center justify-between h-16">
-                    <div className="flex items-center">
-                        <Link 
-                            href="/" 
-                            className="text-[#484DB5] hover:text-[#7A80FB] text-[1.25rem] font-bold"
+        <header className="bg-white border-b border-[#E5E7EB] w-full py-3 px-4">
+            <div className="container mx-auto flex items-center justify-between">
+                {/* Logo */}
+                <div className="text-[#484DB5] font-bold text-xl">
+                    <Link href="/">Casa Dos Escritores</Link>
+                </div>
+
+                {/* Navegação principal - apenas desktop */}
+                <nav className="hidden md:flex items-center space-x-6">
+                    <div className="relative" ref={categoryDropdownRef}>
+                        <button
+                            className="flex items-center text-[#484DB5] space-x-1"
+                            onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
                         >
-                            Casa Dos Escritores
-                        </Link>
-                    </div>
-
-                    <nav className="hidden md:block ml-10">
-                        <ul className="flex items-center space-x-6">
-                            <li ref={categoryDropdownRef} className="relative">
-                                <button
-                                    onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                                    className="flex items-center text-[#484DB5] hover:text-[#7A80FB] text-[1rem]"
-                                >
-                                    <span className="mr-1">
-                                        <Compass size={16} className="max-h-[1rem]" />
-                                    </span>
-                                    <span>Explorar</span>
-                                    <ChevronDown size={16} className="ml-1 max-h-[1rem]" />
-                                </button>
-
-                                {showCategoryDropdown && (
-                                    <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-md shadow-lg z-10">
-                                        <div className="py-1">
-                                            {categories.map((category) => (
-                                                <Link
-                                                    key={category}
-                                                    href={`/categories/${category
-                                                        .toLowerCase()
-                                                        .replace(/\s+/g, "-")}`}
-                                                    onClick={() => setShowCategoryDropdown(false)}
-                                                    className="block px-4 py-2 text-[#484DB5] hover:text-[#7A80FB] hover:bg-gray-50"
-                                                >
-                                                    {category}
-                                                </Link>
-                                            ))}
-                                            <Link
-                                                href="/categories"
-                                                onClick={() => setShowCategoryDropdown(false)}
-                                                className="block px-4 py-2 text-[#484DB5] hover:text-[#7A80FB] hover:bg-gray-50 font-medium"
-                                            >
-                                                Ver Todas
-                                            </Link>
-                                        </div>
-                                    </div>
-                                )}
-                            </li>
-
-                            <li>
-                                <Link
-                                    href="/series"
-                                    className="flex items-center text-[#484DB5] hover:text-[#7A80FB] text-[1rem]"
-                                >
-                                    <span className="mr-1">
-                                        <BookOpen size={16} className="max-h-[1rem]" />
-                                    </span>
-                                    <span>Séries</span>
-                                </Link>
-                            </li>
-                        </ul>
-                    </nav>
-
-                    <div className="hidden md:block mx-auto">
-                        <form onSubmit={handleSearchSubmit}>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    placeholder="Pesquisar... (Ctrl+K)"
-                                    aria-label="Pesquisar no site"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    ref={searchInputRef}
-                                    className="w-[21.3rem] max-h-[2.5rem] pl-3 pr-10 py-2 border border-[#B7B7B7] rounded-md focus:outline-none focus:ring-1 focus:ring-[#484DB5]"
-                                />
-                                <button 
-                                    type="submit"
-                                    aria-label="Buscar"
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#B7B7B7]"
-                                >
-                                    <Search size={20} className="max-h-[1rem]" />
-                                </button>
+                            <Compass size={20} className="mr-1" />
+                            <span>Explorar</span>
+                            <ChevronDown size={16} />
+                        </button>
+                        
+                        {showCategoryDropdown && (
+                            <div className="absolute top-full left-0 mt-2 bg-white rounded-md shadow-lg p-3 w-64 z-10 border border-[#E5E7EB]">
+                                <div className="grid grid-cols-2 gap-2">
+                                    {categories.map((category) => (
+                                        <Link
+                                            key={category}
+                                            href={`/categories/${category.toLowerCase().replace(/\s+/g, "-")}`}
+                                            className="text-gray-700 hover:text-[#484DB5] px-3 py-2 rounded"
+                                            onClick={() => setShowCategoryDropdown(false)}
+                                        >
+                                            {category}
+                                        </Link>
+                                    ))}
+                                    <Link
+                                        href="/categories"
+                                        className="col-span-2 text-center text-[#484DB5] mt-2 font-medium"
+                                        onClick={() => setShowCategoryDropdown(false)}
+                                    >
+                                        Ver Todas
+                                    </Link>
+                                </div>
                             </div>
-                        </form>
-                    </div>
-
-                    <div className="hidden md:flex items-center space-x-4">
-                        {!loading && (
-                            <>
-                                {user ? (
-                                    <div ref={userDropdownRef} className="relative">
-                                        <button
-                                            onClick={() => setShowUserDropdown(!showUserDropdown)}
-                                            className="flex items-center text-[#484DB5] hover:text-[#7A80FB] text-[1rem] font-medium"
-                                        >
-                                            <User size={18} className="mr-1" />
-                                            <span>{profile?.username || 'Perfil'}</span>
-                                            <ChevronDown size={16} className="ml-1 max-h-[1rem]" />
-                                        </button>
-
-                                        {showUserDropdown && (
-                                            <div className="absolute top-full right-0 mt-1 w-48 bg-white rounded-md shadow-lg z-10">
-                                                <div className="py-1">
-                                                    <Link
-                                                        href="/dashboard"
-                                                        onClick={() => setShowUserDropdown(false)}
-                                                        className="flex items-center px-4 py-2 text-[#484DB5] hover:text-[#7A80FB] hover:bg-gray-50"
-                                                    >
-                                                        <LayoutDashboard size={16} className="mr-2" />
-                                                        Meu Painel
-                                                    </Link>
-                                                    <Link
-                                                        href={`/profile/${profile?.username || ''}`}
-                                                        onClick={() => setShowUserDropdown(false)}
-                                                        className="flex items-center px-4 py-2 text-[#484DB5] hover:text-[#7A80FB] hover:bg-gray-50"
-                                                    >
-                                                        <User size={16} className="mr-2" />
-                                                        Meu Perfil
-                                                    </Link>
-                                                    <Link
-                                                        href="/dashboard/series"
-                                                        onClick={() => setShowUserDropdown(false)}
-                                                        className="flex items-center px-4 py-2 text-[#484DB5] hover:text-[#7A80FB] hover:bg-gray-50"
-                                                    >
-                                                        <BookMarked size={16} className="mr-2" />
-                                                        Minhas Séries
-                                                    </Link>
-                                                    {/* Mostrar link para administração se o usuário for admin */}
-                                                    {profile?.role === 'admin' && (
-                                                        <Link
-                                                            href="/admin"
-                                                            onClick={() => setShowUserDropdown(false)}
-                                                            className="flex items-center px-4 py-2 text-[#484DB5] hover:text-[#7A80FB] hover:bg-gray-50"
-                                                        >
-                                                            <svg 
-                                                                xmlns="http://www.w3.org/2000/svg" 
-                                                                width="16" 
-                                                                height="16" 
-                                                                viewBox="0 0 24 24" 
-                                                                fill="none" 
-                                                                stroke="currentColor" 
-                                                                strokeWidth="2" 
-                                                                strokeLinecap="round" 
-                                                                strokeLinejoin="round" 
-                                                                className="mr-2"
-                                                            >
-                                                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                                                <circle cx="9" cy="7" r="4"></circle>
-                                                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                                                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                                            </svg>
-                                                            Administração
-                                                        </Link>
-                                                    )}
-                                                    <button
-                                                        onClick={() => {
-                                                            setShowUserDropdown(false);
-                                                            signOut();
-                                                        }}
-                                                        className="flex items-center w-full text-left px-4 py-2 text-red-600 hover:text-red-700 hover:bg-gray-50"
-                                                    >
-                                                        <LogOut size={16} className="mr-2" />
-                                                        Sair
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <>
-                                        <Link 
-                                            href="/signup"
-                                            className="text-[#484DB5] hover:text-[#7A80FB] text-[1rem] font-bold"
-                                        >
-                                            Cadastre-se
-                                        </Link>
-                                        <Link 
-                                            href="/login"
-                                            className="bg-[#484DB5] hover:bg-[#7A80FB] text-white max-h-[2.5rem] w-[7.5rem] flex items-center justify-center py-2 rounded-md transition-colors"
-                                        >
-                                            <span className="font-bold">Entrar</span>
-                                        </Link>
-                                    </>
-                                )}
-                            </>
                         )}
                     </div>
-                    
-                    {/* Botão do menu mobile */}
-                    <button 
-                        className="md:hidden text-[#484DB5]"
-                        onClick={() => setShowMobileMenu(true)}
-                        aria-label="Menu"
+
+                    <Link
+                        href="/series"
+                        className={`flex items-center ${
+                            pathname.startsWith("/series")
+                                ? "text-[#484DB5] font-medium"
+                                : "text-[#484DB5]"
+                        }`}
                     >
-                        <Menu size={24} />
-                    </button>
+                        <BookOpen size={20} className="mr-1" />
+                        <span>Séries</span>
+                    </Link>
+                </nav>
+
+                {/* Elementos para mobile */}
+                <button
+                    className="md:hidden text-[#484DB5]"
+                    onClick={toggleMobileMenu}
+                    aria-label="Menu"
+                >
+                    <Menu size={24} />
+                </button>
+
+                {/* Menu mobile */}
+                {showMobileMenu && (
+                    <>
+                        <div 
+                            className="fixed inset-0 bg-black bg-opacity-30 z-40"
+                            onClick={() => setShowMobileMenu(false)}
+                        ></div>
+                        <div className="fixed inset-y-0 right-0 w-64 bg-white shadow-lg z-50 p-4">
+                            <div className="flex justify-end mb-6">
+                                <button onClick={() => setShowMobileMenu(false)}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <ul className="space-y-4">
+                                <li>
+                                    <Link 
+                                        href="/categories" 
+                                        className="flex items-center text-[#484DB5]"
+                                        onClick={() => setShowMobileMenu(false)}
+                                    >
+                                        <Compass size={20} className="mr-2" />
+                                        <span>Explorar</span>
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link 
+                                        href="/series" 
+                                        className="flex items-center text-[#484DB5]"
+                                        onClick={() => setShowMobileMenu(false)}
+                                    >
+                                        <BookOpen size={20} className="mr-2" />
+                                        <span>Séries</span>
+                                    </Link>
+                                </li>
+                                {!user && (
+                                    <>
+                                        <li>
+                                            <Link 
+                                                href="/login" 
+                                                className="flex items-center text-[#484DB5]"
+                                                onClick={() => setShowMobileMenu(false)}
+                                            >
+                                                <LogIn size={20} className="mr-2" />
+                                                <span>Entrar</span>
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link 
+                                                href="/signup" 
+                                                className="flex items-center text-[#484DB5]"
+                                                onClick={() => setShowMobileMenu(false)}
+                                            >
+                                                <UserPlus size={20} className="mr-2" />
+                                                <span>Cadastrar</span>
+                                            </Link>
+                                        </li>
+                                    </>
+                                )}
+                                
+                                {user && (
+                                    <>
+                                        <li>
+                                            <Link 
+                                                href="/dashboard" 
+                                                className="flex items-center text-[#484DB5]"
+                                                onClick={() => setShowMobileMenu(false)}
+                                            >
+                                                <LayoutDashboard size={20} className="mr-2" />
+                                                <span>Meu Painel</span>
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link 
+                                                href={`/profile/${encodeURIComponent(username)}`} 
+                                                className="flex items-center text-[#484DB5]"
+                                                onClick={() => setShowMobileMenu(false)}
+                                            >
+                                                <User size={20} className="mr-2" />
+                                                <span>Meu Perfil</span>
+                                            </Link>
+                                        </li>
+                                        {isAdmin && (
+                                            <li>
+                                                <Link 
+                                                    href="/admin" 
+                                                    className="flex items-center text-[#484DB5]"
+                                                    onClick={() => setShowMobileMenu(false)}
+                                                >
+                                                    <Settings size={20} className="mr-2" />
+                                                    <span>Administração</span>
+                                                </Link>
+                                            </li>
+                                        )}
+                                        <li>
+                                            <button 
+                                                className="flex items-center text-[#484DB5] w-full text-left"
+                                                onClick={() => {
+                                                    handleSignOut();
+                                                    setShowMobileMenu(false);
+                                                }}
+                                            >
+                                                <LogOut size={20} className="mr-2" />
+                                                <span>Sair</span>
+                                            </button>
+                                        </li>
+                                    </>
+                                )}
+                            </ul>
+                        </div>
+                    </>
+                )}
+
+                {/* Autenticação / Perfil */}
+                <div className="hidden md:block">
+                    {loading ? (
+                        <div className="text-sm text-gray-500">Carregando...</div>
+                    ) : user ? (
+                        <div className="relative" ref={userDropdownRef}>
+                            <button
+                                className="flex items-center text-gray-700 hover:text-[#484DB5]"
+                                onClick={() => setShowUserDropdown(!showUserDropdown)}
+                            >
+                                <span className="mr-1">{username || "Usuário"}</span>
+                                <ChevronDown size={16} />
+                            </button>
+
+                            {showUserDropdown && (
+                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-md border border-[#E5E7EB] z-10">
+                                    <Link
+                                        href="/dashboard"
+                                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#484DB5]"
+                                        onClick={() => setShowUserDropdown(false)}
+                                    >
+                                        <LayoutDashboard size={18} className="mr-2" />
+                                        <span>Meu Painel</span>
+                                    </Link>
+                                    <Link
+                                        href={`/profile/${encodeURIComponent(username)}`}
+                                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#484DB5]"
+                                        onClick={() => setShowUserDropdown(false)}
+                                    >
+                                        <User size={18} className="mr-2" />
+                                        <span>Meu Perfil</span>
+                                    </Link>
+                                    {isAdmin && (
+                                        <Link
+                                            href="/admin"
+                                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#484DB5]"
+                                            onClick={() => setShowUserDropdown(false)}
+                                        >
+                                            <Settings size={18} className="mr-2" />
+                                            <span>Administração</span>
+                                        </Link>
+                                    )}
+                                    <div className="border-t border-[#E5E7EB] my-1"></div>
+                                    <button
+                                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#484DB5] w-full text-left"
+                                        onClick={handleSignOut}
+                                    >
+                                        <LogOut size={18} className="mr-2" />
+                                        <span>Sair</span>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="flex items-center space-x-4">
+                            <Link
+                                href="/signup"
+                                className="text-[#484DB5]"
+                            >
+                                cadastre-se
+                            </Link>
+                            <Link
+                                href="/login"
+                                className="bg-[#484DB5] text-white px-6 py-2 rounded-md"
+                            >
+                                Entrar
+                            </Link>
+                        </div>
+                    )}
                 </div>
-            </header>
-            
-            {/* Menu mobile */}
-            <MobileMenu 
-                isOpen={showMobileMenu} 
-                onClose={() => setShowMobileMenu(false)}
-                onSearch={handleSearchSubmit}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                user={user}
-                profile={profile}
-                onLogout={signOut}
-            />
-        </>
+            </div>
+        </header>
     );
 }

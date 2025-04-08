@@ -6,14 +6,12 @@ import { BookOpen } from "lucide-react";
 
 export default function MobileSeries({ onClick }) {
     return (
-        <li className="border-t border-gray-100 pt-4">
-            <Link 
-                href="/series" 
-                onClick={onClick}
-                className="flex items-center text-[#484DB5] hover:text-[#7A80FB] text-[1rem] py-2"
-            >
-                <BookOpen size={18} className="max-h-[1rem] mr-2" />
-                <span>Séries</span>
+        <li className="mobile-menu-item">
+            <Link href="/series" className="mobile-menu-link" onClick={onClick}>
+                <div className="mobile-menu-link-content">
+                    <BookOpen size={18} className="mobile-menu-icon" />
+                    <span>Séries</span>
+                </div>
             </Link>
         </li>
     );

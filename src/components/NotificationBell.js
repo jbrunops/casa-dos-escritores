@@ -202,55 +202,33 @@ export default function NotificationBell() {
         return date.toLocaleDateString("pt-BR", {
             day: "2-digit",
             month: "2-digit",
+            year: "2-digit",
         });
     };
 
-    // Função para determinar o URL de redirecionamento para cada tipo de notificação
+    // Determinar URL de redirecionamento com base no tipo de notificação
     const getNotificationUrl = (notification) => {
-        const type = notification.type;
-        const data = notification.additional_data;
-
-        switch (type) {
+        switch (notification.type) {
             case "comment":
-                if (data?.story_id) {
-                    return `/story/${generateSlug(data.story_title, data.story_id)}#comments`;
-                } else if (data?.chapter_id) {
-                    return `/chapter/${generateSlug(data.chapter_title, data.chapter_id)}#comments`;
-                }
-                return `/notifications`;
-
             case "reply":
-                if (data?.story_id) {
-                    return `/story/${generateSlug(data.story_title, data.story_id)}#comment-${data.comment_id}`;
-                } else if (data?.chapter_id) {
-                    return `/chapter/${generateSlug(data.chapter_title, data.chapter_id)}#comment-${data.comment_id}`;
+                // Para histórias, usar slug
+                if (notification.additional_data?.story_id) {
+                    return `/story/${generateSlug(
+                        notification.additional_data?.story_title || "",
+                        notification.additional_data?.story_id
+                    )}`;
                 }
-                return `/notifications`;
-
-            case "follow":
-                if (data?.username) {
-                    return `/profile/${data.username}`;
-                }
-                return `/notifications`;
-
-            case "like":
-                if (data?.story_id) {
-                    return `/story/${generateSlug(data.story_title, data.story_id)}`;
-                } else if (data?.chapter_id) {
-                    return `/chapter/${generateSlug(data.chapter_title, data.chapter_id)}`;
-                }
-                return `/notifications`;
-
+                // Para capítulos, manter apenas o ID por enquanto
+                return `/story/${notification.related_id}`;
             default:
-                return `/notifications`;
+                return "#";
         }
     };
 
-    // Se não estiver logado ou estiver carregando, mostrar apenas o ícone
-    if (loading || notifications === null) {
+    if (loading) {
         return (
-            <div className="relative mx-4">
-                <div className="w-8 h-8 flex items-center justify-center text-gray-600">
+            <div className="notification-bell-container">
+                <div className="notification-icon-wrapper">
                     <Bell size={20} />
                 </div>
             </div>
@@ -259,28 +237,26 @@ export default function NotificationBell() {
 
     // Mostrar apenas para usuários logados
     return (
-        <div className="relative mx-4" ref={dropdownRef}>
+        <div className="notification-bell-container" ref={dropdownRef}>
             <button
-                className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-purple-600 hover:bg-gray-100 rounded-full transition-colors"
+                className="notification-icon-wrapper"
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Notificações"
             >
                 <Bell size={isMobile ? 28 : 20} />
                 {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-                        {unreadCount}
-                    </span>
+                    <span className="notification-badge">{unreadCount}</span>
                 )}
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg z-50 overflow-hidden border border-gray-200">
-                    <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200">
-                        <h3 className="font-medium text-gray-800">Notificações</h3>
+                <div className="notifications-dropdown">
+                    <div className="notifications-header">
+                        <h3>Notificações</h3>
                         {unreadCount > 0 && (
                             <button
                                 onClick={markAllAsRead}
-                                className="text-sm text-purple-600 hover:text-purple-800"
+                                className="mark-read-button"
                             >
                                 Marcar todas como lidas
                             </button>
@@ -288,17 +264,17 @@ export default function NotificationBell() {
                     </div>
 
                     {notifications.length === 0 ? (
-                        <div className="p-6 text-center text-gray-500">
+                        <div className="empty-notifications">
                             <p>Você não tem notificações.</p>
                         </div>
                     ) : (
-                        <div className="max-h-96 overflow-y-auto">
+                        <div className="notifications-list">
                             {notifications.map((notification) => (
                                 <Link
                                     href={getNotificationUrl(notification)}
                                     key={notification.id}
-                                    className={`block px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
-                                        !notification.is_read ? "bg-purple-50" : ""
+                                    className={`notification-item ${
+                                        !notification.is_read ? "unread" : ""
                                     }`}
                                     onClick={() => {
                                         if (!notification.is_read) {
@@ -310,12 +286,12 @@ export default function NotificationBell() {
                                         }
                                     }}
                                 >
-                                    <div className="w-full">
-                                        <div className="text-sm text-gray-700 mb-1">
+                                    <div className="notification-content">
+                                        <div className="notification-text">
                                             {notification.content}
                                         </div>
-                                        <div className="text-xs text-gray-500">
-                                            <span>
+                                        <div className="notification-meta">
+                                            <span className="notification-time">
                                                 {formatNotificationDate(
                                                     notification.created_at
                                                 )}

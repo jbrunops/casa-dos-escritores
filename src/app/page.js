@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import { Edit, BookOpen, Share2, MessageSquare, BookText, Eye } from "lucide-react";
+import { Edit, BookOpen, Share2, MessageSquare, BookText } from "lucide-react";
 import SeriesHighlights from "@/components/SeriesHighlights";
 import { generateSlug } from "@/lib/utils";
 
@@ -217,26 +217,26 @@ export default async function HomePage() {
 
     return (
         <div className="home-page">
-            <section className="mt-[1.8rem] mb-[1.8rem] max-h-[14.3rem] flex flex-col items-center justify-center text-center py-12 px-4" 
-                style={{ background: "linear-gradient(91deg, #FEFEFE 0.72%, #F4F4F4 128.06%)" }}>
-                <h1 className="text-[1.8rem] font-bold text-black mb-4">
-                    O lugar certo para você inserir suas ideias!
-                </h1>
-                <p className="text-[1rem] text-black max-w-2xl">
-                    Crie, compartilhe; escreva fantasia, terror, humor, ficção científica e muito mais.
+            <section className="hero">
+                <h1>O lugar certo para nós!</h1>
+                <p>
+                    Um espaço para compartilhar suas histórias com o mundo,
                     <br />
-                    Escreva até seus pensamentos e opiniões. Aqui você é livre!
+                    comentar, conversar, seguir, favoritar e criar sem limites.
+                    Seja você!
                 </p>
+                {/* <div className="hero-buttons">
+                    <Link href="/signup" className="btn primary">
+                        Cadastre-se
+                    </Link>
+                </div> */}
             </section>
 
-            <section className="columns-section my-10">
-                <div className="columns-grid grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[75rem] mx-auto">
+            <section className="columns-section">
+                <div className="columns-grid">
                     {/* Coluna 1: Histórias Recentes */}
                     <div className="column">
-                        <h2 className="text-[1.8rem] font-bold mb-4 relative">
-                            Histórias Recentes
-                            <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
-                        </h2>
+                        <h2>Histórias Recentes</h2>
                         <div className="stories-list">
                             {recentContent?.length === 0 ? (
                                 <p>Nenhuma história publicada ainda.</p>
@@ -249,21 +249,17 @@ export default async function HomePage() {
                                             className="story-card"
                                         >
                                             <h3>{content.title}</h3>
-                                            <div className="chapter-series-info">
-                                                <BookOpen size={16} className="text-[#484DB5]" />
-                                                <span>Conto Único</span>
-                                            </div>
-                                            <p className="story-summary">
-                                                {createSummary(content.content)}
-                                            </p>
                                             <div className="story-meta-line">
                                                 <span className="author-name">
-                                                    {content.profiles?.username || "Autor"}
+                                                    {content.type === 'chapter' ? content.author.username : content.profiles.username}
                                                 </span>
                                                 <span className="story-date">
                                                     {formatDate(content.created_at)}
                                                 </span>
                                             </div>
+                                            <p className="story-summary">
+                                                {createSummary(content.content)}
+                                            </p>
                                         </Link>
                                     ) : (
                                         <Link
@@ -277,22 +273,25 @@ export default async function HomePage() {
                                             <h3>{content.title}</h3>
                                             
                                             <div className="chapter-series-info">
-                                                <BookText size={16} className="text-[#484DB5]" />
+                                                <BookText size={15} />
                                                 <span>Série: {content.series?.title}</span>
+                                                <span className="chapter-number">
+                                                    Cap. {content.chapter_number}
+                                                </span>
                                             </div>
-                                            
-                                            <p className="chapter-summary">
-                                                {createSummary(content.content)}
-                                            </p>
                                             
                                             <div className="chapter-meta-line">
                                                 <span className="author-name">
-                                                    {content.author?.username || "Autor"}
+                                                    {content.type === 'chapter' ? content.author?.username : content.profiles.username}
                                                 </span>
                                                 <span className="story-date">
                                                     {formatDate(content.created_at)}
                                                 </span>
                                             </div>
+                                            
+                                            <p className="chapter-summary">
+                                                {createSummary(content.content)}
+                                            </p>
                                         </Link>
                                     )
                                 )
@@ -302,10 +301,7 @@ export default async function HomePage() {
 
                     {/* Coluna 2: Mais Comentados */}
                     <div className="column">
-                        <h2 className="text-[1.8rem] font-bold mb-4 relative">
-                            Mais Comentadas
-                            <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
-                        </h2>
+                        <h2>Mais Comentados</h2>
                         <div className="stories-list">
                             {allContentWithComments?.length === 0 ? (
                                 <p>Nenhuma história comentada ainda.</p>
@@ -318,27 +314,31 @@ export default async function HomePage() {
                                             className="story-card"
                                         >
                                             <h3>{content.title}</h3>
-                                            <div className="chapter-series-info">
-                                                <BookOpen size={16} className="text-[#484DB5]" />
-                                                <span>Conto Único</span>
+                                            <div className="story-meta-line">
+                                                <span className="author-name">
+                                                    {content.type === 'chapter' ? content.author.username : content.profiles.username}
+                                                </span>
+                                                <div className="meta-right">
+                                                    <span className="story-date">
+                                                        {formatDate(
+                                                            content.created_at
+                                                        )}
+                                                    </span>
+                                                    <span className="comment-badge">
+                                                        <span className="comment-icon-container">
+                                                            <MessageSquare
+                                                                size={14}
+                                                            />
+                                                        </span>
+                                                        <span>
+                                                            {content.comment_count}
+                                                        </span>
+                                                    </span>
+                                                </div>
                                             </div>
                                             <p className="story-summary">
                                                 {createSummary(content.content)}
                                             </p>
-                                            <div className="story-meta-line">
-                                                <span className="author-name">
-                                                    {content.profiles?.username || "Autor"}
-                                                </span>
-                                                <div className="meta-right">
-                                                    <span className="story-date">
-                                                        {formatDate(content.created_at)}
-                                                    </span>
-                                                    <span className="comment-badge">
-                                                        <MessageSquare size={12} />
-                                                        <span>{content.comment_count}</span>
-                                                    </span>
-                                                </div>
-                                            </div>
                                         </Link>
                                     ) : (
                                         <Link
@@ -352,28 +352,39 @@ export default async function HomePage() {
                                             <h3>{content.title}</h3>
                                             
                                             <div className="chapter-series-info">
-                                                <BookText size={16} className="text-[#484DB5]" />
+                                                <BookText size={15} />
                                                 <span>Série: {content.series?.title}</span>
+                                                <span className="chapter-number">
+                                                    Cap. {content.chapter_number}
+                                                </span>
+                                            </div>
+                                            
+                                            <div className="chapter-meta-line">
+                                                <span className="author-name">
+                                                    {content.type === 'chapter' ? content.author?.username : content.profiles.username}
+                                                </span>
+                                                <div className="meta-right">
+                                                    <span className="story-date">
+                                                        {formatDate(
+                                                            content.created_at
+                                                        )}
+                                                    </span>
+                                                    <span className="comment-badge">
+                                                        <span className="comment-icon-container">
+                                                            <MessageSquare
+                                                                size={14}
+                                                            />
+                                                        </span>
+                                                        <span>
+                                                            {content.comment_count}
+                                                        </span>
+                                                    </span>
+                                                </div>
                                             </div>
                                             
                                             <p className="chapter-summary">
                                                 {createSummary(content.content)}
                                             </p>
-                                            
-                                            <div className="chapter-meta-line">
-                                                <span className="author-name">
-                                                    {content.author?.username || "Autor"}
-                                                </span>
-                                                <div className="meta-right">
-                                                    <span className="story-date">
-                                                        {formatDate(content.created_at)}
-                                                    </span>
-                                                    <span className="comment-badge">
-                                                        <MessageSquare size={12} />
-                                                        <span>{content.comment_count}</span>
-                                                    </span>
-                                                </div>
-                                            </div>
                                         </Link>
                                     )
                                 )
@@ -383,10 +394,7 @@ export default async function HomePage() {
 
                     {/* Coluna 3: Top 10 Escritores */}
                     <div className="column">
-                        <h2 className="text-[1.8rem] font-bold mb-4 relative">
-                            Top 10 Escritores
-                            <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
-                        </h2>
+                        <h2>Top 10 Escritores</h2>
                         <div className="writers-list">
                             {topWriters?.length === 0 ? (
                                 <p>Nenhum escritor ativo ainda.</p>
@@ -424,15 +432,12 @@ export default async function HomePage() {
                                                     {writer.username}
                                                 </Link>
                                             </h3>
-                                            <div className="writer-username">
-                                                @{writer.username.toLowerCase()}
-                                            </div>
-                                            <div className="writer-stats-container">
-                                                <div className="writer-stat-badge">
-                                                    <BookOpen size={14} />
-                                                    {writer.count} publicações
-                                                </div>
-                                            </div>
+                                            <p className="writer-stats">
+                                                {writer.count}{" "}
+                                                {writer.count === 1
+                                                    ? "história"
+                                                    : "histórias"}
+                                            </p>
                                         </div>
                                     </div>
                                 ))
@@ -448,42 +453,39 @@ export default async function HomePage() {
             </section>
 
             <section className="features-section">
-                <h2 className="text-[1.8rem] font-bold mb-4 relative">
-                    Como funciona
-                    <div className="w-[8.6rem] h-[3px] bg-[#484DB5] mt-2 title-line"></div>
-                </h2>
+                <h2>Como funciona</h2>
 
                 <div className="features-grid">
                     <div className="feature-card">
                         <div className="feature-icon">
-                            <Edit size={28} />
+                            <Edit size={32} color="#4a4fbc" />
                         </div>
-                        <h3 className="feature-title">Crie uma conta</h3>
-                        <p className="feature-description">
-                            Registre-se gratuitamente para começar a compartilhar suas histórias com outros leitores. 
-                            O processo é simples e rápido.
+                        <h3>1. Crie uma conta</h3>
+                        <p>
+                            Registre-se gratuitamente para começar a
+                            compartilhar suas histórias com outros leitores.
                         </p>
                     </div>
 
                     <div className="feature-card">
                         <div className="feature-icon">
-                            <BookOpen size={28} />
+                            <BookOpen size={32} color="#4a4fbc" />
                         </div>
-                        <h3 className="feature-title">Escreva suas histórias</h3>
-                        <p className="feature-description">
-                            Use nosso editor intuitivo para criar suas obras. Crie contos únicos ou desenvolva séries com 
-                            múltiplos capítulos.
+                        <h3>2. Escreva suas histórias</h3>
+                        <p>
+                            Use nosso editor intuitivo para criar suas obras com
+                            formatação profissional.
                         </p>
                     </div>
 
                     <div className="feature-card">
                         <div className="feature-icon">
-                            <Share2 size={28} />
+                            <Share2 size={32} color="#4a4fbc" />
                         </div>
-                        <h3 className="feature-title">Compartilhe com o mundo</h3>
-                        <p className="feature-description">
-                            Publique suas histórias e receba feedback da comunidade. Acompanhe visualizações e comentários 
-                            em suas obras.
+                        <h3>3. Compartilhe com o mundo</h3>
+                        <p>
+                            Publique suas histórias e receba feedback valioso da
+                            comunidade de leitores.
                         </p>
                     </div>
                 </div>
