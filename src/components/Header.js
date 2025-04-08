@@ -187,7 +187,7 @@ export default function Header() {
     };
 
     return (
-        <header className="bg-white border-b border-[#E5E7EB] w-full py-3 px-4">
+        <header className="bg-white border-b border-[#E5E7EB] w-full py-3 px-4 mb-[1.875rem]">
             <div className="max-w-[75rem] mx-auto flex items-center justify-between">
                 {/* Logo */}
                 <div className="text-[#484DB5] font-bold text-xl">
