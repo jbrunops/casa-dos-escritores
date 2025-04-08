@@ -107,68 +107,68 @@ export default async function SeriesPage({ searchParams }) {
         const totalPages = Math.ceil((count || 0) / PAGE_SIZE);
 
         return (
-            <div className="series-browse-page">
-                <div className="series-header">
-                    <h1>Séries Literárias</h1>
-                    <p className="series-subtitle">
+            <div className="max-w-[75rem] mx-auto px-4">
+                <div className="mb-8 text-center">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Séries Literárias</h1>
+                    <p className="text-gray-600">
                         Explore histórias em capítulos criadas pelos escritores
                         da plataforma.
                     </p>
                 </div>
 
                 {series?.length === 0 ? (
-                    <div className="empty-state">
-                        <p>Ainda não há séries publicadas.</p>
-                        <Link href="/dashboard/new" className="btn primary">
+                    <div className="flex flex-col items-center justify-center space-y-4 py-8">
+                        <p className="text-gray-600">Ainda não há séries publicadas.</p>
+                        <Link href="/dashboard/new" className="h-10 px-4 flex items-center justify-center bg-[#484DB5] text-white rounded-md hover:shadow-md transition-shadow duration-200">
                             Crie a primeira série
                         </Link>
                     </div>
                 ) : (
                     <>
-                        <div className="series-grid">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {seriesWithChapterCount.map((serie) => (
                                 <Link
                                     href={`/series/${generateSlug(serie.title, serie.id)}`}
                                     key={serie.id}
-                                    className="series-card"
+                                    className="group border border-[#E5E7EB] rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200"
                                 >
-                                    <div className="series-card-image">
+                                    <div className="aspect-[3/4] relative bg-gray-100">
                                         {serie.cover_url ? (
                                             <img
                                                 src={serie.cover_url}
                                                 alt={serie.title}
-                                                className="series-cover-image"
+                                                className="w-full h-full object-cover"
                                             />
                                         ) : (
-                                            <div className="series-cover-placeholder">
+                                            <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-gray-400">
                                                 {serie.title
                                                     .charAt(0)
                                                     .toUpperCase()}
                                             </div>
                                         )}
                                     </div>
-                                    <div className="series-card-content">
-                                        <h3 className="series-title">
+                                    <div className="p-4">
+                                        <h3 className="font-medium text-gray-900 mb-1 line-clamp-1">
                                             {serie.title}
                                         </h3>
-                                        <p className="series-author">
+                                        <p className="text-sm text-gray-600 mb-2">
                                             por {serie.author_name}
                                         </p>
-                                        <div className="series-meta">
-                                            <span className="series-chapters">
+                                        <div className="flex items-center justify-between text-sm">
+                                            <span className="text-gray-600">
                                                 {serie.chapter_count}{" "}
                                                 {serie.chapter_count === 1
                                                     ? "capítulo"
                                                     : "capítulos"}
                                             </span>
-                                            <span className="series-status">
+                                            <span className="text-gray-600">
                                                 {serie.is_completed
                                                     ? "Completa"
                                                     : "Em andamento"}
                                             </span>
                                         </div>
                                         {serie.genre && (
-                                            <span className="series-genre">
+                                            <span className="inline-block mt-2 px-2 py-1 bg-gray-100 text-gray-600 text-sm rounded">
                                                 {serie.genre}
                                             </span>
                                         )}
@@ -178,11 +178,13 @@ export default async function SeriesPage({ searchParams }) {
                         </div>
 
                         {totalPages > 1 && (
-                            <Pagination
-                                currentPage={page}
-                                totalPages={totalPages}
-                                baseUrl="/series"
-                            />
+                            <div className="mt-8">
+                                <Pagination
+                                    currentPage={page}
+                                    totalPages={totalPages}
+                                    baseUrl="/series"
+                                />
+                            </div>
                         )}
                     </>
                 )}
@@ -191,10 +193,10 @@ export default async function SeriesPage({ searchParams }) {
     } catch (error) {
         console.error("Erro na página de séries:", error);
         return (
-            <div className="series-browse-page">
-                <div className="series-header">
-                    <h1>Séries Literárias</h1>
-                    <p className="series-subtitle">
+            <div className="max-w-[75rem] mx-auto px-4">
+                <div className="mb-8 text-center">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Séries Literárias</h1>
+                    <p className="text-gray-600">
                         Explore histórias em capítulos criadas pelos escritores
                         da plataforma.
                     </p>

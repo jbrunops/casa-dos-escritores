@@ -18,11 +18,15 @@ export default function RootLayout({ children }) {
             <body suppressHydrationWarning>
                 <Header />
                 <main className="content-wrapper">{children}</main>
-                <footer>
-                    <p>
-                        &copy; {new Date().getFullYear()} Casa Dos Escritores —
-                        O lugar certo para nós!
-                    </p>
+                <footer className="border-t border-[#E5E7EB] mt-[1.875rem]">
+                    <div className="max-w-[75rem] mx-auto px-4 py-8">
+                        <div className="flex flex-col items-center justify-center space-y-4">
+                            <p className="text-lg font-medium text-gray-900">
+                                &copy; {new Date().getFullYear()} Casa Dos Escritores
+                            </p>
+                            <p className="text-gray-600">O lugar certo para nós!</p>
+                        </div>
+                    </div>
                 </footer>
             </body>
         </html>
