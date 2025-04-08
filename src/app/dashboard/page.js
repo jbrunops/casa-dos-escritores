@@ -409,206 +409,194 @@ export default function DashboardPage() {
 
     if (loading) {
         return (
-            <div className="dashboard-loading">
-                <div className="loader-large"></div>
-                <p>Carregando seu painel...</p>
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="flex flex-col items-center space-y-4">
+                    <div className="w-8 h-8 border-4 border-[#484DB5] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-600">Carregando seu painel...</p>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="dashboard-container">
-            <div className="dashboard-header">
-                <div className="welcome-section">
-                    <h1>Meu Dashboard</h1>
-                    <p>Bem-vindo, {profile?.username || "Escritor"}</p>
+        <div className="max-w-[75rem] mx-auto px-4 py-8">
+            <div className="flex justify-between items-center mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900">Meu Dashboard</h1>
+                    <p className="text-gray-600 mt-1">Bem-vindo, {profile?.username || "Escritor"}</p>
                 </div>
 
-                <div className="actions-section">
+                <div className="flex items-center space-x-4">
                     <button
                         onClick={refreshData}
-                        className="refresh-button"
+                        className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200"
                         aria-label="Atualizar dados"
                     >
-                        <RefreshCw size={20} />
+                        <RefreshCw size={20} className="text-gray-600" />
                     </button>
 
-                    <Link href="/dashboard/new" className="new-story-button">
-                        <PlusCircle size={20} />
+                    <Link href="/dashboard/new" className="h-10 px-4 flex items-center bg-[#484DB5] text-white rounded-md hover:shadow-md transition-shadow duration-200">
+                        <PlusCircle size={20} className="mr-2" />
                         <span>Nova História</span>
                     </Link>
                 </div>
             </div>
 
             {successMessage && (
-                <div className="success-message">{successMessage}</div>
+                <div className="bg-green-50 text-green-700 p-4 rounded-md mb-8">
+                    {successMessage}
+                </div>
             )}
 
-            <div className="stats-section">
-                <div className="stat-card">
-                    <div className="stat-content">
-                        <span className="stat-value">{stats.totalStories}</span>
-                        <span className="stat-label">Total de histórias</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="bg-white p-6 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
+                    <div className="text-center">
+                        <span className="block text-3xl font-bold text-gray-900 mb-2">{stats.totalStories}</span>
+                        <span className="text-gray-600">Total de histórias</span>
                     </div>
                 </div>
 
-                <div className="stat-card">
-                    <div className="stat-content">
-                        <span className="stat-value">
-                            {stats.publishedStories}
-                        </span>
-                        <span className="stat-label">Publicadas</span>
+                <div className="bg-white p-6 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
+                    <div className="text-center">
+                        <span className="block text-3xl font-bold text-gray-900 mb-2">{stats.publishedStories}</span>
+                        <span className="text-gray-600">Publicadas</span>
                     </div>
                 </div>
 
-                <div className="stat-card">
-                    <div className="stat-content">
-                        <span className="stat-value">{stats.totalViews}</span>
-                        <span className="stat-label">Visualizações</span>
+                <div className="bg-white p-6 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
+                    <div className="text-center">
+                        <span className="block text-3xl font-bold text-gray-900 mb-2">{stats.totalViews}</span>
+                        <span className="text-gray-600">Visualizações</span>
                     </div>
                 </div>
 
-                <div className="stat-card">
-                    <div className="stat-content">
-                        <span className="stat-value">
-                            {stats.totalComments}
-                        </span>
-                        <span className="stat-label">Comentários</span>
+                <div className="bg-white p-6 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
+                    <div className="text-center">
+                        <span className="block text-3xl font-bold text-gray-900 mb-2">{stats.totalComments}</span>
+                        <span className="text-gray-600">Comentários</span>
                     </div>
                 </div>
             </div>
 
-            <div className="stories-section">
-                <div className="stories-header">
-                    <h2>Minhas Histórias</h2>
+            <div className="bg-white rounded-lg border border-[#E5E7EB] mb-8">
+                <div className="p-6 border-b border-[#E5E7EB]">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-bold text-gray-900">Minhas Histórias</h2>
 
-                    <div className="stories-tabs">
-                        <button
-                            className={`tab-btn ${
-                                activeTab === "all" ? "active" : ""
-                            }`}
-                            onClick={() => setActiveTab("all")}
-                        >
-                            Todas
-                        </button>
-                        <button
-                            className={`tab-btn ${
-                                activeTab === "published" ? "active" : ""
-                            }`}
-                            onClick={() => setActiveTab("published")}
-                        >
-                            Publicadas
-                        </button>
-                        <button
-                            className={`tab-btn ${
-                                activeTab === "drafts" ? "active" : ""
-                            }`}
-                            onClick={() => setActiveTab("drafts")}
-                        >
-                            Rascunhos
-                        </button>
+                        <div className="flex space-x-2">
+                            <button
+                                className={`h-10 px-4 rounded-md transition-shadow duration-200 ${
+                                    activeTab === "all" 
+                                    ? "bg-[#484DB5] text-white" 
+                                    : "bg-white border border-[#E5E7EB] text-gray-600 hover:shadow-md"
+                                }`}
+                                onClick={() => setActiveTab("all")}
+                            >
+                                Todas
+                            </button>
+                            <button
+                                className={`h-10 px-4 rounded-md transition-shadow duration-200 ${
+                                    activeTab === "published"
+                                    ? "bg-[#484DB5] text-white"
+                                    : "bg-white border border-[#E5E7EB] text-gray-600 hover:shadow-md"
+                                }`}
+                                onClick={() => setActiveTab("published")}
+                            >
+                                Publicadas
+                            </button>
+                            <button
+                                className={`h-10 px-4 rounded-md transition-shadow duration-200 ${
+                                    activeTab === "drafts"
+                                    ? "bg-[#484DB5] text-white"
+                                    : "bg-white border border-[#E5E7EB] text-gray-600 hover:shadow-md"
+                                }`}
+                                onClick={() => setActiveTab("drafts")}
+                            >
+                                Rascunhos
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 {loadingStories ? (
-                    <div className="stories-loading">
-                        <div className="loader-large"></div>
-                        <p>Carregando histórias...</p>
+                    <div className="flex items-center justify-center p-8">
+                        <div className="flex flex-col items-center space-y-4">
+                            <div className="w-8 h-8 border-4 border-[#484DB5] border-t-transparent rounded-full animate-spin"></div>
+                            <p className="text-gray-600">Carregando histórias...</p>
+                        </div>
                     </div>
                 ) : filteredStories.length === 0 ? (
-                    <div className="empty-stories">
-                        <p>
+                    <div className="flex flex-col items-center justify-center p-8 text-center">
+                        <p className="text-gray-600 mb-4">
                             {activeTab === "all"
                                 ? "Você ainda não criou nenhuma história."
                                 : activeTab === "published"
                                 ? "Você ainda não publicou nenhuma história."
                                 : "Você não tem nenhum rascunho."}
                         </p>
-                        <Link href="/dashboard/new" className="create-first">
+                        <Link href="/dashboard/new" className="h-10 px-4 flex items-center bg-[#484DB5] text-white rounded-md hover:shadow-md transition-shadow duration-200">
                             Criar minha primeira história
                         </Link>
                     </div>
                 ) : (
-                    <div className="stories-list-dashboard">
+                    <div className="divide-y divide-[#E5E7EB]">
                         {filteredStories.map((story) => (
-                            <div key={story.id} className="story-item">
-                                <div className="story-main">
-                                    <h3 className="story-title">
+                            <div key={story.id} className="flex justify-between items-center p-6 hover:bg-gray-50">
+                                <div className="flex-1">
+                                    <h3 className="font-medium text-gray-900 mb-1">
                                         {story.title}
                                     </h3>
 
-                                    <div className="story-details">
-                                        <span className="story-category">
-                                            {story.category || "Sem categoria"}
-                                        </span>
-
-                                        <span
-                                            className={`story-status ${
-                                                story.is_published
-                                                    ? "published"
-                                                    : "draft"
-                                            }`}
-                                        >
-                                            {story.is_published
-                                                ? "Publicado"
-                                                : "Rascunho"}
+                                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                                        <span>{story.category || "Sem categoria"}</span>
+                                        <span className={`px-2 py-1 rounded-full text-xs ${
+                                            story.is_published
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-yellow-100 text-yellow-700"
+                                        }`}>
+                                            {story.is_published ? "Publicado" : "Rascunho"}
                                         </span>
                                     </div>
 
-                                    <div className="story-meta">
-                                        <div className="story-stats">
-                                            <span className="stat-item">
-                                                <Eye size={14} />
-                                                <span>
-                                                    {story.view_count || 0}
-                                                </span>
-                                            </span>
-                                            <span className="stat-item">
-                                                <MessageSquare size={14} />
-                                                <span>
-                                                    {story.comment_count || 0}
-                                                </span>
-                                            </span>
-                                            <span className="stat-item">
-                                                <BookOpen size={14} />
-                                                <span>
-                                                    {formatDate(
-                                                        story.created_at
-                                                    )}
-                                                </span>
-                                            </span>
-                                        </div>
+                                    <div className="flex items-center space-x-6 mt-2 text-sm text-gray-600">
+                                        <span className="flex items-center">
+                                            <Eye size={14} className="mr-1" />
+                                            {story.view_count || 0}
+                                        </span>
+                                        <span className="flex items-center">
+                                            <MessageSquare size={14} className="mr-1" />
+                                            {story.comment_count || 0}
+                                        </span>
+                                        <span className="flex items-center">
+                                            <BookOpen size={14} className="mr-1" />
+                                            {formatDate(story.created_at)}
+                                        </span>
                                     </div>
                                 </div>
 
-                                <div className="story-actions">
+                                <div className="flex items-center space-x-2">
                                     <Link
                                         href={`/story/${generateSlug(story.title, story.id)}`}
-                                        className="action-btn view-btn"
+                                        className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200"
                                         title="Visualizar"
                                     >
-                                        <Eye size={18} />
+                                        <Eye size={18} className="text-gray-600" />
                                     </Link>
 
                                     <Link
                                         href={`/dashboard/edit/${story.id}`}
-                                        className="action-btn edit-btn"
+                                        className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200"
                                         title="Editar"
                                     >
-                                        <Edit3 size={18} />
+                                        <Edit3 size={18} className="text-gray-600" />
                                     </Link>
 
                                     <button
-                                        onClick={() =>
-                                            openDeleteModal(
-                                                story.id,
-                                                story.title
-                                            )
-                                        }
-                                        className="action-btn delete-btn"
+                                        onClick={() => openDeleteModal(story.id, story.title)}
+                                        className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200"
                                         title="Excluir"
                                     >
-                                        <Trash2 size={18} />
+                                        <Trash2 size={18} className="text-gray-600" />
                                     </button>
                                 </div>
                             </div>
@@ -617,49 +605,49 @@ export default function DashboardPage() {
                 )}
             </div>
 
-            {/* Link para a página de séries - substituindo a tabela */}
-            <div className="series-link-section">
-                <div className="series-link-header">
-                    <h2>Minhas Séries</h2>
-                    <Link href="/series" className="view-all-series-link">
-                        <BookOpen size={18} />
+            <div className="bg-white rounded-lg border border-[#E5E7EB]">
+                <div className="p-6 border-b border-[#E5E7EB] flex justify-between items-center">
+                    <h2 className="text-xl font-bold text-gray-900">Minhas Séries</h2>
+                    <Link href="/series" className="h-10 px-4 flex items-center text-[#484DB5] hover:shadow-md transition-shadow duration-200">
+                        <BookOpen size={18} className="mr-2" />
                         <span>Ver minhas séries</span>
                     </Link>
                 </div>
                 
-                <div className="series-stats-card">
-                    <div className="series-stats-content">
-                        <div className="series-stats-item">
-                            <span className="series-stats-label">Total de séries</span>
-                            <span className="series-stats-value">{series.length}</span>
+                <div className="p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div className="text-center">
+                            <span className="block text-3xl font-bold text-gray-900 mb-2">{series.length}</span>
+                            <span className="text-gray-600">Total de séries</span>
                         </div>
-                        <div className="series-stats-item">
-                            <span className="series-stats-label">Completas</span>
-                            <span className="series-stats-value">
+                        <div className="text-center">
+                            <span className="block text-3xl font-bold text-gray-900 mb-2">
                                 {series.filter(s => s.is_completed).length}
                             </span>
+                            <span className="text-gray-600">Completas</span>
                         </div>
-                        <div className="series-stats-item">
-                            <span className="series-stats-label">Em andamento</span>
-                            <span className="series-stats-value">
+                        <div className="text-center">
+                            <span className="block text-3xl font-bold text-gray-900 mb-2">
                                 {series.filter(s => !s.is_completed).length}
                             </span>
+                            <span className="text-gray-600">Em andamento</span>
                         </div>
                     </div>
-                    <Link href="/dashboard/new-series" className="create-series-link">
-                        <Plus size={16} />
-                        <span>Nova Série</span>
-                    </Link>
+                    <div className="mt-6 text-center">
+                        <Link href="/dashboard/new-series" className="h-10 px-4 inline-flex items-center bg-[#484DB5] text-white rounded-md hover:shadow-md transition-shadow duration-200">
+                            <Plus size={20} className="mr-2" />
+                            <span>Criar nova série</span>
+                        </Link>
+                    </div>
                 </div>
             </div>
 
-            {/* Modal de confirmação de exclusão */}
             <DeleteModal
                 isOpen={deleteModal.open}
                 onClose={closeDeleteModal}
                 onConfirm={handleDelete}
                 title={deleteModal.title}
-                type={deleteModal.type}
+                loading={deleting}
             />
         </div>
     );
