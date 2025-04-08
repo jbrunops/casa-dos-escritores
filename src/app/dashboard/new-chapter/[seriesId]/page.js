@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import TipTapEditor from "@/components/TipTapEditor";
@@ -24,11 +24,8 @@ export default function NewChapterPage() {
     const mountedRef = useRef(true);
     const isSavingRef = useRef(false);
     
-    // Usar useRef para o cliente Supabase para evitar recriá-lo a cada renderização
-    const supabaseRef = useRef(null);
-    if (!supabaseRef.current) {
-        supabaseRef.current = createBrowserClient();
-    }
+    // Criar cliente Supabase diretamente
+    const supabase = createBrowserClient();
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
@@ -47,6 +44,7 @@ export default function NewChapterPage() {
 
     // Resetar ref na desmontagem
     useEffect(() => {
+        mountedRef.current = true;
         return () => {
             mountedRef.current = false;
             if (redirectTimeoutRef.current) {
@@ -56,88 +54,85 @@ export default function NewChapterPage() {
     }, []);
 
     // Buscar informações da série e definir número do capítulo
-    useEffect(() => {
-        async function fetchSeriesInfo() {
-            // Se já estamos carregando ou redirecionando, não iniciar nova busca
-            if (!mountedRef.current || isRedirecting) return;
+    const fetchSeriesInfo = useCallback(async () => {
+        if (!seriesId || !mountedRef.current || isRedirecting) return;
+        
+        setLoading(true);
+        setError(null);
+        
+        try {
+            console.log("Buscando informações da série:", seriesId);
             
-            try {
-                setLoading(true);
+            // Verificar se usuário está autenticado
+            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            
+            if (authError) {
+                console.error("Erro de autenticação:", authError);
+                throw new Error("Erro de autenticação");
+            }
+            
+            if (!user) {
+                router.push("/login");
+                return;
+            }
 
-                // Verificar se usuário está autenticado
-                const {
-                    data: { user },
-                } = await supabaseRef.current.auth.getUser();
-                
-                if (!user) {
-                    router.push("/login");
-                    return;
-                }
+            // Buscar série
+            const { data: seriesData, error: seriesError } = await supabase
+                .from("series")
+                .select("*")
+                .eq("id", seriesId)
+                .single();
 
-                // Buscar série
-                const { data: seriesData, error: seriesError } = await supabaseRef.current
-                    .from("series")
-                    .select("*")
-                    .eq("id", seriesId)
-                    .single();
+            if (seriesError) {
+                console.error("Erro ao buscar série:", seriesError);
+                throw new Error(
+                    "Não foi possível encontrar a série especificada"
+                );
+            }
 
-                if (seriesError) {
-                    console.error("Erro ao buscar série:", seriesError);
-                    throw new Error(
-                        "Não foi possível encontrar a série especificada"
-                    );
-                }
+            if (!seriesData) {
+                throw new Error("Série não encontrada");
+            }
 
-                if (!seriesData) {
-                    throw new Error("Série não encontrada");
-                }
+            // Verificar se o usuário é o autor da série
+            if (seriesData.author_id !== user.id) {
+                router.push("/dashboard");
+                return;
+            }
 
-                // Verificar se o usuário é o autor da série
-                if (seriesData.author_id !== user.id) {
-                    router.push("/dashboard");
-                    return;
-                }
+            setSeries(seriesData);
 
-                if (mountedRef.current) {
-                    setSeries(seriesData);
-                }
+            // Buscar maior número de capítulo existente
+            const { data: chapters, error: chaptersError } = await supabase
+                .from("chapters")
+                .select("chapter_number")
+                .eq("series_id", seriesId)
+                .order("chapter_number", { ascending: false });
 
-                // Buscar maior número de capítulo existente
-                const { data: chapters, error: chaptersError } = await supabaseRef.current
-                    .from("chapters")
-                    .select("chapter_number")
-                    .eq("series_id", seriesId)
-                    .order("chapter_number", { ascending: false });
+            if (chaptersError) {
+                console.error("Erro ao buscar capítulos:", chaptersError);
+            }
 
-                if (chaptersError) {
-                    console.error("Erro ao buscar capítulos:", chaptersError);
-                }
+            const nextChapterNumber =
+                chapters && chapters.length > 0
+                    ? chapters[0].chapter_number + 1
+                    : 1;
 
-                const nextChapterNumber =
-                    chapters && chapters.length > 0
-                        ? chapters[0].chapter_number + 1
-                        : 1;
-
-                if (mountedRef.current) {
-                    setChapterNumber(nextChapterNumber);
-                    setMaxChapterNumber(nextChapterNumber);
-                }
-            } catch (error) {
-                console.error("Erro ao buscar informações da série:", error);
-                if (mountedRef.current) {
-                    setError("Não foi possível carregar as informações da série");
-                }
-            } finally {
-                if (mountedRef.current) {
-                    setLoading(false);
-                }
+            setChapterNumber(nextChapterNumber);
+            setMaxChapterNumber(nextChapterNumber);
+        } catch (error) {
+            console.error("Erro ao buscar informações da série:", error);
+            setError("Não foi possível carregar as informações da série");
+        } finally {
+            if (mountedRef.current) {
+                setLoading(false);
             }
         }
+    }, [seriesId, router, supabase, isRedirecting]);
 
-        if (seriesId && !isRedirecting) {
-            fetchSeriesInfo();
-        }
-    }, [seriesId, router, isRedirecting]);
+    useEffect(() => {
+        fetchSeriesInfo();
+    }, [fetchSeriesInfo]);
 
     // Detectar mudanças no formulário
     useEffect(() => {
@@ -223,18 +218,16 @@ export default function NewChapterPage() {
         setSuccess(null);
 
         try {
-            const {
-                data: { user },
-            } = await supabaseRef.current.auth.getUser();
+            const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-            if (!user) {
+            if (authError || !user) {
                 isSavingRef.current = false;
                 setSaving(false);
                 throw new Error("Você precisa estar logado");
             }
 
             // Inserir novo capítulo
-            const { data, error } = await supabaseRef.current
+            const { data, error } = await supabase
                 .from("chapters")
                 .insert({
                     title,
@@ -253,7 +246,7 @@ export default function NewChapterPage() {
             }
 
             // Atualizar timestamp da série
-            const { error: updateError } = await supabaseRef.current
+            const { error: updateError } = await supabase
                 .from("series")
                 .update({ updated_at: new Date().toISOString() })
                 .eq("id", seriesId);
