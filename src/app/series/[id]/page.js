@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import { BookOpen, Calendar, User, Edit, Trash2, Plus, MessageCircle } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { extractIdFromSlug, generateSlug } from "@/lib/utils";
 import Comments from "@/components/Comments";
 
 export default function SeriesPage() {
     const params = useParams();
+    const router = useRouter();
     const slug = params.id;
     const id = extractIdFromSlug(slug) || slug;
     const [series, setSeries] = useState(null);
@@ -22,77 +23,80 @@ export default function SeriesPage() {
     const [deleting, setDeleting] = useState(false);
     const supabase = createBrowserClient();
 
-    useEffect(() => {
-        async function loadSeriesData() {
-            setLoading(true);
-            setError(null);
+    // Usar useCallback para a função de carregamento para garantir que ela não cause loops infinitos
+    const loadSeriesData = useCallback(async () => {
+        if (!id) return;
+        
+        setLoading(true);
+        setError(null);
 
-            try {
-                // Buscar detalhes da série
-                const { data: seriesData, error: seriesError } = await supabase
-                    .from("series")
-                    .select("*")
-                    .eq("id", id)
-                    .single();
+        try {
+            // Buscar detalhes da série
+            const { data: seriesData, error: seriesError } = await supabase
+                .from("series")
+                .select("*")
+                .eq("id", id)
+                .single();
 
-                if (seriesError) {
-                    console.error(`Erro ao buscar série com ID '${id}':`, seriesError);
-                    throw seriesError;
-                }
-
-                if (!seriesData) {
-                    console.error(`Série não encontrada para o ID: '${id}'`);
-                    throw new Error("Série não encontrada");
-                }
-
-                setSeries(seriesData);
-
-                // Buscar o autor separadamente
-                const { data: authorData } = await supabase
-                    .from("profiles")
-                    .select("username")
-                    .eq("id", seriesData.author_id)
-                    .single();
-
-                setAuthor(authorData);
-
-                // Buscar capítulos
-                const { data: chaptersData } = await supabase
-                    .from("chapters")
-                    .select("*")
-                    .eq("series_id", id)
-                    .order("chapter_number", { ascending: true });
-
-                setChapters(chaptersData || []);
-
-                // Verificar se o usuário atual é o autor
-                const {
-                    data: { session },
-                } = await supabase.auth.getSession();
-                const userId = session?.user?.id;
-                setIsAuthor(userId === seriesData.author_id);
-                
-                // Guarde o userId para usar em outros componentes
-                setCurrentUserId(userId);
-
-                // Atualizar contador de visualizações
-                try {
-                    await fetch(`/api/series/view?id=${id}`, {
-                        method: 'POST',
-                    });
-                } catch (viewError) {
-                    console.error("Erro ao atualizar visualizações:", viewError);
-                }
-            } catch (err) {
-                console.error("Erro ao carregar dados da série:", err);
-                setError(err.message || "Erro ao carregar a série");
-            } finally {
-                setLoading(false);
+            if (seriesError) {
+                console.error(`Erro ao buscar série com ID '${id}':`, seriesError);
+                throw seriesError;
             }
-        }
 
-        loadSeriesData();
+            if (!seriesData) {
+                console.error(`Série não encontrada para o ID: '${id}'`);
+                throw new Error("Série não encontrada");
+            }
+
+            setSeries(seriesData);
+
+            // Buscar o autor separadamente
+            const { data: authorData } = await supabase
+                .from("profiles")
+                .select("username")
+                .eq("id", seriesData.author_id)
+                .single();
+
+            setAuthor(authorData);
+
+            // Buscar capítulos
+            const { data: chaptersData } = await supabase
+                .from("chapters")
+                .select("*")
+                .eq("series_id", id)
+                .order("chapter_number", { ascending: true });
+
+            setChapters(chaptersData || []);
+
+            // Verificar se o usuário atual é o autor
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+            const userId = session?.user?.id;
+            setIsAuthor(userId === seriesData.author_id);
+            
+            // Guarde o userId para usar em outros componentes
+            setCurrentUserId(userId);
+
+            // Atualizar contador de visualizações
+            try {
+                await fetch(`/api/series/view?id=${id}`, {
+                    method: 'POST',
+                });
+            } catch (viewError) {
+                console.error("Erro ao atualizar visualizações:", viewError);
+            }
+        } catch (err) {
+            console.error("Erro ao carregar dados da série:", err);
+            setError(err.message || "Erro ao carregar a série");
+        } finally {
+            setLoading(false);
+        }
     }, [id, supabase]);
+
+    useEffect(() => {
+        loadSeriesData();
+    }, [loadSeriesData]);
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -125,8 +129,8 @@ export default function SeriesPage() {
 
             if (seriesError) throw seriesError;
 
-            // Redirecionar para o dashboard após sucesso
-            window.location.href = "/dashboard";
+            // Redirecionar para o dashboard após sucesso usando o router
+            router.push('/dashboard');
         } catch (err) {
             console.error("Erro ao excluir série:", err);
             alert("Não foi possível excluir a série. Por favor, tente novamente.");
@@ -139,6 +143,9 @@ export default function SeriesPage() {
         if (!confirm("Tem certeza que deseja excluir este capítulo?")) return;
 
         try {
+            // Desabilitar o estado de carregamento para evitar problemas de navegação
+            setLoading(true);
+            
             const { error } = await supabase
                 .from("chapters")
                 .delete()
@@ -146,11 +153,27 @@ export default function SeriesPage() {
 
             if (error) throw error;
 
-            // Atualizar a lista de capítulos localmente
-            setChapters(chapters.filter((chapter) => chapter.id !== chapterId));
+            // Atualizar o timestamp da série para refletir a mudança
+            try {
+                await supabase
+                    .from("series")
+                    .update({ updated_at: new Date().toISOString() })
+                    .eq("id", id);
+            } catch (updateError) {
+                console.error("Erro ao atualizar timestamp da série:", updateError);
+                // Continuamos mesmo com erro aqui, pois a exclusão já foi feita
+            }
+            
+            // Mensagem de sucesso
+            alert("Capítulo excluído com sucesso!");
+            
+            // Recarregar a página para evitar problemas de estado
+            await loadSeriesData();
         } catch (err) {
             console.error("Erro ao excluir capítulo:", err);
             alert("Erro ao excluir capítulo. Por favor, tente novamente.");
+        } finally {
+            setLoading(false);
         }
     };
 
