@@ -180,7 +180,7 @@ export default function SeriesHighlights() {
                                     </div>
                                 )}
                             </div>
-                            <div className="p-3 flex-grow">
+                            <div className="p-3 flex-grow flex flex-col">
                                 <h3 className="font-bold text-base line-clamp-2 mb-1">{serie.title}</h3>
                                 <p className="text-xs text-gray-600 mb-2">
                                     de {serie.author_name}
@@ -192,7 +192,7 @@ export default function SeriesHighlights() {
                                         </span>
                                     </div>
                                 )}
-                                <div className="flex items-center justify-between text-xs text-gray-600 mt-auto">
+                                <div className="mt-auto flex items-center justify-between text-xs text-gray-600">
                                     <div className="flex items-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -206,10 +206,8 @@ export default function SeriesHighlights() {
                                         </svg>
                                         {serie.chapter_count}
                                     </div>
-                                </div>
-                                <div className="mt-2">
-                                    <span className="inline-block bg-purple-100 text-[#484DB5] px-2 py-0.5 rounded text-xs">
-                                        {serie.is_completed ? "Completa" : "em andamento"}
+                                    <span className="text-xs text-[#484DB5] bg-purple-100 px-2 py-0.5 rounded">
+                                        {serie.is_completed ? "Completa" : "escrevendo..."}
                                     </span>
                                 </div>
                             </div>
