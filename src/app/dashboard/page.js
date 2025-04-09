@@ -526,9 +526,9 @@ export default function DashboardPage() {
                                 ? "Você ainda não publicou nenhuma história."
                                 : "Você não tem nenhum rascunho."}
                         </p>
-                        <Link href="/dashboard/new" className="h-10 px-4 flex items-center bg-[#484DB5] text-white rounded-md hover:shadow-md transition-shadow duration-200">
+                        {/* <Link href="/dashboard/new" className="h-10 px-4 flex items-center bg-[#484DB5] text-white rounded-md hover:shadow-md transition-shadow duration-200">
                             Criar minha primeira história
-                        </Link>
+                        </Link> */}
                     </div>
                 ) : (
                     <div className="divide-y divide-[#E5E7EB]">

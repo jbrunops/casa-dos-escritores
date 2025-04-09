@@ -158,7 +158,7 @@ export default async function HomePage() {
     ].sort((a, b) => b.comment_count - a.comment_count).slice(0, 10);
 
     // Buscar os 10 escritores mais ativos (que mais publicam)
-    // Primeiro, buscar todos os escritores com contagem de publicações
+    // Primeiro, buscar todos os escritores com contagem de publicações (histórias)
     const { data: authorStats } = await supabase
         .from("stories")
         .select(
@@ -169,25 +169,84 @@ export default async function HomePage() {
         )
         .eq("is_published", true);
 
-    // Contar o número de histórias por autor
-    const authorCounts = {};
+    // Buscar TODOS os capítulos com seus autores e todos seus campos
+    const { data: allChaptersWithAuthors } = await supabase
+        .from("chapters")
+        .select("*");
+    
+    // Log para debug
+    console.log("Total de capítulos encontrados:", allChaptersWithAuthors?.length || 0);
+    if (allChaptersWithAuthors?.length > 0) {
+        console.log("Campos disponíveis nos capítulos:", Object.keys(allChaptersWithAuthors[0]));
+    }
+        
+    // Buscar todos os perfis para uso posterior
+    const { data: allProfiles } = await supabase
+        .from("profiles")
+        .select("id, username, avatar_url");
+        
+    // Criar um mapa de perfis para fácil acesso
+    const profilesMap = {};
+    (allProfiles || []).forEach(profile => {
+        profilesMap[profile.id] = profile;
+    });
+
+    // Criar uma tabela virtual de "publicações" que combina histórias e capítulos
+    const publicationsByAuthor = {};
+    
+    // Log para debug
+    console.log("Total de histórias encontradas:", authorStats?.length || 0);
+    
+    // Adicionar histórias à contagem
     (authorStats || []).forEach((story) => {
+        if (!story.author_id || !story.profiles) return;
+        
         const authorId = story.author_id;
-        if (!authorCounts[authorId]) {
-            authorCounts[authorId] = {
+        
+        if (!publicationsByAuthor[authorId]) {
+            publicationsByAuthor[authorId] = {
                 id: authorId,
                 username: story.profiles.username,
                 avatar_url: story.profiles.avatar_url,
-                count: 0,
+                count: 0
             };
         }
-        authorCounts[authorId].count += 1;
+        
+        publicationsByAuthor[authorId].count += 1;
     });
-
+    
+    // Adicionar todos os capítulos à contagem do mesmo autor
+    (allChaptersWithAuthors || []).forEach((chapter) => {
+        if (!chapter.author_id) return;
+        
+        const authorId = chapter.author_id;
+        const authorProfile = profilesMap[authorId];
+        
+        if (!authorProfile) return;
+        
+        if (!publicationsByAuthor[authorId]) {
+            publicationsByAuthor[authorId] = {
+                id: authorId,
+                username: authorProfile.username,
+                avatar_url: authorProfile.avatar_url,
+                count: 0
+            };
+        }
+        
+        publicationsByAuthor[authorId].count += 1;
+    });
+    
+    // Log para debug - mostrar autores com suas contagens
+    console.log("Autores e suas contagens:", Object.values(publicationsByAuthor).map(a => 
+        ({ username: a.username, count: a.count })));
+        
     // Converter para array, ordenar por contagem e pegar os 10 primeiros
-    const topWriters = Object.values(authorCounts)
+    const topWriters = Object.values(publicationsByAuthor)
         .sort((a, b) => b.count - a.count)
         .slice(0, 10);
+        
+    // Log para debug - mostrar top 10 escritores
+    console.log("Top 10 escritores:", topWriters.map(a => ({ username: a.username, count: a.count })));
 
     // Função para criar um resumo do conteúdo HTML
     const createSummary = (htmlContent, maxLength = 150) => {
@@ -431,8 +490,8 @@ export default async function HomePage() {
                                             <p className="text-sm text-gray-600">
                                                 {writer.count}{" "}
                                                 {writer.count === 1
-                                                    ? "história"
-                                                    : "histórias"}
+                                                    ? "publicação"
+                                                    : "publicações"}
                                             </p>
                                         </div>
                                     </div>
