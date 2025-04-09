@@ -350,13 +350,13 @@ export default function Header() {
                                         )}
                                         <li>
                                             <button 
-                                                className="flex items-center text-[#484DB5] w-full text-left"
+                                                className="flex items-center text-red-600 w-full text-left"
                                                 onClick={() => {
                                                     handleSignOut();
                                                     setShowMobileMenu(false);
                                                 }}
                                             >
-                                                <LogOut size={20} className="mr-2" />
+                                                <LogOut size={20} className="mr-2 text-red-600" />
                                                 <span>Sair</span>
                                             </button>
                                         </li>
@@ -374,9 +374,10 @@ export default function Header() {
                     ) : user ? (
                         <div className="relative" ref={userDropdownRef}>
                             <button
-                                className="flex items-center text-gray-700 hover:text-[#484DB5]"
+                                className="flex items-center text-[#484DB5] font-semibold"
                                 onClick={() => setShowUserDropdown(!showUserDropdown)}
                             >
+                                <User size={18} className="mr-1.5" />
                                 <span className="mr-1">{username || "Usuário"}</span>
                                 <ChevronDown size={16} />
                             </button>
@@ -411,10 +412,10 @@ export default function Header() {
                                     )}
                                     <div className="border-t border-[#E5E7EB] my-1"></div>
                                     <button
-                                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#484DB5] w-full text-left"
+                                        className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left"
                                         onClick={handleSignOut}
                                     >
-                                        <LogOut size={18} className="mr-2" />
+                                        <LogOut size={18} className="mr-2 text-red-600" />
                                         <span>Sair</span>
                                     </button>
                                 </div>

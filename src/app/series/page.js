@@ -125,19 +125,19 @@ export default async function SeriesPage({ searchParams }) {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                             {seriesWithChapterCount.map((serie) => (
                                 <Link
                                     href={`/series/${generateSlug(serie.title, serie.id)}`}
                                     key={serie.id}
-                                    className="group border border-[#E5E7EB] rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200"
+                                    className="group border border-[#E5E7EB] rounded-lg overflow-hidden hover:shadow-md transition-all duration-200"
                                 >
-                                    <div className="aspect-[3/4] relative bg-gray-100">
+                                    <div className="aspect-[2/3] relative bg-gray-100">
                                         {serie.cover_url ? (
                                             <img
                                                 src={serie.cover_url}
                                                 alt={serie.title}
-                                                className="w-full h-full object-cover"
+                                                className="w-full h-full object-cover bg-gray-50"
                                             />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-gray-400">
@@ -147,14 +147,14 @@ export default async function SeriesPage({ searchParams }) {
                                             </div>
                                         )}
                                     </div>
-                                    <div className="p-4">
-                                        <h3 className="font-medium text-gray-900 mb-1 line-clamp-1">
+                                    <div className="p-3">
+                                        <h3 className="font-medium text-gray-900 mb-1 line-clamp-1 text-sm">
                                             {serie.title}
                                         </h3>
-                                        <p className="text-sm text-gray-600 mb-2">
+                                        <p className="text-xs text-gray-600 mb-1">
                                             por {serie.author_name}
                                         </p>
-                                        <div className="flex items-center justify-between text-sm">
+                                        <div className="flex items-center justify-between text-xs">
                                             <span className="text-gray-600">
                                                 {serie.chapter_count}{" "}
                                                 {serie.chapter_count === 1
@@ -168,7 +168,7 @@ export default async function SeriesPage({ searchParams }) {
                                             </span>
                                         </div>
                                         {serie.genre && (
-                                            <span className="inline-block mt-2 px-2 py-1 bg-gray-100 text-gray-600 text-sm rounded">
+                                            <span className="inline-block mt-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
                                                 {serie.genre}
                                             </span>
                                         )}
