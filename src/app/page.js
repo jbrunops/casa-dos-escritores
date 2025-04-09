@@ -218,7 +218,7 @@ export default async function HomePage() {
     return (
         <div className="home-page">
             <section className="columns-section">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[75rem] mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[75rem] mx-auto px-4 sm:px-6 md:px-0">
                     {/* Coluna 1: Histórias Recentes */}
                     <div className="column">
                         <h2 className="text-2xl font-extrabold text-black mb-4 border-b border-[#E5E7EB] pb-2 relative">
@@ -448,7 +448,7 @@ export default async function HomePage() {
                 <SeriesHighlights />
             </section>
 
-            <section className="max-w-[75rem] mx-auto px-4 py-12 features-section">
+            <section className="max-w-[75rem] mx-auto px-4 sm:px-6 md:px-0 py-12 features-section">
                 <h2 className="text-3xl font-extrabold text-black mb-8 pb-2 relative">
                     Como funciona
                     <span className="block h-1 w-64 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>

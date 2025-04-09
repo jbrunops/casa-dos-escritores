@@ -10,4 +10,12 @@ html, body {
 /* Espaçamento para o cabeçalho fixo */
 main {
   padding-top: 0px;
+}
+
+/* Ajuste de padding responsivo para seções */
+@media (max-width: 768px) {
+  .section-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 } 

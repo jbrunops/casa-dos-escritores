@@ -139,7 +139,7 @@ export default function SeriesHighlights() {
 
     return (
         <section className="py-8">
-            <div className="max-w-[75rem] mx-auto px-4">
+            <div className="max-w-[75rem] mx-auto px-4 sm:px-6 md:px-0">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-3xl font-extrabold text-black relative">
                         Séries em Destaque

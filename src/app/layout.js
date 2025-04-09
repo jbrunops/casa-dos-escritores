@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
                 <Header />
                 <main className="content-wrapper">{children}</main>
                 <footer className="border-t border-[#E5E7EB] mt-[1.875rem]">
-                    <div className="max-w-[75rem] mx-auto px-4 py-8">
+                    <div className="max-w-[75rem] mx-auto px-4 sm:px-6 md:px-0 py-8">
                         <div className="flex flex-col items-center justify-center space-y-4">
                             <p className="text-lg font-medium text-gray-900">
                                 &copy; {new Date().getFullYear()} Casa Dos Escritores
