@@ -263,11 +263,11 @@ export default async function HomePage() {
                                             <div className="flex items-center text-sm text-gray-600 mt-1 mb-2">
                                                 <span className="mr-2">
                                                     <span className="font-semibold">Série:</span>{" "}
-                                                    <Link href={`/series/${generateSlug(content.series?.title || "", content.series?.id || "")}`} 
-                                                        className="inline-flex items-center bg-[#484DB5]/10 text-[#484DB5] px-2 py-0.5 rounded-md hover:bg-[#484DB5]/20 transition-all">
+                                                    <span 
+                                                        className="inline-flex items-center bg-[#484DB5]/10 text-[#484DB5] px-2 py-0.5 rounded-md">
                                                         <Book size={14} className="mr-1" />
                                                         {content.series?.title}
-                                                    </Link>
+                                                    </span>
                                                 </span>
                                             </div>
                                             
@@ -347,11 +347,11 @@ export default async function HomePage() {
                                             <div className="flex items-center text-sm text-gray-600 mt-1 mb-2">
                                                 <span className="mr-2">
                                                     <span className="font-semibold">Série:</span>{" "}
-                                                    <Link href={`/series/${generateSlug(content.series?.title || "", content.series?.id || "")}`} 
-                                                        className="inline-flex items-center bg-[#484DB5]/10 text-[#484DB5] px-2 py-0.5 rounded-md hover:bg-[#484DB5]/20 transition-all">
+                                                    <span 
+                                                        className="inline-flex items-center bg-[#484DB5]/10 text-[#484DB5] px-2 py-0.5 rounded-md">
                                                         <Book size={14} className="mr-1" />
                                                         {content.series?.title}
-                                                    </Link>
+                                                    </span>
                                                 </span>
                                             </div>
                                             
