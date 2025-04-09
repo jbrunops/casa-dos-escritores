@@ -467,7 +467,7 @@ export default async function HomePage() {
                                             <img
                                                 src={writer.avatar_url}
                                                 alt={writer.username}
-                                                className="w-10 h-10 rounded-full mr-3"
+                                                className="w-10 h-10 rounded-full mr-3 object-cover"
                                             />
                                         ) : (
                                             <div className="w-10 h-10 rounded-full bg-[#484DB5] text-white flex items-center justify-center mr-3">

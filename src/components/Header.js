@@ -48,6 +48,7 @@ export default function Header() {
         "Poesia",
         "Ficção Científica",
         "Brasileiro",
+        "Anime",
         "Outros",
     ];
 

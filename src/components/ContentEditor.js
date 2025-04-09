@@ -72,6 +72,7 @@ export default function ContentEditor({
         "Poesia",
         "Ficção Científica",
         "Brasileiro",
+        "Anime",
         "Outros",
     ];
 

@@ -31,6 +31,7 @@ export default async function CategoriesPage() {
         "Poesia",
         "Ficção Científica",
         "Brasileiro",
+        "Anime",
         "Outros",
     ];
 
