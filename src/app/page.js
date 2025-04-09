@@ -256,7 +256,7 @@ export default async function HomePage() {
                                             className="block relative p-[1.875rem] rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
                                         >
                                             <div className="absolute top-0 right-0 px-2 py-1 bg-[#484DB5] text-white text-xs rounded-tr-lg">
-                                                Capítulo
+                                                Capítulo {content.chapter_number}
                                             </div>
                                             <h3 className="font-semibold text-lg mt-2 mb-3">{content.title}</h3>
                                             
@@ -268,9 +268,6 @@ export default async function HomePage() {
                                                         <Book size={14} className="mr-1" />
                                                         {content.series?.title}
                                                     </Link>
-                                                </span>
-                                                <span className="bg-gray-200 px-2 py-0.5 rounded-full text-xs">
-                                                    Cap. {content.chapter_number}
                                                 </span>
                                             </div>
                                             
@@ -343,7 +340,7 @@ export default async function HomePage() {
                                             className="block relative p-[1.875rem] rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
                                         >
                                             <div className="absolute top-0 right-0 px-2 py-1 bg-[#484DB5] text-white text-xs rounded-tr-lg">
-                                                Capítulo
+                                                Capítulo {content.chapter_number}
                                             </div>
                                             <h3 className="font-semibold text-lg mt-2 mb-3">{content.title}</h3>
                                             
@@ -355,9 +352,6 @@ export default async function HomePage() {
                                                         <Book size={14} className="mr-1" />
                                                         {content.series?.title}
                                                     </Link>
-                                                </span>
-                                                <span className="bg-gray-200 px-2 py-0.5 rounded-full text-xs">
-                                                    Cap. {content.chapter_number}
                                                 </span>
                                             </div>
                                             
