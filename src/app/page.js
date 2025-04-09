@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import { Edit, BookOpen, Share2, MessageSquare, BookText } from "lucide-react";
+import { Edit, BookOpen, Share2, MessageSquare, BookText, Book } from "lucide-react";
 import SeriesHighlights from "@/components/SeriesHighlights";
 import { generateSlug } from "@/lib/utils";
 
@@ -253,22 +253,32 @@ export default async function HomePage() {
                                         <Link
                                             href={`/chapter/${generateSlug(content.title, content.id)}`}
                                             key={`chapter-${content.id}`}
-                                            className="block p-4 rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
+                                            className="block relative p-[1.875rem] rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
                                         >
-                                            <div className="inline-block px-2 py-1 bg-[#484DB5] text-white text-xs rounded mb-2">
+                                            <div className="absolute top-0 right-0 px-2 py-1 bg-[#484DB5] text-white text-xs rounded-tr-lg">
                                                 Capítulo
                                             </div>
-                                            <h3 className="font-semibold text-lg">{content.title}</h3>
+                                            <h3 className="font-semibold text-lg mt-2 mb-3">{content.title}</h3>
                                             
                                             <div className="flex items-center text-sm text-gray-600 mt-1 mb-2">
-                                                <BookText size={15} className="mr-1" />
-                                                <span className="mr-2">Série: {content.series?.title}</span>
+                                                <span className="mr-2">
+                                                    <span className="font-semibold">Série:</span>{" "}
+                                                    <Link href={`/series/${generateSlug(content.series?.title || "", content.series?.id || "")}`} 
+                                                        className="inline-flex items-center bg-[#484DB5]/10 text-[#484DB5] px-2 py-0.5 rounded-md hover:bg-[#484DB5]/20 transition-all">
+                                                        <Book size={14} className="mr-1" />
+                                                        {content.series?.title}
+                                                    </Link>
+                                                </span>
                                                 <span className="bg-gray-200 px-2 py-0.5 rounded-full text-xs">
                                                     Cap. {content.chapter_number}
                                                 </span>
                                             </div>
                                             
-                                            <div className="flex justify-between text-sm text-gray-600 mt-1 mb-2">
+                                            <p className="text-gray-700 my-4">
+                                                {createSummary(content.content)}
+                                            </p>
+                                            
+                                            <div className="flex justify-between text-sm text-gray-600 mt-4 pt-3 border-t border-[#E5E7EB]">
                                                 <span className="font-medium">
                                                     {content.type === 'chapter' ? content.author?.username : content.profiles.username}
                                                 </span>
@@ -276,10 +286,6 @@ export default async function HomePage() {
                                                     {formatDate(content.created_at)}
                                                 </span>
                                             </div>
-                                            
-                                            <p className="text-gray-700">
-                                                {createSummary(content.content)}
-                                            </p>
                                         </Link>
                                     )
                                 )
@@ -334,30 +340,38 @@ export default async function HomePage() {
                                         <Link
                                             href={`/chapter/${generateSlug(content.title, content.id)}`}
                                             key={`chapter-${content.id}`}
-                                            className="block p-4 rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
+                                            className="block relative p-[1.875rem] rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
                                         >
-                                            <div className="inline-block px-2 py-1 bg-[#484DB5] text-white text-xs rounded mb-2">
+                                            <div className="absolute top-0 right-0 px-2 py-1 bg-[#484DB5] text-white text-xs rounded-tr-lg">
                                                 Capítulo
                                             </div>
-                                            <h3 className="font-semibold text-lg">{content.title}</h3>
+                                            <h3 className="font-semibold text-lg mt-2 mb-3">{content.title}</h3>
                                             
                                             <div className="flex items-center text-sm text-gray-600 mt-1 mb-2">
-                                                <BookText size={15} className="mr-1" />
-                                                <span className="mr-2">Série: {content.series?.title}</span>
+                                                <span className="mr-2">
+                                                    <span className="font-semibold">Série:</span>{" "}
+                                                    <Link href={`/series/${generateSlug(content.series?.title || "", content.series?.id || "")}`} 
+                                                        className="inline-flex items-center bg-[#484DB5]/10 text-[#484DB5] px-2 py-0.5 rounded-md hover:bg-[#484DB5]/20 transition-all">
+                                                        <Book size={14} className="mr-1" />
+                                                        {content.series?.title}
+                                                    </Link>
+                                                </span>
                                                 <span className="bg-gray-200 px-2 py-0.5 rounded-full text-xs">
                                                     Cap. {content.chapter_number}
                                                 </span>
                                             </div>
                                             
-                                            <div className="flex justify-between text-sm text-gray-600 mt-1 mb-2">
+                                            <p className="text-gray-700 my-4">
+                                                {createSummary(content.content)}
+                                            </p>
+                                            
+                                            <div className="flex justify-between text-sm text-gray-600 mt-4 pt-3 border-t border-[#E5E7EB]">
                                                 <span className="font-medium">
                                                     {content.type === 'chapter' ? content.author?.username : content.profiles.username}
                                                 </span>
                                                 <div className="flex items-center space-x-2">
                                                     <span>
-                                                        {formatDate(
-                                                            content.created_at
-                                                        )}
+                                                        {formatDate(content.created_at)}
                                                     </span>
                                                     <span className="flex items-center bg-gray-100 px-2 py-0.5 rounded-full">
                                                         <MessageSquare
@@ -370,10 +384,6 @@ export default async function HomePage() {
                                                     </span>
                                                 </div>
                                             </div>
-                                            
-                                            <p className="text-gray-700">
-                                                {createSummary(content.content)}
-                                            </p>
                                         </Link>
                                     )
                                 )
