@@ -108,8 +108,7 @@ Este projeto está licenciado sob a licença [MIT](LICENSE).
 ## 📞 Contato e Suporte
 
 - **Site**: [casadosescritores.com.br](https://casadosescritores.com.br)
-- **Email**: contato@casadosescritores.com.br
-- **GitHub**: [github.com/seu-usuario/casadosescritores](https://github.com/seu-usuario/casadosescritores)
+- **Email**: jbrunops@outlook.com
 
 ---
 

@@ -189,60 +189,63 @@ export default function Header() {
     return (
         <header className="bg-white border-b border-[#E5E7EB] w-full py-3 px-4 md:px-0 mb-[1.875rem]">
             <div className="max-w-[75rem] mx-auto flex items-center justify-between">
-                {/* Logo */}
-                <div className="text-[#484DB5] font-bold text-xl">
-                    <Link href="/">Casa Dos Escritores</Link>
-                </div>
-
-                {/* Navegação principal - apenas desktop */}
-                <nav className="hidden md:flex items-center space-x-6">
-                    <div className="relative" ref={categoryDropdownRef}>
-                        <button
-                            className="flex items-center text-[#484DB5] space-x-1"
-                            onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                        >
-                            <Compass size={20} className="mr-1" />
-                            <span>Explorar</span>
-                            <ChevronDown size={16} />
-                        </button>
-                        
-                        {showCategoryDropdown && (
-                            <div className="absolute top-full left-0 mt-2 bg-white rounded-md shadow-lg p-3 w-64 z-10 border border-[#E5E7EB]">
-                                <div className="grid grid-cols-2 gap-2">
-                                    {categories.map((category) => (
-                                        <Link
-                                            key={category}
-                                            href={`/categories/${category.toLowerCase().replace(/\s+/g, "-")}`}
-                                            className="text-gray-700 hover:text-[#484DB5] px-3 py-2 rounded"
-                                            onClick={() => setShowCategoryDropdown(false)}
-                                        >
-                                            {category}
-                                        </Link>
-                                    ))}
-                                    <Link
-                                        href="/categories"
-                                        className="col-span-2 text-center text-[#484DB5] mt-2 font-medium"
-                                        onClick={() => setShowCategoryDropdown(false)}
-                                    >
-                                        Ver Todas
-                                    </Link>
-                                </div>
-                            </div>
-                        )}
+                {/* Logo e navegação principal agrupados */}
+                <div className="flex items-center">
+                    {/* Logo */}
+                    <div className="text-[#484DB5] font-bold text-xl mr-6">
+                        <Link href="/">Casa Dos Escritores</Link>
                     </div>
 
-                    <Link
-                        href="/series"
-                        className={`flex items-center ${
-                            pathname.startsWith("/series")
-                                ? "text-[#484DB5] font-medium"
-                                : "text-[#484DB5]"
-                        }`}
-                    >
-                        <BookOpen size={20} className="mr-1" />
-                        <span>Séries</span>
-                    </Link>
-                </nav>
+                    {/* Navegação principal - apenas desktop */}
+                    <nav className="hidden md:flex items-center space-x-6">
+                        <div className="relative" ref={categoryDropdownRef}>
+                            <button
+                                className="flex items-center text-[#484DB5] space-x-1 h-10 transition-transform duration-200 ease-in-out hover:scale-105"
+                                onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                            >
+                                <Compass size={20} className="mr-1" />
+                                <span>Explorar</span>
+                                <ChevronDown size={16} />
+                            </button>
+                            
+                            {showCategoryDropdown && (
+                                <div className="absolute top-full left-0 mt-2 bg-white rounded-md shadow-lg p-3 w-64 z-10 border border-[#E5E7EB]">
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {categories.map((category) => (
+                                            <Link
+                                                key={category}
+                                                href={`/categories/${category.toLowerCase().replace(/\s+/g, "-")}`}
+                                                className="text-gray-700 hover:bg-gray-100 transition-colors duration-200 px-3 py-2 rounded"
+                                                onClick={() => setShowCategoryDropdown(false)}
+                                            >
+                                                {category}
+                                            </Link>
+                                        ))}
+                                        <Link
+                                            href="/categories"
+                                            className="col-span-2 text-center text-[#484DB5] mt-2 font-medium transition-transform duration-200 ease-in-out hover:scale-105"
+                                            onClick={() => setShowCategoryDropdown(false)}
+                                        >
+                                            Ver Todas
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <Link
+                            href="/series"
+                            className={`flex items-center h-10 transition-transform duration-200 ease-in-out hover:scale-105 ${
+                                pathname.startsWith("/series")
+                                    ? "text-[#484DB5] font-medium"
+                                    : "text-[#484DB5]"
+                            }`}
+                        >
+                            <BookOpen size={20} className="mr-1" />
+                            <span>Séries</span>
+                        </Link>
+                    </nav>
+                </div>
 
                 {/* Elementos para mobile */}
                 <button
@@ -425,13 +428,13 @@ export default function Header() {
                         <div className="flex items-center space-x-4">
                             <Link
                                 href="/signup"
-                                className="text-[#484DB5]"
+                                className="text-[#484DB5] h-10 flex items-center transition-transform duration-200 ease-in-out hover:scale-105"
                             >
                                 cadastre-se
                             </Link>
                             <Link
                                 href="/login"
-                                className="bg-[#484DB5] text-white px-6 py-2 rounded-md"
+                                className="bg-[#484DB5] text-white px-6 h-10 flex items-center justify-center rounded-md transition-transform duration-200 ease-in-out hover:scale-105"
                             >
                                 Entrar
                             </Link>

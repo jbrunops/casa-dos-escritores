@@ -420,21 +420,13 @@ export default function DashboardPage() {
 
     return (
         <div className="max-w-[75rem] mx-auto px-4 py-8">
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">Meu Dashboard</h1>
                     <p className="text-gray-600 mt-1">Bem-vindo, {profile?.username || "Escritor"}</p>
                 </div>
 
-                <div className="flex items-center space-x-4">
-                    <button
-                        onClick={refreshData}
-                        className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200"
-                        aria-label="Atualizar dados"
-                    >
-                        <RefreshCw size={20} className="text-gray-600" />
-                    </button>
-
+                <div className="flex items-center mt-4 sm:mt-0">
                     <Link href="/dashboard/new" className="h-10 px-4 flex items-center bg-[#484DB5] text-white rounded-md hover:shadow-md transition-shadow duration-200">
                         <PlusCircle size={20} className="mr-2" />
                         <span>Nova História</span>
@@ -448,44 +440,44 @@ export default function DashboardPage() {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="bg-white p-6 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
                     <div className="text-center">
-                        <span className="block text-3xl font-bold text-gray-900 mb-2">{stats.totalStories}</span>
-                        <span className="text-gray-600">Total de histórias</span>
+                        <span className="block text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stats.totalStories}</span>
+                        <span className="text-sm sm:text-base text-gray-600">Total de histórias</span>
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
+                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
                     <div className="text-center">
-                        <span className="block text-3xl font-bold text-gray-900 mb-2">{stats.publishedStories}</span>
-                        <span className="text-gray-600">Publicadas</span>
+                        <span className="block text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stats.publishedStories}</span>
+                        <span className="text-sm sm:text-base text-gray-600">Publicadas</span>
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
+                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
                     <div className="text-center">
-                        <span className="block text-3xl font-bold text-gray-900 mb-2">{stats.totalViews}</span>
-                        <span className="text-gray-600">Visualizações</span>
+                        <span className="block text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stats.totalViews}</span>
+                        <span className="text-sm sm:text-base text-gray-600">Visualizações</span>
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
+                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
                     <div className="text-center">
-                        <span className="block text-3xl font-bold text-gray-900 mb-2">{stats.totalComments}</span>
-                        <span className="text-gray-600">Comentários</span>
+                        <span className="block text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stats.totalComments}</span>
+                        <span className="text-sm sm:text-base text-gray-600">Comentários</span>
                     </div>
                 </div>
             </div>
 
             <div className="bg-white rounded-lg border border-[#E5E7EB] mb-8">
                 <div className="p-6 border-b border-[#E5E7EB]">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold text-gray-900">Minhas Histórias</h2>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                        <h2 className="text-xl font-bold text-gray-900 mb-4 sm:mb-0">Minhas Histórias</h2>
 
-                        <div className="flex space-x-2">
+                        <div className="flex flex-wrap gap-2">
                             <button
-                                className={`h-10 px-4 rounded-md transition-shadow duration-200 ${
+                                className={`h-10 px-2 sm:px-4 text-sm sm:text-base rounded-md transition-shadow duration-200 ${
                                     activeTab === "all" 
                                     ? "bg-[#484DB5] text-white" 
                                     : "bg-white border border-[#E5E7EB] text-gray-600 hover:shadow-md"
@@ -495,7 +487,7 @@ export default function DashboardPage() {
                                 Todas
                             </button>
                             <button
-                                className={`h-10 px-4 rounded-md transition-shadow duration-200 ${
+                                className={`h-10 px-2 sm:px-4 text-sm sm:text-base rounded-md transition-shadow duration-200 ${
                                     activeTab === "published"
                                     ? "bg-[#484DB5] text-white"
                                     : "bg-white border border-[#E5E7EB] text-gray-600 hover:shadow-md"
@@ -505,7 +497,7 @@ export default function DashboardPage() {
                                 Publicadas
                             </button>
                             <button
-                                className={`h-10 px-4 rounded-md transition-shadow duration-200 ${
+                                className={`h-10 px-2 sm:px-4 text-sm sm:text-base rounded-md transition-shadow duration-200 ${
                                     activeTab === "drafts"
                                     ? "bg-[#484DB5] text-white"
                                     : "bg-white border border-[#E5E7EB] text-gray-600 hover:shadow-md"
@@ -606,31 +598,31 @@ export default function DashboardPage() {
             </div>
 
             <div className="bg-white rounded-lg border border-[#E5E7EB]">
-                <div className="p-6 border-b border-[#E5E7EB] flex justify-between items-center">
+                <div className="p-6 border-b border-[#E5E7EB] flex flex-row justify-between items-center">
                     <h2 className="text-xl font-bold text-gray-900">Minhas Séries</h2>
-                    <Link href="/series" className="h-10 px-4 flex items-center text-[#484DB5] hover:shadow-md transition-shadow duration-200">
+                    <Link href="/series" className="h-10 px-4 flex items-center text-[#484DB5] hover:shadow-md transition-shadow duration-200 whitespace-nowrap">
                         <BookOpen size={18} className="mr-2" />
                         <span>Ver minhas séries</span>
                     </Link>
                 </div>
                 
                 <div className="p-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-3 gap-4">
                         <div className="text-center">
-                            <span className="block text-3xl font-bold text-gray-900 mb-2">{series.length}</span>
-                            <span className="text-gray-600">Total de séries</span>
+                            <span className="block text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{series.length}</span>
+                            <span className="text-sm sm:text-base text-gray-600">Total de séries</span>
                         </div>
                         <div className="text-center">
-                            <span className="block text-3xl font-bold text-gray-900 mb-2">
+                            <span className="block text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
                                 {series.filter(s => s.is_completed).length}
                             </span>
-                            <span className="text-gray-600">Completas</span>
+                            <span className="text-sm sm:text-base text-gray-600">Completas</span>
                         </div>
                         <div className="text-center">
-                            <span className="block text-3xl font-bold text-gray-900 mb-2">
+                            <span className="block text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
                                 {series.filter(s => !s.is_completed).length}
                             </span>
-                            <span className="text-gray-600">Em andamento</span>
+                            <span className="text-sm sm:text-base text-gray-600">Em andamento</span>
                         </div>
                     </div>
                     <div className="mt-6 text-center">
