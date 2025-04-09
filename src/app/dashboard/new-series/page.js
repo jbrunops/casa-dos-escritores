@@ -206,68 +206,68 @@ export default function NewSeriesPage() {
     };
 
     return (
-        <div className="series-editor-container">
-            <div className="series-editor-header">
-                <h1>Criar Nova Série</h1>
+        <div className="max-w-[75rem] mx-auto px-6 py-8">
+            <div className="mb-6">
+                <h1 className="text-2xl font-bold">Criar Nova Série</h1>
             </div>
 
-            <div className="back-dashboard">
-                <Link href="/dashboard" className="back-link">
-                    <ArrowLeft size={16} />
+            <div className="mb-6">
+                <Link href="/dashboard" className="inline-flex items-center text-[#484DB5] hover:text-opacity-80 transition-all duration-200">
+                    <ArrowLeft size={16} className="mr-2" />
                     <span>Voltar ao Dashboard</span>
                 </Link>
             </div>
 
             {error && (
-                <div className="series-message error">
-                    <AlertTriangle size={20} />
+                <div className="flex items-center p-4 mb-6 bg-red-50 text-red-700 rounded-md">
+                    <AlertTriangle size={20} className="mr-2 flex-shrink-0" />
                     <span>{error}</span>
                 </div>
             )}
 
             {success && (
-                <div className="series-message success">
-                    <CheckCircle2 size={20} />
+                <div className="flex items-center p-4 mb-6 bg-green-50 text-green-700 rounded-md">
+                    <CheckCircle2 size={20} className="mr-2 flex-shrink-0" />
                     <span>{success}</span>
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="series-editor-form">
-                <div className="series-form-grid">
-                    <div className="series-form-column">
-                        <div className="series-form-group">
-                            <label htmlFor="title">Título da Série*</label>
+            <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <label htmlFor="title" className="block text-sm font-medium text-gray-700">Título da Série*</label>
                             <input
                                 id="title"
                                 type="text"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="series-input"
+                                className="w-full h-10 px-3 py-2 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200"
                                 placeholder="Um título cativante para sua série..."
                                 required
                             />
                         </div>
 
-                        <div className="series-form-group">
-                            <label htmlFor="description">Sinopse</label>
+                        <div className="space-y-2">
+                            <label htmlFor="description" className="block text-sm font-medium text-gray-700">Sinopse</label>
                             <textarea
                                 id="description"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="series-textarea"
+                                className="w-full px-3 py-2 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200"
                                 placeholder="Descreva sua série em algumas linhas..."
                                 rows={5}
                             />
                         </div>
 
-                        <div className="series-form-row">
-                            <div className="series-form-group">
-                                <label htmlFor="genre">Gênero</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label htmlFor="genre" className="block text-sm font-medium text-gray-700">Gênero</label>
                                 <select
                                     id="genre"
                                     value={genre}
                                     onChange={(e) => setGenre(e.target.value)}
-                                    className="series-select"
+                                    className="w-full h-10 px-3 py-2 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200 bg-white"
                                 >
                                     <option value="">
                                         Selecione um gênero
@@ -280,8 +280,8 @@ export default function NewSeriesPage() {
                                 </select>
                             </div>
 
-                            <div className="series-form-group">
-                                <label htmlFor="tags">Tags (max. 5)</label>
+                            <div className="space-y-2">
+                                <label htmlFor="tags" className="block text-sm font-medium text-gray-700">Tags (max. 5)</label>
                                 <input
                                     id="tags"
                                     type="text"
@@ -290,22 +290,22 @@ export default function NewSeriesPage() {
                                         setTagInput(e.target.value)
                                     }
                                     onKeyDown={handleAddTag}
-                                    className="series-input"
+                                    className="w-full h-10 px-3 py-2 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200"
                                     placeholder="Digite e pressione Enter..."
                                     disabled={tags.length >= 5}
                                 />
-                                <div className="form-hint">
+                                <div className="text-xs text-gray-500 mt-1">
                                     Adicione tags para ajudar leitores a
                                     encontrar sua série
                                 </div>
                                 {tags.length > 0 && (
-                                    <div className="tags-container">
+                                    <div className="flex flex-wrap gap-2 mt-2">
                                         {tags.map((tag, index) => (
-                                            <span key={index} className="tag">
+                                            <span key={index} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#484DB5] bg-opacity-10 text-[#484DB5]">
                                                 {tag}
                                                 <button
                                                     type="button"
-                                                    className="tag-remove"
+                                                    className="ml-1.5 text-[#484DB5] hover:text-opacity-70 transition-colors duration-200"
                                                     onClick={() =>
                                                         handleRemoveTag(tag)
                                                     }
@@ -320,54 +320,57 @@ export default function NewSeriesPage() {
                         </div>
                     </div>
 
-                    <div className="series-form-column">
-                        <div className="series-form-group">
-                            <label>Capa da Série</label>
-                            <div className="cover-upload-container">
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">Capa da Série</label>
+                            <div className="border-2 border-dashed border-[#E5E7EB] rounded-lg overflow-hidden">
                                 {coverPreview ? (
-                                    <div className="cover-preview-container">
-                                        <img
-                                            src={coverPreview}
-                                            alt="Preview da capa"
-                                            className="cover-preview"
-                                            key={coverPreview}
-                                        />
-                                        <div className="cover-actions">
-                                            <button
-                                                type="button"
-                                                className="cover-change-btn"
-                                                onClick={() => document.getElementById('coverFileInput').click()}
-                                            >
-                                                Trocar imagem
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="cover-remove-btn"
-                                                onClick={() => {
-                                                    setCoverFile(null);
-                                                    setCoverPreview("");
-                                                }}
-                                            >
-                                                Remover
-                                            </button>
+                                    <div className="relative">
+                                        <div className="aspect-[2/3] w-48 mx-auto overflow-hidden rounded-md">
+                                            <img
+                                                src={coverPreview}
+                                                alt="Preview da capa"
+                                                className="w-full h-full object-cover"
+                                                key={coverPreview}
+                                            />
+                                        </div>
+                                        <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-all duration-300">
+                                            <div className="flex space-x-2">
+                                                <button
+                                                    type="button"
+                                                    className="px-3 py-1.5 bg-white text-gray-700 rounded hover:bg-gray-100 transition-colors duration-200"
+                                                    onClick={() => document.getElementById('coverFileInput').click()}
+                                                >
+                                                    Trocar imagem
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="px-3 py-1.5 bg-white text-red-600 rounded hover:bg-gray-100 transition-colors duration-200"
+                                                    onClick={() => {
+                                                        setCoverFile(null);
+                                                        setCoverPreview("");
+                                                    }}
+                                                >
+                                                    Remover
+                                                </button>
+                                            </div>
                                         </div>
                                         <input
                                             id="coverFileInput"
                                             type="file"
                                             accept="image/jpeg, image/png, image/gif"
                                             onChange={handleCoverChange}
-                                            className="cover-input hidden"
-                                            style={{ display: 'none' }}
+                                            className="hidden"
                                         />
                                     </div>
                                 ) : (
-                                    <div className="cover-upload">
-                                        <div className="cover-placeholder">
-                                            <Image size={48} opacity={0.3} />
-                                            <span>
+                                    <div className="relative">
+                                        <div className="aspect-[2/3] w-48 mx-auto flex flex-col items-center justify-center py-12 cursor-pointer border border-[#E5E7EB] border-dashed rounded-md">
+                                            <Image size={48} className="text-gray-400 mb-4" />
+                                            <span className="text-sm text-gray-500 text-center">
                                                 Clique para enviar uma imagem
                                                 <br />
-                                                <small>JPG, PNG ou GIF • Máx 2MB</small>
+                                                <span className="text-xs">JPG, PNG ou GIF • Máx 2MB</span>
                                             </span>
                                         </div>
                                         <input
@@ -375,12 +378,12 @@ export default function NewSeriesPage() {
                                             id="cover"
                                             accept="image/jpeg, image/png, image/gif"
                                             onChange={handleCoverChange}
-                                            className="cover-input"
+                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                         />
                                     </div>
                                 )}
                             </div>
-                            <div className="form-hint">
+                            <div className="text-xs text-gray-500 mt-1">
                                 Arquivos JPG, PNG ou GIF de até 2MB. Proporção
                                 ideal: 2:3 (como capas de livros)
                             </div>
@@ -388,23 +391,23 @@ export default function NewSeriesPage() {
                     </div>
                 </div>
 
-                <div className="series-actions">
+                <div className="flex justify-end pt-6 border-t border-[#E5E7EB]">
                     <button
                         type="submit"
                         disabled={saving || !title.trim() || !formTouched}
-                        className="series-btn series-btn-primary"
+                        className="h-10 px-6 flex items-center justify-center bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#484DB5] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {saving ? (
                             <>
                                 <Save
-                                    className="series-btn-icon btn-spinner"
+                                    className="mr-2 animate-spin"
                                     size={18}
                                 />
                                 <span>Criando série...</span>
                             </>
                         ) : (
                             <>
-                                <Save className="series-btn-icon" size={18} />
+                                <Save className="mr-2" size={18} />
                                 <span>Criar Série e Adicionar Capítulos</span>
                             </>
                         )}
