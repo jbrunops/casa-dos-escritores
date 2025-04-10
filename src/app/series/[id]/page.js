@@ -141,7 +141,7 @@ export default function SeriesPage() {
 
     if (loading) {
         return (
-            <div className="max-w-[75rem] mx-auto px-4 py-8">
+            <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
                 <div className="flex flex-col items-center justify-center py-12">
                     <div className="w-12 h-12 border-4 border-t-[#484DB5] border-r-[#E5E7EB] border-b-[#E5E7EB] border-l-[#E5E7EB] rounded-full animate-spin"></div>
                     <p className="mt-4 text-gray-700">Carregando série...</p>
@@ -152,7 +152,7 @@ export default function SeriesPage() {
 
     if (error || !series) {
         return (
-            <div className="max-w-[75rem] mx-auto px-4 py-8">
+            <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
                 <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md">
                     {error || "Série não encontrada."}
                 </div>
@@ -166,7 +166,7 @@ export default function SeriesPage() {
     }
 
     return (
-        <div className="max-w-[75rem] mx-auto px-4 py-8">
+        <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 {/* Header com informações da série */}
                 <div className="flex flex-col md:flex-row p-6 gap-6 border-b border-[#E5E7EB]">

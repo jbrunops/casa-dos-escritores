@@ -232,7 +232,7 @@ export default function EditProfilePage() {
 
     if (loading) {
         return (
-            <div className="max-w-[75rem] mx-auto px-4 py-8">
+            <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
                 <div className="flex flex-col items-center justify-center py-12">
                     <div className="w-12 h-12 border-4 border-t-[#484DB5] border-r-[#E5E7EB] border-b-[#E5E7EB] border-l-[#E5E7EB] rounded-full animate-spin"></div>
                     <p className="mt-4 text-gray-700">Carregando seu perfil...</p>
@@ -242,7 +242,7 @@ export default function EditProfilePage() {
     }
 
     return (
-        <div className="max-w-[75rem] mx-auto px-4 py-8">
+        <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
             <div className="mb-6">
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Editar Perfil</h1>
                 <p className="text-gray-600 mt-1">Atualize suas informações pessoais e links de redes sociais</p>

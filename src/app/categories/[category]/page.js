@@ -63,8 +63,8 @@ export default async function CategoryPage({ params, searchParams }) {
     const totalPages = Math.ceil((count || 0) / PAGE_SIZE);
 
     return (
-        <div className="category-page">
-            <h1>Histórias de {categoryName}</h1>
+        <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-[1.875rem]">
+            <h1 className="text-3xl font-bold text-black mb-[1.875rem]">Histórias de {categoryName}</h1>
 
             {stories.length === 0 ? (
                 <div className="empty-category">

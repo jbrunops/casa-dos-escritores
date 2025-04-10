@@ -107,7 +107,7 @@ export default async function SeriesPage({ searchParams }) {
         const totalPages = Math.ceil((count || 0) / PAGE_SIZE);
 
         return (
-            <div className="max-w-[75rem] mx-auto px-4">
+            <div className="max-w-[75rem] mx-auto px-4 sm:px-0">
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Séries Literárias</h1>
                     <p className="text-gray-600">
@@ -196,7 +196,7 @@ export default async function SeriesPage({ searchParams }) {
     } catch (error) {
         console.error("Erro na página de séries:", error);
         return (
-            <div className="max-w-[75rem] mx-auto px-4">
+            <div className="max-w-[75rem] mx-auto px-4 sm:px-0">
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Séries Literárias</h1>
                     <p className="text-gray-600">

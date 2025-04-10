@@ -109,20 +109,20 @@ export default async function ProfilePage({ params }) {
         };
 
         return (
-            <div className="max-w-[75rem] mx-auto px-4 py-8">
-                <div className="bg-white rounded-lg shadow-md overflow-hidden p-6 mb-8">
+            <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
+                <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden p-6 mb-8">
                     <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
                         {/* Avatar */}
                         <div className="flex-shrink-0">
                             {profile.avatar_url ? (
                                 <div 
-                                    className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-cover bg-center border-4 border-[#484DB5] shadow-lg"
+                                    className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-cover bg-center border-4 border-[#484DB5]"
                                     style={{
                                         backgroundImage: `url(${profile.avatar_url})`,
                                     }}
                                 ></div>
                             ) : (
-                                <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-[#484DB5] text-white flex items-center justify-center text-4xl font-bold border-4 border-[#484DB5] shadow-lg">
+                                <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-[#484DB5] text-white flex items-center justify-center text-4xl font-bold border-4 border-[#484DB5]">
                                     {profile.username.charAt(0).toUpperCase()}
                                 </div>
                             )}
@@ -150,7 +150,7 @@ export default async function ProfilePage({ params }) {
                                 {profile.website_url && (
                                     <a
                                         href={formatUrl(profile.website_url)}
-                                        className="inline-flex items-center h-10 px-4 rounded-md border border-[#E5E7EB] text-gray-700 hover:bg-gray-50 transition-all duration-200"
+                                        className="inline-flex items-center h-10 px-4 rounded-md border border-[#E5E7EB] text-gray-700 hover:bg-gray-50"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         aria-label="Website"
@@ -162,7 +162,7 @@ export default async function ProfilePage({ params }) {
                                 {profile.twitter_url && (
                                     <a
                                         href={formatUrl(profile.twitter_url)}
-                                        className="inline-flex items-center h-10 px-4 rounded-md border border-[#E5E7EB] text-gray-700 hover:bg-gray-50 transition-all duration-200"
+                                        className="inline-flex items-center h-10 px-4 rounded-md border border-[#E5E7EB] text-gray-700 hover:bg-gray-50"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         aria-label="Twitter"
@@ -174,7 +174,7 @@ export default async function ProfilePage({ params }) {
                                 {profile.facebook_url && (
                                     <a
                                         href={formatUrl(profile.facebook_url)}
-                                        className="inline-flex items-center h-10 px-4 rounded-md border border-[#E5E7EB] text-gray-700 hover:bg-gray-50 transition-all duration-200"
+                                        className="inline-flex items-center h-10 px-4 rounded-md border border-[#E5E7EB] text-gray-700 hover:bg-gray-50"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         aria-label="Facebook"
@@ -186,7 +186,7 @@ export default async function ProfilePage({ params }) {
                                 {profile.instagram_url && (
                                     <a
                                         href={formatUrl(profile.instagram_url)}
-                                        className="inline-flex items-center h-10 px-4 rounded-md border border-[#E5E7EB] text-gray-700 hover:bg-gray-50 transition-all duration-200"
+                                        className="inline-flex items-center h-10 px-4 rounded-md border border-[#E5E7EB] text-gray-700 hover:bg-gray-50"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         aria-label="Instagram"
@@ -202,7 +202,7 @@ export default async function ProfilePage({ params }) {
                                 <div>
                                     <Link
                                         href="/profile/edit"
-                                        className="inline-flex items-center justify-center h-10 px-6 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200"
+                                        className="inline-flex items-center justify-center h-10 px-6 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90"
                                     >
                                         <Edit size={16} className="mr-2" />
                                         <span>Editar Perfil</span>
@@ -215,39 +215,39 @@ export default async function ProfilePage({ params }) {
                 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <div className="bg-white rounded-lg shadow-md p-4 flex items-center">
+                    <div className="bg-white rounded-lg border border-[#E5E7EB] p-4 flex items-center">
                         <div className="p-3 bg-blue-50 text-[#484DB5] rounded-full mr-4">
                             <BookText size={24} />
                         </div>
                         <div>
-                            <div className="text-2xl font-bold text-gray-900">{stories?.length || 0}</div>
+                            <div className="text-2xl font-bold text-[#484DB5]">{stories?.length || 0}</div>
                             <div className="text-sm text-gray-600">Histórias</div>
                         </div>
                     </div>
                     
-                    <div className="bg-white rounded-lg shadow-md p-4 flex items-center">
+                    <div className="bg-white rounded-lg border border-[#E5E7EB] p-4 flex items-center">
                         <div className="p-3 bg-blue-50 text-[#484DB5] rounded-full mr-4">
                             <Eye size={24} />
                         </div>
                         <div>
-                            <div className="text-2xl font-bold text-gray-900">{totalViews}</div>
+                            <div className="text-2xl font-bold text-[#484DB5]">{totalViews}</div>
                             <div className="text-sm text-gray-600">Visualizações</div>
                         </div>
                     </div>
                     
-                    <div className="bg-white rounded-lg shadow-md p-4 flex items-center">
+                    <div className="bg-white rounded-lg border border-[#E5E7EB] p-4 flex items-center">
                         <div className="p-3 bg-blue-50 text-[#484DB5] rounded-full mr-4">
                             <Award size={24} />
                         </div>
                         <div>
-                            <div className="text-2xl font-bold text-gray-900">{favoriteCategory}</div>
+                            <div className="text-2xl font-bold text-[#484DB5]">{favoriteCategory}</div>
                             <div className="text-sm text-gray-600">Categoria Favorita</div>
                         </div>
                     </div>
                 </div>
 
                 {/* Histórias organizadas por categoria */}
-                <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
                     <div className="border-b border-[#E5E7EB] p-4 bg-gray-50">
                         <h2 className="flex items-center text-lg font-medium text-gray-900">
                             <BookOpen size={20} className="mr-2 text-[#484DB5]" /> 
@@ -279,7 +279,7 @@ export default async function ProfilePage({ params }) {
                                                     <Link
                                                         href={`/story/${generateSlug(story.title, story.id)}`}
                                                         key={story.id}
-                                                        className="block p-4 border border-[#E5E7EB] rounded-md hover:border-[#484DB5] hover:shadow-md transition-all duration-200"
+                                                        className="block p-4 border border-[#E5E7EB] rounded-md hover:border-[#484DB5]"
                                                     >
                                                         <h4 className="font-medium text-gray-900 mb-2 line-clamp-2">{story.title}</h4>
                                                         <div className="flex justify-between text-sm text-gray-500">
@@ -315,7 +315,7 @@ export default async function ProfilePage({ params }) {
             <div className="max-w-[75rem] mx-auto px-4 py-8 text-center">
                 <h1 className="text-2xl font-bold text-gray-900 mb-4">Erro ao carregar perfil</h1>
                 <p className="text-gray-700 mb-6">Não foi possível carregar os dados do perfil.</p>
-                <Link href="/" className="inline-flex items-center justify-center h-10 px-6 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200">
+                <Link href="/" className="inline-flex items-center justify-center h-10 px-6 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90">
                     Voltar para a página inicial
                 </Link>
             </div>

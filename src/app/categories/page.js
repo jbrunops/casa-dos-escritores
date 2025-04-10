@@ -39,7 +39,7 @@ export default async function CategoriesPage() {
         categories.length > 0 ? categories : defaultCategories;
 
     return (
-        <div className="max-w-[75rem] mx-auto px-4 py-[1.875rem]">
+        <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-[1.875rem]">
             <h1 className="text-3xl font-bold text-black mb-[1.875rem]">Todas as Categorias</h1>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[1.875rem]">

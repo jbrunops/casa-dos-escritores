@@ -419,7 +419,7 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="max-w-[75rem] mx-auto px-4 py-8">
+        <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">Meu Dashboard</h1>
@@ -427,7 +427,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="flex items-center mt-4 sm:mt-0">
-                    <Link href="/dashboard/new" className="h-10 px-4 flex items-center bg-[#484DB5] text-white rounded-md hover:shadow-md transition-shadow duration-200">
+                    <Link href="/dashboard/new" className="h-10 px-4 flex items-center bg-[#484DB5] text-white rounded-md hover:bg-opacity-90">
                         <PlusCircle size={20} className="mr-2" />
                         <span>Nova História</span>
                     </Link>
@@ -441,30 +441,30 @@ export default function DashboardPage() {
             )}
 
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
+                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB]">
                     <div className="text-center">
-                        <span className="block text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stats.totalStories}</span>
+                        <span className="block text-2xl sm:text-3xl font-bold text-[#484DB5] mb-1">{stats.totalStories}</span>
                         <span className="text-sm sm:text-base text-gray-600">Total de histórias</span>
                     </div>
                 </div>
 
-                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
+                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB]">
                     <div className="text-center">
-                        <span className="block text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stats.publishedStories}</span>
+                        <span className="block text-2xl sm:text-3xl font-bold text-[#484DB5] mb-1">{stats.publishedStories}</span>
                         <span className="text-sm sm:text-base text-gray-600">Publicadas</span>
                     </div>
                 </div>
 
-                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
+                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB]">
                     <div className="text-center">
-                        <span className="block text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stats.totalViews}</span>
+                        <span className="block text-2xl sm:text-3xl font-bold text-[#484DB5] mb-1">{stats.totalViews}</span>
                         <span className="text-sm sm:text-base text-gray-600">Visualizações</span>
                     </div>
                 </div>
 
-                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200">
+                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB]">
                     <div className="text-center">
-                        <span className="block text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{stats.totalComments}</span>
+                        <span className="block text-2xl sm:text-3xl font-bold text-[#484DB5] mb-1">{stats.totalComments}</span>
                         <span className="text-sm sm:text-base text-gray-600">Comentários</span>
                     </div>
                 </div>
@@ -477,30 +477,30 @@ export default function DashboardPage() {
 
                         <div className="flex flex-wrap gap-2">
                             <button
-                                className={`h-10 px-2 sm:px-4 text-sm sm:text-base rounded-md transition-shadow duration-200 ${
+                                className={`h-10 px-2 sm:px-4 text-sm sm:text-base rounded-md ${
                                     activeTab === "all" 
                                     ? "bg-[#484DB5] text-white" 
-                                    : "bg-white border border-[#E5E7EB] text-gray-600 hover:shadow-md"
+                                    : "bg-white border border-[#E5E7EB] text-gray-600"
                                 }`}
                                 onClick={() => setActiveTab("all")}
                             >
                                 Todas
                             </button>
                             <button
-                                className={`h-10 px-2 sm:px-4 text-sm sm:text-base rounded-md transition-shadow duration-200 ${
+                                className={`h-10 px-2 sm:px-4 text-sm sm:text-base rounded-md ${
                                     activeTab === "published"
                                     ? "bg-[#484DB5] text-white"
-                                    : "bg-white border border-[#E5E7EB] text-gray-600 hover:shadow-md"
+                                    : "bg-white border border-[#E5E7EB] text-gray-600"
                                 }`}
                                 onClick={() => setActiveTab("published")}
                             >
                                 Publicadas
                             </button>
                             <button
-                                className={`h-10 px-2 sm:px-4 text-sm sm:text-base rounded-md transition-shadow duration-200 ${
+                                className={`h-10 px-2 sm:px-4 text-sm sm:text-base rounded-md ${
                                     activeTab === "drafts"
                                     ? "bg-[#484DB5] text-white"
-                                    : "bg-white border border-[#E5E7EB] text-gray-600 hover:shadow-md"
+                                    : "bg-white border border-[#E5E7EB] text-gray-600"
                                 }`}
                                 onClick={() => setActiveTab("drafts")}
                             >
@@ -526,7 +526,7 @@ export default function DashboardPage() {
                                 ? "Você ainda não publicou nenhuma história."
                                 : "Você não tem nenhum rascunho."}
                         </p>
-                        {/* <Link href="/dashboard/new" className="h-10 px-4 flex items-center bg-[#484DB5] text-white rounded-md hover:shadow-md transition-shadow duration-200">
+                        {/* <Link href="/dashboard/new" className="h-10 px-4 flex items-center bg-[#484DB5] text-white rounded-md hover:bg-opacity-90">
                             Criar minha primeira história
                         </Link> */}
                     </div>
@@ -569,7 +569,7 @@ export default function DashboardPage() {
                                 <div className="flex items-center space-x-2">
                                     <Link
                                         href={`/story/${generateSlug(story.title, story.id)}`}
-                                        className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200"
+                                        className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB]"
                                         title="Visualizar"
                                     >
                                         <Eye size={18} className="text-gray-600" />
@@ -577,7 +577,7 @@ export default function DashboardPage() {
 
                                     <Link
                                         href={`/dashboard/edit/${story.id}`}
-                                        className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200"
+                                        className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB]"
                                         title="Editar"
                                     >
                                         <Edit3 size={18} className="text-gray-600" />
@@ -585,7 +585,7 @@ export default function DashboardPage() {
 
                                     <button
                                         onClick={() => openDeleteModal(story.id, story.title)}
-                                        className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB] hover:shadow-md transition-shadow duration-200"
+                                        className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB]"
                                         title="Excluir"
                                     >
                                         <Trash2 size={18} className="text-gray-600" />
@@ -600,7 +600,7 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg border border-[#E5E7EB]">
                 <div className="p-6 border-b border-[#E5E7EB] flex flex-row justify-between items-center">
                     <h2 className="text-xl font-bold text-gray-900">Minhas Séries</h2>
-                    <Link href="/series" className="h-10 px-4 flex items-center text-[#484DB5] hover:shadow-md transition-shadow duration-200 whitespace-nowrap">
+                    <Link href="/series" className="h-10 px-4 flex items-center text-[#484DB5]">
                         <BookOpen size={18} className="mr-2" />
                         <span>Ver minhas séries</span>
                     </Link>
@@ -609,24 +609,24 @@ export default function DashboardPage() {
                 <div className="p-6">
                     <div className="grid grid-cols-3 gap-4">
                         <div className="text-center">
-                            <span className="block text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{series.length}</span>
+                            <span className="block text-2xl sm:text-3xl font-bold text-[#484DB5] mb-1">{series.length}</span>
                             <span className="text-sm sm:text-base text-gray-600">Total de séries</span>
                         </div>
                         <div className="text-center">
-                            <span className="block text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
+                            <span className="block text-2xl sm:text-3xl font-bold text-[#484DB5] mb-1">
                                 {series.filter(s => s.is_completed).length}
                             </span>
                             <span className="text-sm sm:text-base text-gray-600">Completas</span>
                         </div>
                         <div className="text-center">
-                            <span className="block text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
+                            <span className="block text-2xl sm:text-3xl font-bold text-[#484DB5] mb-1">
                                 {series.filter(s => !s.is_completed).length}
                             </span>
                             <span className="text-sm sm:text-base text-gray-600">Em andamento</span>
                         </div>
                     </div>
                     <div className="mt-6 text-center">
-                        <Link href="/dashboard/new-series" className="h-10 px-4 inline-flex items-center bg-[#484DB5] text-white rounded-md hover:shadow-md transition-shadow duration-200">
+                        <Link href="/dashboard/new-series" className="h-10 px-4 inline-flex items-center bg-[#484DB5] text-white rounded-md hover:bg-opacity-90">
                             <Plus size={20} className="mr-2" />
                             <span>Criar nova série</span>
                         </Link>
