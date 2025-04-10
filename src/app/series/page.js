@@ -125,53 +125,56 @@ export default async function SeriesPage({ searchParams }) {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
                             {seriesWithChapterCount.map((serie) => (
                                 <Link
                                     href={`/series/${generateSlug(serie.title, serie.id)}`}
                                     key={serie.id}
-                                    className="group border border-[#E5E7EB] rounded-lg overflow-hidden hover:shadow-md transition-all duration-200"
+                                    className="flex flex-col rounded-lg border border-[#E5E7EB] overflow-hidden hover:shadow-md transition-shadow bg-white"
                                 >
-                                    <div className="aspect-[2/3] relative bg-gray-100">
+                                    <div className="relative w-full pt-[150%]">
                                         {serie.cover_url ? (
                                             <img
                                                 src={serie.cover_url}
                                                 alt={serie.title}
-                                                className="w-full h-full object-cover bg-gray-50"
+                                                className="absolute top-0 left-0 w-full h-full object-cover"
                                             />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-gray-400">
-                                                {serie.title
-                                                    .charAt(0)
-                                                    .toUpperCase()}
+                                            <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-[#484DB5] text-white text-4xl font-bold">
+                                                {serie.title.charAt(0).toUpperCase()}
                                             </div>
                                         )}
                                     </div>
-                                    <div className="p-3">
-                                        <h3 className="font-medium text-gray-900 mb-1 line-clamp-1 text-sm">
-                                            {serie.title}
-                                        </h3>
-                                        <p className="text-xs text-gray-600 mb-1">
-                                            por {serie.author_name}
+                                    <div className="p-3 flex-grow flex flex-col">
+                                        <h3 className="font-bold text-base line-clamp-2 mb-1">{serie.title}</h3>
+                                        <p className="text-xs text-gray-600 mb-2">
+                                            de {serie.author_name}
                                         </p>
-                                        <div className="flex items-center justify-between text-xs">
-                                            <span className="text-gray-600">
-                                                {serie.chapter_count}{" "}
-                                                {serie.chapter_count === 1
-                                                    ? "capítulo"
-                                                    : "capítulos"}
-                                            </span>
-                                            <span className="text-gray-600">
-                                                {serie.is_completed
-                                                    ? "Completa"
-                                                    : "Em andamento"}
+                                        {serie.genre && (
+                                            <div className="mb-2">
+                                                <span className="text-xs text-[#484DB5] font-medium">
+                                                    › {serie.genre}
+                                                </span>
+                                            </div>
+                                        )}
+                                        <div className="mt-auto flex items-center justify-between text-xs text-gray-600">
+                                            <div className="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                                {serie.view_count?.toLocaleString("pt-BR") || "0"}
+                                            </div>
+                                            <div className="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                {serie.chapter_count}
+                                            </div>
+                                            <span className="text-xs text-[#484DB5] bg-purple-100 px-2 py-0.5 rounded">
+                                                {serie.is_completed ? "Completa" : "escrevendo..."}
                                             </span>
                                         </div>
-                                        {serie.genre && (
-                                            <span className="inline-block mt-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
-                                                {serie.genre}
-                                            </span>
-                                        )}
                                     </div>
                                 </Link>
                             ))}
