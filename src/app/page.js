@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { Edit, BookOpen, Share2, MessageSquare, BookText, Book } from "lucide-react";
 import SeriesHighlights from "@/components/SeriesHighlights";
+import { HeroHighlight } from "@/components/HeroHighlight";
 import { generateSlug } from "@/lib/utils";
 
 export default async function HomePage() {
@@ -275,9 +276,15 @@ export default async function HomePage() {
     };
 
     return (
-        <div className="home-page">
-            <section className="columns-section">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[75rem] mx-auto px-4 sm:px-6 md:px-0">
+        <>
+            {/* Seção Hero */}
+            <section className="hero-section">
+                <HeroHighlight />
+            </section>
+
+            {/* Seção de 3 colunas */}
+            <section className="max-w-[75rem] mx-auto px-4 sm:px-6 md:px-0 py-8 three-columns-section">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Coluna 1: Histórias Recentes */}
                     <div className="column">
                         <h2 className="text-2xl font-extrabold text-black mb-4 border-[#E5E7EB] pb-2 relative">
@@ -548,6 +555,6 @@ export default async function HomePage() {
                     </div>
                 </div>
             </section>
-        </div>
+        </>
     );
 }
