@@ -82,7 +82,7 @@ export function HeroHighlight({
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
           {title || (
             <>
-              Compartilhe suas <Highlight>histórias</Highlight> e conecte-se com outros <Highlight>escritores</Highlight>
+              <Highlight>Compartilhe suas histórias</Highlight> e conecte-se com outros escritores
             </>
           )}
         </h1>
