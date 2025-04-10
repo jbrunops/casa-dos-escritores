@@ -105,7 +105,7 @@ O projeto segue uma estrutura de CSS organizada:
 
 Este projeto está licenciado sob a licença [MIT](LICENSE).
 
-## 📞 Contato e Suporte
+## 📞 Contato e Suporte ^^
 
 - **Site**: [casadosescritores.com.br](https://casadosescritores.com.br)
 - **Email**: jbrunops@outlook.com
