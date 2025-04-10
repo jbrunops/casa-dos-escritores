@@ -121,7 +121,7 @@ export function Highlight({ children, className }) {
         backgroundPosition: "left center",
         display: "inline",
       }}
-      className={`relative inline-block bg-gradient-to-r from-[#484DB5]/30 to-[#484DB5]/10 px-1 pb-1 ${className || ""}`}
+      className={`relative inline-block bg-gradient-to-r from-[#484DB5]/30 to-[#484DB5]/6 px-0.5 pb-0.1 rounded-md ${className || ""}`}
     >
       {children}
     </motion.span>
