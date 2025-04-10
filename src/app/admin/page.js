@@ -364,7 +364,7 @@ export default function AdminDashboard() {
                     onClick={() => setActiveTab("users")}
                 >
                     <Users size={18} />
-                    <span>Usuários</span>
+                    <span className="hidden sm:inline">Usuários</span>
                     <span className="ml-2 bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs">{users.length}</span>
                 </button>
                 
@@ -377,7 +377,7 @@ export default function AdminDashboard() {
                     onClick={() => setActiveTab("stories")}
                 >
                     <BookOpen size={18} />
-                    <span>Histórias</span>
+                    <span className="hidden sm:inline">Histórias</span>
                     <span className="ml-2 bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs">{stories.length}</span>
                 </button>
                 
@@ -390,7 +390,7 @@ export default function AdminDashboard() {
                     onClick={() => setActiveTab("comments")}
                 >
                     <MessageSquare size={18} />
-                    <span>Comentários</span>
+                    <span className="hidden sm:inline">Comentários</span>
                     <span className="ml-2 bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs">{comments.length}</span>
                 </button>
             </div>
