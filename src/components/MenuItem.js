@@ -47,7 +47,7 @@ export default function MenuItem({
   `;
   
   // Efeito hover personalizado (não usando a cor padrão)
-  const hoverEffect = "hover:scale-105";
+  const hoverEffect = variant !== "primary" ? "hover:bg-gray-50" : "";
   
   // Classes finais
   const finalClasses = `${baseStyles} ${hoverEffect}`.trim();

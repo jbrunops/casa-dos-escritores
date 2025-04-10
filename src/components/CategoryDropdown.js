@@ -72,7 +72,7 @@ export default function CategoryDropdown({
             {footerLink && footerLabel && (
               <Link
                 href={footerLink}
-                className={`col-span-${columns} text-center text-[#484DB5] mt-2 font-medium transition-transform duration-200 ease-in-out hover:scale-105`}
+                className={`col-span-${columns} text-center text-[#484DB5] mt-2 font-medium hover:bg-gray-50 rounded px-2 py-1`}
                 onClick={() => setIsOpen(false)}
               >
                 {footerLabel}

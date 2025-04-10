@@ -360,7 +360,7 @@ export default function Header() {
                         <DropdownMenu
                             trigger={
                                 <button
-                                    className="flex items-center text-[#484DB5] font-semibold h-10 transition-all duration-200 ease-in-out hover:scale-105"
+                                    className="flex items-center text-[#484DB5] font-semibold h-10 hover:bg-gray-50 rounded px-2"
                                     onClick={() => setShowUserDropdown(!showUserDropdown)}
                                 >
                                     <User size={18} className="mr-1.5" />
