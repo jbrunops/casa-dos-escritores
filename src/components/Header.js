@@ -19,6 +19,9 @@ import {
     Bell
 } from "lucide-react";
 import NotificationBell from "./NotificationBell";
+import MenuItem from "./MenuItem";
+import DropdownMenu from "./DropdownMenu";
+import CategoryDropdown from "./CategoryDropdown";
 
 export default function Header() {
     const pathname = usePathname();
@@ -33,8 +36,6 @@ export default function Header() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
-    const userDropdownRef = useRef(null);
-    const categoryDropdownRef = useRef(null);
     const mobileMenuRef = useRef(null);
     const supabase = createBrowserClient();
 
@@ -119,27 +120,8 @@ export default function Header() {
             }
         });
 
-        // Fechar dropdowns quando clicar fora deles
-        const handleClickOutside = (event) => {
-            if (
-                userDropdownRef.current &&
-                !userDropdownRef.current.contains(event.target)
-            ) {
-                setShowUserDropdown(false);
-            }
-            if (
-                categoryDropdownRef.current &&
-                !categoryDropdownRef.current.contains(event.target)
-            ) {
-                setShowCategoryDropdown(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-
         return () => {
             subscription.unsubscribe();
-            document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [isMobile]);
 
@@ -177,10 +159,42 @@ export default function Header() {
         router.push("/");
     };
 
-    // Ir para categorias (versão mobile)
-    const navigateToExplore = () => {
-        router.push("/categories");
-    };
+    // Configuração dos itens do menu de usuário
+    const userMenuItems = user ? [
+        {
+            label: "Meu Painel",
+            href: "/dashboard",
+            icon: <LayoutDashboard size={18} />
+        },
+        {
+            label: "Meu Perfil",
+            href: `/profile/${encodeURIComponent(username)}`,
+            icon: <User size={18} />
+        },
+        ...(isAdmin ? [{
+            label: "Administração",
+            href: "/admin",
+            icon: <Settings size={18} />
+        }] : []),
+        { divider: true },
+        {
+            label: "Sair",
+            onClick: handleSignOut,
+            icon: <LogOut size={18} />,
+            variant: "danger"
+        }
+    ] : [
+        {
+            label: "Entrar",
+            href: "/login",
+            icon: <LogIn size={18} />
+        },
+        {
+            label: "Cadastrar",
+            href: "/signup",
+            icon: <UserPlus size={18} />
+        }
+    ];
 
     // Toggle menu mobile
     const toggleMobileMenu = () => {
@@ -199,52 +213,25 @@ export default function Header() {
 
                     {/* Navegação principal - apenas desktop */}
                     <nav className="hidden md:flex items-center space-x-6">
-                        <div className="relative" ref={categoryDropdownRef}>
-                            <button
-                                className="flex items-center text-[#484DB5] space-x-1 h-10 transition-transform duration-200 ease-in-out hover:scale-105"
-                                onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                            >
-                                <Compass size={20} className="mr-1" />
-                                <span>Explorar</span>
-                                <ChevronDown size={16} />
-                            </button>
-                            
-                            {showCategoryDropdown && (
-                                <div className="absolute top-full left-0 mt-2 bg-white rounded-md shadow-lg p-3 w-64 z-10 border border-[#E5E7EB]">
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {categories.map((category) => (
-                                            <Link
-                                                key={category}
-                                                href={`/categories/${category.toLowerCase().replace(/\s+/g, "-")}`}
-                                                className="text-gray-700 hover:bg-gray-100 transition-colors duration-200 px-3 py-2 rounded"
-                                                onClick={() => setShowCategoryDropdown(false)}
-                                            >
-                                                {category}
-                                            </Link>
-                                        ))}
-                                        <Link
-                                            href="/categories"
-                                            className="col-span-2 text-center text-[#484DB5] mt-2 font-medium transition-transform duration-200 ease-in-out hover:scale-105"
-                                            onClick={() => setShowCategoryDropdown(false)}
-                                        >
-                                            Ver Todas
-                                        </Link>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        {/* Menu de Categorias */}
+                        <CategoryDropdown 
+                            icon={<Compass size={20} />}
+                            isOpen={showCategoryDropdown}
+                            setIsOpen={setShowCategoryDropdown}
+                            categories={categories}
+                            columns={2}
+                            footerLink="/categories"
+                            footerLabel="Ver Todas"
+                        />
 
-                        <Link
+                        {/* Item de menu Séries */}
+                        <MenuItem 
                             href="/series"
-                            className={`flex items-center h-10 transition-transform duration-200 ease-in-out hover:scale-105 ${
-                                pathname.startsWith("/series")
-                                    ? "text-[#484DB5] font-medium"
-                                    : "text-[#484DB5]"
-                            }`}
+                            icon={<BookOpen size={20} />}
+                            isActive={pathname.startsWith("/series")}
                         >
-                            <BookOpen size={20} className="mr-1" />
-                            <span>Séries</span>
-                        </Link>
+                            Séries
+                        </MenuItem>
                     </nav>
                 </div>
 
@@ -274,46 +261,42 @@ export default function Header() {
                             </div>
                             <ul className="space-y-4">
                                 <li>
-                                    <Link 
-                                        href="/categories" 
-                                        className="flex items-center text-[#484DB5]"
+                                    <MenuItem 
+                                        href="/categories"
+                                        icon={<Compass size={20} />}
                                         onClick={() => setShowMobileMenu(false)}
                                     >
-                                        <Compass size={20} className="mr-2" />
-                                        <span>Explorar</span>
-                                    </Link>
+                                        Explorar
+                                    </MenuItem>
                                 </li>
                                 <li>
-                                    <Link 
-                                        href="/series" 
-                                        className="flex items-center text-[#484DB5]"
+                                    <MenuItem 
+                                        href="/series"
+                                        icon={<BookOpen size={20} />}
                                         onClick={() => setShowMobileMenu(false)}
                                     >
-                                        <BookOpen size={20} className="mr-2" />
-                                        <span>Séries</span>
-                                    </Link>
+                                        Séries
+                                    </MenuItem>
                                 </li>
                                 {!user && (
                                     <>
                                         <li>
-                                            <Link 
-                                                href="/login" 
-                                                className="flex items-center text-[#484DB5]"
+                                            <MenuItem 
+                                                href="/login"
+                                                icon={<LogIn size={20} />}
                                                 onClick={() => setShowMobileMenu(false)}
                                             >
-                                                <LogIn size={20} className="mr-2" />
-                                                <span>Entrar</span>
-                                            </Link>
+                                                Entrar
+                                            </MenuItem>
                                         </li>
                                         <li>
-                                            <Link 
-                                                href="/signup" 
-                                                className="flex items-center text-[#484DB5]"
+                                            <MenuItem 
+                                                href="/signup"
+                                                icon={<UserPlus size={20} />}
                                                 onClick={() => setShowMobileMenu(false)}
                                             >
-                                                <UserPlus size={20} className="mr-2" />
-                                                <span>Cadastrar</span>
-                                            </Link>
+                                                Cadastrar
+                                            </MenuItem>
                                         </li>
                                     </>
                                 )}
@@ -321,48 +304,46 @@ export default function Header() {
                                 {user && (
                                     <>
                                         <li>
-                                            <Link 
-                                                href="/dashboard" 
-                                                className="flex items-center text-[#484DB5]"
+                                            <MenuItem 
+                                                href="/dashboard"
+                                                icon={<LayoutDashboard size={20} />}
                                                 onClick={() => setShowMobileMenu(false)}
                                             >
-                                                <LayoutDashboard size={20} className="mr-2" />
-                                                <span>Meu Painel</span>
-                                            </Link>
+                                                Meu Painel
+                                            </MenuItem>
                                         </li>
                                         <li>
-                                            <Link 
-                                                href={`/profile/${encodeURIComponent(username)}`} 
-                                                className="flex items-center text-[#484DB5]"
+                                            <MenuItem 
+                                                href={`/profile/${encodeURIComponent(username)}`}
+                                                icon={<User size={20} />}
                                                 onClick={() => setShowMobileMenu(false)}
                                             >
-                                                <User size={20} className="mr-2" />
-                                                <span>Meu Perfil</span>
-                                            </Link>
+                                                Meu Perfil
+                                            </MenuItem>
                                         </li>
                                         {isAdmin && (
                                             <li>
-                                                <Link 
-                                                    href="/admin" 
-                                                    className="flex items-center text-[#484DB5]"
+                                                <MenuItem 
+                                                    href="/admin"
+                                                    icon={<Settings size={20} />}
                                                     onClick={() => setShowMobileMenu(false)}
                                                 >
-                                                    <Settings size={20} className="mr-2" />
-                                                    <span>Administração</span>
-                                                </Link>
+                                                    Administração
+                                                </MenuItem>
                                             </li>
                                         )}
                                         <li>
-                                            <button 
-                                                className="flex items-center text-red-600 w-full text-left"
+                                            <MenuItem 
+                                                isButton
+                                                variant="danger"
+                                                icon={<LogOut size={20} />}
                                                 onClick={() => {
                                                     handleSignOut();
                                                     setShowMobileMenu(false);
                                                 }}
                                             >
-                                                <LogOut size={20} className="mr-2 text-red-600" />
-                                                <span>Sair</span>
-                                            </button>
+                                                Sair
+                                            </MenuItem>
                                         </li>
                                     </>
                                 )}
@@ -376,69 +357,30 @@ export default function Header() {
                     {loading ? (
                         <div className="text-sm text-gray-500">Carregando...</div>
                     ) : user ? (
-                        <div className="relative" ref={userDropdownRef}>
-                            <button
-                                className="flex items-center text-[#484DB5] font-semibold"
-                                onClick={() => setShowUserDropdown(!showUserDropdown)}
-                            >
-                                <User size={18} className="mr-1.5" />
-                                <span className="mr-1">{username || "Usuário"}</span>
-                                <ChevronDown size={16} />
-                            </button>
-
-                            {showUserDropdown && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-md border border-[#E5E7EB] z-10">
-                                    <Link
-                                        href="/dashboard"
-                                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#484DB5]"
-                                        onClick={() => setShowUserDropdown(false)}
-                                    >
-                                        <LayoutDashboard size={18} className="mr-2" />
-                                        <span>Meu Painel</span>
-                                    </Link>
-                                    <Link
-                                        href={`/profile/${encodeURIComponent(username)}`}
-                                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#484DB5]"
-                                        onClick={() => setShowUserDropdown(false)}
-                                    >
-                                        <User size={18} className="mr-2" />
-                                        <span>Meu Perfil</span>
-                                    </Link>
-                                    {isAdmin && (
-                                        <Link
-                                            href="/admin"
-                                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#484DB5]"
-                                            onClick={() => setShowUserDropdown(false)}
-                                        >
-                                            <Settings size={18} className="mr-2" />
-                                            <span>Administração</span>
-                                        </Link>
-                                    )}
-                                    <div className="border-t border-[#E5E7EB] my-1"></div>
-                                    <button
-                                        className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left"
-                                        onClick={handleSignOut}
-                                    >
-                                        <LogOut size={18} className="mr-2 text-red-600" />
-                                        <span>Sair</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                        <DropdownMenu
+                            trigger={
+                                <button
+                                    className="flex items-center text-[#484DB5] font-semibold h-10 transition-all duration-200 ease-in-out hover:scale-105"
+                                    onClick={() => setShowUserDropdown(!showUserDropdown)}
+                                >
+                                    <User size={18} className="mr-1.5" />
+                                    <span className="mr-1">{username || "Usuário"}</span>
+                                    <ChevronDown size={16} />
+                                </button>
+                            }
+                            isOpen={showUserDropdown}
+                            setIsOpen={setShowUserDropdown}
+                            items={userMenuItems}
+                            position="right"
+                        />
                     ) : (
                         <div className="flex items-center space-x-4">
-                            <Link
-                                href="/signup"
-                                className="text-[#484DB5] h-10 flex items-center transition-transform duration-200 ease-in-out hover:scale-105"
-                            >
+                            <MenuItem href="/signup">
                                 cadastre-se
-                            </Link>
-                            <Link
-                                href="/login"
-                                className="bg-[#484DB5] text-white px-6 h-10 flex items-center justify-center rounded-md transition-transform duration-200 ease-in-out hover:scale-105"
-                            >
+                            </MenuItem>
+                            <MenuItem href="/login" variant="primary">
                                 Entrar
-                            </Link>
+                            </MenuItem>
                         </div>
                     )}
                 </div>
