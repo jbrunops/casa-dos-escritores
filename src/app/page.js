@@ -280,7 +280,7 @@ export default async function HomePage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[75rem] mx-auto px-4 sm:px-6 md:px-0">
                     {/* Coluna 1: Histórias Recentes */}
                     <div className="column">
-                        <h2 className="text-2xl font-extrabold text-black mb-4 border-b border-[#E5E7EB] pb-2 relative">
+                        <h2 className="text-2xl font-extrabold text-black mb-4 border-[#E5E7EB] pb-2 relative">
                             Histórias Recentes
                             <span className="block h-1 w-32 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
                         </h2>
@@ -351,7 +351,7 @@ export default async function HomePage() {
 
                     {/* Coluna 2: Mais Comentados */}
                     <div className="column">
-                        <h2 className="text-2xl font-extrabold text-black mb-4 border-b border-[#E5E7EB] pb-2 relative">
+                        <h2 className="text-2xl font-extrabold text-black mb-4  border-[#E5E7EB] pb-2 relative">
                             Mais Comentados
                             <span className="block h-1 w-32 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
                         </h2>
@@ -446,7 +446,7 @@ export default async function HomePage() {
 
                     {/* Coluna 3: Top 10 Escritores */}
                     <div className="column">
-                        <h2 className="text-2xl font-extrabold text-black mb-4 border-b border-[#E5E7EB] pb-2 relative">
+                        <h2 className="text-2xl font-extrabold text-black mb-4  border-[#E5E7EB] pb-2 relative">
                             Top 10 Escritores
                             <span className="block h-1 w-32 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
                         </h2>
