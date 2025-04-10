@@ -297,10 +297,10 @@ export default async function HomePage() {
                                         >
                                             <h3 className="font-semibold text-lg">{content.title}</h3>
                                             <div className="flex justify-between text-sm text-gray-600 mt-1 mb-2">
-                                                <span className="font-medium">
+                                                <span className="font-bold text-[#484DB5]">
                                                     {content.type === 'chapter' ? content.author.username : content.profiles.username}
                                                 </span>
-                                                <span>
+                                                <span className="text-xs">
                                                     {formatDate(content.created_at)}
                                                 </span>
                                             </div>
@@ -312,7 +312,7 @@ export default async function HomePage() {
                                         <Link
                                             href={`/chapter/${generateSlug(content.title, content.id)}`}
                                             key={`chapter-${content.id}`}
-                                            className="block relative p-[1.875rem] rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
+                                            className="block relative p-4 rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
                                         >
                                             <div className="absolute top-0 right-0 px-2 py-1 bg-[#484DB5] text-white text-xs rounded-tr-lg">
                                                 Capítulo {content.chapter_number}
@@ -335,10 +335,10 @@ export default async function HomePage() {
                                             </p>
                                             
                                             <div className="flex justify-between text-sm text-gray-600 mt-4 pt-3 border-t border-[#E5E7EB]">
-                                                <span className="font-medium">
+                                                <span className="font-bold text-[#484DB5]">
                                                     {content.type === 'chapter' ? content.author?.username : content.profiles.username}
                                                 </span>
-                                                <span>
+                                                <span className="text-xs">
                                                     {formatDate(content.created_at)}
                                                 </span>
                                             </div>
@@ -368,11 +368,11 @@ export default async function HomePage() {
                                         >
                                             <h3 className="font-semibold text-lg">{content.title}</h3>
                                             <div className="flex justify-between text-sm text-gray-600 mt-1 mb-2">
-                                                <span className="font-medium">
+                                                <span className="font-bold text-[#484DB5]">
                                                     {content.type === 'chapter' ? content.author.username : content.profiles.username}
                                                 </span>
                                                 <div className="flex items-center space-x-2">
-                                                    <span>
+                                                    <span className="text-xs">
                                                         {formatDate(
                                                             content.created_at
                                                         )}
@@ -396,7 +396,7 @@ export default async function HomePage() {
                                         <Link
                                             href={`/chapter/${generateSlug(content.title, content.id)}`}
                                             key={`chapter-${content.id}`}
-                                            className="block relative p-[1.875rem] rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
+                                            className="block relative p-4 rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
                                         >
                                             <div className="absolute top-0 right-0 px-2 py-1 bg-[#484DB5] text-white text-xs rounded-tr-lg">
                                                 Capítulo {content.chapter_number}
@@ -419,11 +419,11 @@ export default async function HomePage() {
                                             </p>
                                             
                                             <div className="flex justify-between text-sm text-gray-600 mt-4 pt-3 border-t border-[#E5E7EB]">
-                                                <span className="font-medium">
+                                                <span className="font-bold text-[#484DB5]">
                                                     {content.type === 'chapter' ? content.author?.username : content.profiles.username}
                                                 </span>
                                                 <div className="flex items-center space-x-2">
-                                                    <span>
+                                                    <span className="text-xs">
                                                         {formatDate(content.created_at)}
                                                     </span>
                                                     <span className="flex items-center bg-gray-100 px-2 py-0.5 rounded-full">
