@@ -148,7 +148,7 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-center bg-white py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md border border-[#E5E7EB]">
                 <div className="text-center">
                     <h1 className="text-3xl font-extrabold text-black">Criar Conta</h1>
