@@ -35,6 +35,20 @@ export default async function CategoriesPage() {
         "Outros",
     ];
 
+    // Descrições para cada categoria
+    const categoryDescriptions = {
+        "Fantasia": "Mundos mágicos, criaturas fantásticas e aventuras extraordinárias.",
+        "Romance": "Histórias de amor, relacionamentos e emoções intensas.",
+        "Terror": "Narrativas assustadoras que exploram o medo e o desconhecido.",
+        "LGBTQ+": "Histórias que celebram e exploram diversas identidades e experiências.",
+        "Humor": "Contos divertidos e situações cômicas para animar seu dia.",
+        "Poesia": "Expressões artísticas em versos que tocam a alma.",
+        "Ficção Científica": "Visões do futuro, tecnologia avançada e exploração espacial.",
+        "Brasileiro": "Histórias com o charme, cultura e identidade brasileira.",
+        "Anime": "Narrativas inspiradas no estilo japonês de storytelling.",
+        "Outros": "Gêneros diversos e histórias que desafiam classificações.",
+    };
+
     const displayCategories =
         categories.length > 0 ? categories : defaultCategories;
 
@@ -49,10 +63,16 @@ export default async function CategoriesPage() {
                         href={`/categories/${category
                             .toLowerCase()
                             .replace(/\s+/g, "-")}`}
-                        className="flex items-center justify-between h-10 px-4 bg-white border border-[#E5E7EB] rounded-md hover:shadow-md transition-shadow duration-200"
+                        className="flex flex-col h-auto py-4 px-5 bg-white border border-[#E5E7EB] rounded-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:border-gray-300 relative overflow-hidden group"
                     >
-                        <h2 className="text-lg font-medium text-gray-900">{category}</h2>
-                        <span className="text-[#484DB5]">→</span>
+                        <div className="flex items-center justify-between mb-2 z-10">
+                            <h2 className="text-lg font-medium text-gray-900">{category}</h2>
+                            <span className="text-[#484DB5] transition-transform duration-300 transform group-hover:translate-x-1">→</span>
+                        </div>
+                        <p className="text-sm text-gray-600 z-10">
+                            {categoryDescriptions[category] || `Explore histórias na categoria ${category}.`}
+                        </p>
+                        <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-gray-100 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                     </Link>
                 ))}
             </div>
