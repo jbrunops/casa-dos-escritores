@@ -34,11 +34,43 @@ export default async function HomePage() {
             .not('series_id', 'is', null)
             .order("created_at", { ascending: false })
             .limit(6);
+            
+        // Organizar capítulos por série
+        const chaptersBySeries = {};
+        latestChapters?.forEach(chapter => {
+            if (!chaptersBySeries[chapter.series_id]) {
+                chaptersBySeries[chapter.series_id] = [];
+            }
+            chaptersBySeries[chapter.series_id].push({...chapter});
+        });
+        
+        // Para cada série, ordenar capítulos por data de criação e atribuir números sequenciais
+        Object.keys(chaptersBySeries).forEach(seriesId => {
+            const chaptersForSeries = chaptersBySeries[seriesId];
+            // Ordenar por data (do mais antigo para o mais recente)
+            chaptersForSeries.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            // Atribuir números sequenciais
+            chaptersForSeries.forEach((chapter, index) => {
+                chapter.calculated_chapter_number = index + 1;
+            });
+        });
+        
+        // Aplanar a estrutura de volta para um array
+        const chaptersWithCalculatedNumbers = Object.values(chaptersBySeries).flat();
+        
+        // Mapear de volta para o formato original, mantendo a ordem por data de criação (decrescente)
+        const mappedChapters = latestChapters.map(chapter => {
+            const calculatedChapter = chaptersWithCalculatedNumbers.find(c => c.id === chapter.id);
+            return {
+                ...chapter,
+                calculated_chapter_number: calculatedChapter ? calculatedChapter.calculated_chapter_number : chapter.chapter_number
+            };
+        });
 
         // Processar cada capítulo para buscar detalhes relacionados
         if (latestChapters && latestChapters.length > 0) {
             const chaptersWithDetails = await Promise.all(
-                latestChapters.map(async (chapter) => {
+                mappedChapters.map(async (chapter) => {
                     // Buscar dados da série relacionada
                     const { data: series } = await supabase
                         .from("series")
@@ -110,10 +142,42 @@ export default async function HomePage() {
         .from("chapters")
         .select("id, title, content, chapter_number, series_id, author_id, created_at")
         .not('series_id', 'is', null);
+        
+    // Organizar capítulos por série para calcular o número correto
+    const allChaptersBySeries = {};
+    allChapters?.forEach(chapter => {
+        if (!allChaptersBySeries[chapter.series_id]) {
+            allChaptersBySeries[chapter.series_id] = [];
+        }
+        allChaptersBySeries[chapter.series_id].push({...chapter});
+    });
+    
+    // Para cada série, ordenar capítulos por data de criação e atribuir números sequenciais
+    Object.keys(allChaptersBySeries).forEach(seriesId => {
+        const chaptersForSeries = allChaptersBySeries[seriesId];
+        // Ordenar por data (do mais antigo para o mais recente)
+        chaptersForSeries.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        // Atribuir números sequenciais
+        chaptersForSeries.forEach((chapter, index) => {
+            chapter.calculated_chapter_number = index + 1;
+        });
+    });
+    
+    // Aplanar a estrutura de volta para um array
+    const allChaptersWithCalculatedNumbers = Object.values(allChaptersBySeries).flat();
+    
+    // Mapear de volta para o formato original
+    const mappedAllChapters = allChapters.map(chapter => {
+        const calculatedChapter = allChaptersWithCalculatedNumbers.find(c => c.id === chapter.id);
+        return {
+            ...chapter,
+            calculated_chapter_number: calculatedChapter ? calculatedChapter.calculated_chapter_number : chapter.chapter_number
+        };
+    });
 
     // Buscar detalhes adicionais para cada capítulo
     const chaptersWithDetails = await Promise.all(
-        (allChapters || []).map(async (chapter) => {
+        (mappedAllChapters || []).map(async (chapter) => {
             // Buscar série relacionada
             const { data: series } = await supabase
                 .from("series")
@@ -322,7 +386,7 @@ export default async function HomePage() {
                                             className="block relative p-4 rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
                                         >
                                             <div className="absolute top-0 right-0 px-2 py-1 bg-[#484DB5] text-white text-xs rounded-tr-lg">
-                                                Capítulo {content.chapter_number}
+                                                Capítulo {content.calculated_chapter_number || content.chapter_number}
                                             </div>
                                             <h3 className="font-semibold text-lg mt-2 mb-3">{content.title}</h3>
                                             
@@ -406,7 +470,7 @@ export default async function HomePage() {
                                             className="block relative p-4 rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
                                         >
                                             <div className="absolute top-0 right-0 px-2 py-1 bg-[#484DB5] text-white text-xs rounded-tr-lg">
-                                                Capítulo {content.chapter_number}
+                                                Capítulo {content.calculated_chapter_number || content.chapter_number}
                                             </div>
                                             <h3 className="font-semibold text-lg mt-2 mb-3">{content.title}</h3>
                                             

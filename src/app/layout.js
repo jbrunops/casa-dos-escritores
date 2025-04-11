@@ -38,10 +38,10 @@ export default function RootLayout({ children }) {
                                 <div className="grid grid-cols-2 gap-3">
                                     <Link href="/categories" className="text-white hover:text-opacity-80 transition-colors duration-200">Categorias</Link>
                                     <Link href="/series" className="text-white hover:text-opacity-80 transition-colors duration-200">Séries</Link>
-                                    <Link href="/about" className="text-white hover:text-opacity-80 transition-colors duration-200">Sobre nós</Link>
-                                    <Link href="/terms" className="text-white hover:text-opacity-80 transition-colors duration-200">Termos de uso</Link>
-                                    <Link href="/privacy" className="text-white hover:text-opacity-80 transition-colors duration-200">Privacidade</Link>
-                                    <Link href="/faq" className="text-white hover:text-opacity-80 transition-colors duration-200">FAQ</Link>
+                                    
+                                    
+                                    
+                                    
                                 </div>
                             </div>
                             
