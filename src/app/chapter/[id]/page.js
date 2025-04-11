@@ -138,7 +138,7 @@ export default async function ChapterPage({ params }) {
     };
 
     return (
-        <div className="max-w-[75rem] mx-auto px-4 py-6">
+        <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-6">
             {/* Script para incrementar a contagem de visualização do lado do cliente */}
             <Script id="increment-view">{`
                 (async function() {
@@ -209,7 +209,7 @@ export default async function ChapterPage({ params }) {
                         Capítulo {chapter.chapter_number}: {chapter.title}
                     </h1>
                     <div className="flex flex-wrap gap-3 text-sm text-gray-600">
-                        <span className="inline-flex items-center">Por <span className="ml-1 font-medium">{author.username}</span></span>
+                        <span className="inline-flex items-center">Por <Link href={`/profile/${encodeURIComponent(author.username)}`} className="ml-1 font-medium text-[#484DB5] hover:underline transition-all duration-200">{author.username}</Link></span>
                         <span className="inline-flex items-center">{formatDate(chapter.created_at)}</span>
                     </div>
                 </div>

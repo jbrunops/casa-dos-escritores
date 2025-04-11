@@ -248,19 +248,19 @@ export default function SeriesPage() {
 
                 {/* Seção de capítulos */}
                 <div className="p-6 border-b border-[#E5E7EB]">
-                    <div className="flex justify-between items-center mb-4">
+                    <div className="flex flex-row justify-between items-center mb-4">
                         <h2 className="text-xl font-bold text-gray-900">
                             Capítulos ({chapters.length})
                         </h2>
                         
-                        {/* Botão "Adicionar Capítulo" movido para cá */}
+                        {/* Botão "Adicionar Capítulo" - apenas ícone no mobile */}
                         {isAuthor && (
                             <Link
                                 href={`/dashboard/new-chapter/${series.id}`}
-                                className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200"
+                                className="inline-flex items-center justify-center h-10 px-4 sm:px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-300 ease-in-out"
                             >
-                                <Plus size={16} className="mr-2" />
-                                <span>Adicionar Capítulo</span>
+                                <Plus size={16} className="sm:mr-2" />
+                                <span className="hidden sm:inline">Adicionar Capítulo</span>
                             </Link>
                         )}
                     </div>

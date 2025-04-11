@@ -65,15 +65,15 @@ export default function SeriesActions({ series, isAuthor }) {
             {series.first_chapter ? (
                 <Link
                     href={`/chapter/${series.first_chapter}`}
-                    className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200"
+                    className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-300 ease-in-out"
                 >
-                    <BookOpen size={18} className="mr-2" />
-                    <span>Ver Série</span>
+                    <BookOpen size={18} className="sm:mr-2" />
+                    <span className="hidden sm:inline">Ver Série</span>
                 </Link>
             ) : (
                 <span className="inline-flex items-center justify-center h-10 px-4 border border-[#E5E7EB] text-gray-400 rounded-md bg-gray-50 cursor-not-allowed">
-                    <BookOpen size={18} className="mr-2" />
-                    <span>Sem Capítulos</span>
+                    <BookOpen size={18} className="sm:mr-2" />
+                    <span className="hidden sm:inline">Sem Capítulos</span>
                 </span>
             )}
 
@@ -81,19 +81,19 @@ export default function SeriesActions({ series, isAuthor }) {
                 <>
                     <Link
                         href={`/dashboard/edit-series/${series.id}`}
-                        className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200"
+                        className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-300 ease-in-out"
                     >
-                        <Edit size={18} className="mr-2" />
-                        <span>Editar Série</span>
+                        <Edit size={18} className="sm:mr-2" />
+                        <span className="hidden sm:inline">Editar Série</span>
                     </Link>
 
                     <button
                         onClick={handleDelete}
                         disabled={deleting}
-                        className="inline-flex items-center justify-center h-10 px-4 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="inline-flex items-center justify-center h-10 px-4 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        <Trash2 size={18} className="mr-2" />
-                        <span>{deleting ? "Excluindo..." : "Excluir"}</span>
+                        <Trash2 size={18} className="sm:mr-2" />
+                        <span className="hidden sm:inline">{deleting ? "Excluindo..." : "Excluir"}</span>
                     </button>
                 </>
             )}
