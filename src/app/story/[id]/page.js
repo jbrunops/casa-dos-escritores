@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import Comments from "@/components/Comments";
 import StoryContent from "@/components/StoryContent";
 import { extractIdFromSlug, formatDate, calculateReadingTime } from "@/lib/utils";
+import { Eye } from "lucide-react";
 
 export async function generateMetadata({ params }) {
     try {
@@ -106,7 +107,7 @@ export default async function StoryPage({ params }) {
         const readingTime = calculateReadingTime(story.content);
 
         return (
-            <div className="max-w-[75rem] mx-auto px-4 py-8">
+            <div className="max-w-[75rem] mx-auto py-8 px-4 sm:px-0">
                 <h1 className="text-4xl font-bold mb-6">{story.title}</h1>
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -134,33 +135,38 @@ export default async function StoryPage({ params }) {
                                 {story.profiles?.username ||
                                     "Autor desconhecido"}
                             </Link>
-                            <div className="flex text-sm text-gray-500 gap-2">
-                                <span>
-                                    {formattedDate}
-                                </span>
-                                <span>·</span>
-                                <span>
-                                    {readingTime} min para ler
-                                </span>
+                            <div className="flex flex-col sm:flex-row sm:items-center">
+                                <div className="flex text-sm text-gray-500 gap-2 items-center">
+                                    <span>
+                                        {formattedDate}
+                                    </span>
+                                    <span>·</span>
+                                    <span>
+                                        {readingTime} min para ler
+                                    </span>
+                                </div>
+                                
+                                <div className="flex text-sm text-gray-500 gap-2 items-center mt-1 sm:mt-0 sm:ml-2">
+                                    <span className="hidden sm:inline">·</span>
+                                    {story.category && (
+                                        <>
+                                            <Link
+                                                href={`/categories/${story.category
+                                                    .toLowerCase()
+                                                    .replace(/\s+/g, "-")}`}
+                                                className="px-2 py-0.5 rounded-full bg-gray-100 border border-[#E5E7EB] hover:bg-gray-200 transition-colors duration-200"
+                                            >
+                                                {story.category}
+                                            </Link>
+                                            <span>·</span>
+                                        </>
+                                    )}
+                                    <span className="flex items-center gap-1" title="Visualizações">
+                                        <Eye size={14} className="text-[#484DB5]" /> {story.view_count.toLocaleString("pt-BR")}
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                        {story.category && (
-                            <Link
-                                href={`/categories/${story.category
-                                    .toLowerCase()
-                                    .replace(/\s+/g, "-")}`}
-                                className="px-3 py-1 rounded-full text-sm bg-gray-100 border border-[#E5E7EB] hover:bg-gray-200 transition-colors duration-200"
-                            >
-                                {story.category}
-                            </Link>
-                        )}
-
-                        <span className="flex items-center gap-1 text-sm text-gray-500" title="Visualizações">
-                            👁️ {story.view_count.toLocaleString("pt-BR")}
-                        </span>
                     </div>
                 </div>
 
