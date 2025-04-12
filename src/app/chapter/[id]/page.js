@@ -58,12 +58,12 @@ export default async function ChapterPage({ params }) {
     if (error) {
         console.error(`Erro ao buscar capítulo com ID '${id}':`, error?.message);
         return (
-            <div className="max-w-[75rem] mx-auto px-4 py-8">
-                <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md">
+            <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
+                <div className="bg-red-50 border border-red-200 text-red-700 p-4">
                     Capítulo não encontrado.
                 </div>
                 <div className="text-center mt-4">
-                    <Link href="/series" className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200">
+                    <Link href="/series" className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-300 hover:-translate-y-1">
                         Voltar para séries
                     </Link>
                 </div>
@@ -74,12 +74,12 @@ export default async function ChapterPage({ params }) {
     if (!chapter) {
         console.error(`Capítulo não encontrado para o ID: '${id}'`);
         return (
-            <div className="max-w-[75rem] mx-auto px-4 py-8">
-                <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md">
+            <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
+                <div className="bg-red-50 border border-red-200 text-red-700 p-4">
                     Capítulo não encontrado.
                 </div>
                 <div className="text-center mt-4">
-                    <Link href="/series" className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200">
+                    <Link href="/series" className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-300 hover:-translate-y-1">
                         Voltar para séries
                     </Link>
                 </div>
@@ -153,7 +153,7 @@ export default async function ChapterPage({ params }) {
                 })();
             `}</Script>
             
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 border-b border-[#E5E7EB] pb-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 border border-[#E5E7EB] p-4">
                 <Link href={`/series/${generateSlug(series.title, chapter.series_id)}`} className="inline-flex items-center text-gray-700 hover:text-[#484DB5] transition-colors duration-200 mb-2 sm:mb-0">
                     <ArrowLeft size={16} className="mr-1" />
                     <span className="font-medium">{series.title}</span>
@@ -163,7 +163,7 @@ export default async function ChapterPage({ params }) {
                     {prevChapter ? (
                         <Link
                             href={`/chapter/${generateSlug(prevChapter.title, prevChapter.id)}`}
-                            className="inline-flex items-center h-10 px-3 border border-[#E5E7EB] rounded-md text-gray-700 hover:text-[#484DB5] hover:border-[#484DB5] transition-all duration-200"
+                            className="inline-flex items-center h-10 px-3 border border-[#E5E7EB] rounded-md text-gray-700 hover:text-[#484DB5] hover:border-[#484DB5] transition-all duration-300 hover:-translate-y-1"
                             title={`Capítulo ${prevChapter.chapter_number}: ${prevChapter.title}`}
                         >
                             <ArrowLeft size={16} className="mr-1" />
@@ -178,7 +178,7 @@ export default async function ChapterPage({ params }) {
                     
                     <Link
                         href={`/series/${generateSlug(series.title, chapter.series_id)}`}
-                        className="inline-flex items-center h-10 px-3 border border-[#E5E7EB] rounded-md text-gray-700 hover:text-[#484DB5] hover:border-[#484DB5] transition-all duration-200"
+                        className="inline-flex items-center h-10 px-3 border border-[#E5E7EB] rounded-md text-gray-700 hover:text-[#484DB5] hover:border-[#484DB5] transition-all duration-300 hover:-translate-y-1"
                         title="Ver todos os capítulos"
                     >
                         <ListOrdered size={16} className="mr-1" />
@@ -188,7 +188,7 @@ export default async function ChapterPage({ params }) {
                     {nextChapter ? (
                         <Link
                             href={`/chapter/${generateSlug(nextChapter.title, nextChapter.id)}`}
-                            className="inline-flex items-center h-10 px-3 border border-[#E5E7EB] rounded-md text-gray-700 hover:text-[#484DB5] hover:border-[#484DB5] transition-all duration-200"
+                            className="inline-flex items-center h-10 px-3 border border-[#E5E7EB] rounded-md text-gray-700 hover:text-[#484DB5] hover:border-[#484DB5] transition-all duration-300 hover:-translate-y-1"
                             title={`Capítulo ${nextChapter.chapter_number}: ${nextChapter.title}`}
                         >
                             <span>Cap. {nextChapter.chapter_number}</span>
@@ -203,7 +203,7 @@ export default async function ChapterPage({ params }) {
                 </div>
             </div>
             
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="border border-[#E5E7EB] mb-6">
                 <div className="p-6 border-b border-[#E5E7EB]">
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
                         Capítulo {chapter.chapter_number}: {chapter.title}
@@ -222,7 +222,7 @@ export default async function ChapterPage({ params }) {
                     {prevChapter && (
                         <Link
                             href={`/chapter/${generateSlug(prevChapter.title, prevChapter.id)}`}
-                            className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200"
+                            className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-300 hover:-translate-y-1"
                         >
                             <ArrowLeft size={16} className="mr-2" />
                             <span className="truncate max-w-[200px]">Capítulo {prevChapter.chapter_number}</span>
@@ -231,7 +231,7 @@ export default async function ChapterPage({ params }) {
 
                     <Link 
                         href={`/series/${generateSlug(series.title, chapter.series_id)}`} 
-                        className="inline-flex items-center justify-center h-10 px-4 border border-[#E5E7EB] text-gray-700 rounded-md hover:bg-gray-50 transition-all duration-200"
+                        className="inline-flex items-center justify-center h-10 px-4 border border-[#E5E7EB] text-gray-700 rounded-md hover:bg-gray-50 transition-all duration-300 hover:-translate-y-1"
                     >
                         <ListOrdered size={16} className="mr-2" />
                         <span>Ver todos os capítulos</span>
@@ -240,7 +240,7 @@ export default async function ChapterPage({ params }) {
                     {nextChapter && (
                         <Link
                             href={`/chapter/${generateSlug(nextChapter.title, nextChapter.id)}`}
-                            className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200"
+                            className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-300 hover:-translate-y-1"
                         >
                             <span className="truncate max-w-[200px]">Capítulo {nextChapter.chapter_number}</span>
                             <ArrowRight size={16} className="ml-2" />

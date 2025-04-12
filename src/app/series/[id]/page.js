@@ -167,148 +167,154 @@ export default function SeriesPage() {
 
     return (
         <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                {/* Header com informações da série */}
-                <div className="flex flex-col md:flex-row p-6 gap-6 border-b border-[#E5E7EB]">
-                    <div className="w-full md:w-1/3 lg:w-1/4">
-                        {series.cover_url ? (
-                            <img
-                                src={series.cover_url}
-                                alt={series.title}
-                                className="w-full h-auto object-cover rounded-md shadow-sm"
-                            />
-                        ) : (
-                            <div className="w-full aspect-[2/3] bg-gray-200 flex items-center justify-center rounded-md text-4xl font-bold text-gray-500">
-                                {series.title.charAt(0).toUpperCase()}
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="w-full md:w-2/3 lg:w-3/4">
-                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">{series.title}</h1>
-
-                        {/* Metadados da série */}
-                        <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
-                            <div className="flex items-center gap-1">
-                                <User size={16} className="text-gray-500" />
-                                <span>
-                                    Por{" "}
-                                    <Link
-                                        href={`/profile/${encodeURIComponent(
-                                            author?.username || "usuário"
-                                        )}`}
-                                        className="text-[#484DB5] hover:text-[#5c61ca] transition-colors duration-200"
-                                    >
-                                        {author?.username || "Usuário"}
-                                    </Link>
-                                </span>
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                                <Calendar size={16} className="text-gray-500" />
-                                <span>{formatDate(series.created_at)}</span>
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                                <BookOpen size={16} className="text-gray-500" />
-                                <span>{chapters?.length || 0} capítulos</span>
-                            </div>
-                            
-                            {series.genre && (
-                                <div className="flex items-center gap-1">
-                                    <span className="px-2 py-0.5 bg-[#484DB5] text-white text-xs rounded-full">
-                                        {series.genre}
-                                    </span>
-                                </div>
-                            )}
+            {/* Header com informações da série */}
+            <div className="flex flex-col md:flex-row p-6 gap-6 border border-[#E5E7EB] mb-6">
+                <div className="w-full md:w-1/3 lg:w-1/4">
+                    {series.cover_url ? (
+                        <img
+                            src={series.cover_url}
+                            alt={series.title}
+                            className="w-full h-auto object-cover rounded-md"
+                        />
+                    ) : (
+                        <div className="w-full aspect-[2/3] bg-gray-200 flex items-center justify-center rounded-md text-4xl font-bold text-gray-500">
+                            {series.title.charAt(0).toUpperCase()}
                         </div>
-
-                        {/* Descrição */}
-                        {series.description && (
-                            <div className="mb-4 prose prose-sm max-w-none text-gray-700">
-                                <p>{series.description}</p>
-                            </div>
-                        )}
-
-                        {/* Tags */}
-                        <div className="flex flex-wrap gap-2 mb-6">
-                            {series.tags && series.tags.length > 0 &&
-                                series.tags.map((tag) => (
-                                    <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border border-[#E5E7EB]">
-                                        {tag}
-                                    </span>
-                                ))
-                            }
-                        </div>
-
-                        {/* Botões de ações */}
-                        <SeriesActions series={series} isAuthor={isAuthor} />
-                    </div>
+                    )}
                 </div>
 
-                {/* Seção de capítulos */}
-                <div className="p-6 border-b border-[#E5E7EB]">
-                    <div className="flex flex-row justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold text-gray-900">
-                            Capítulos ({chapters.length})
-                        </h2>
+                <div className="w-full md:w-2/3 lg:w-3/4">
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">{series.title}</h1>
+
+                    {/* Metadados da série */}
+                    <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
+                        <div className="flex items-center gap-1">
+                            <User size={16} className="text-gray-500" />
+                            <span>
+                                Por{" "}
+                                <Link
+                                    href={`/profile/${encodeURIComponent(
+                                        author?.username || "usuário"
+                                    )}`}
+                                    className="text-[#484DB5] hover:text-[#5c61ca] transition-colors duration-200"
+                                >
+                                    {author?.username || "Usuário"}
+                                </Link>
+                            </span>
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                            <Calendar size={16} className="text-gray-500" />
+                            <span>{formatDate(series.created_at)}</span>
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                            <BookOpen size={16} className="text-gray-500" />
+                            <span>{chapters?.length || 0} capítulos</span>
+                        </div>
                         
-                        {/* Botão "Adicionar Capítulo" - apenas ícone no mobile */}
+                        {series.genre && (
+                            <div className="flex items-center gap-1">
+                                <span className="px-2 py-0.5 bg-[#484DB5] text-white text-xs rounded-full">
+                                    {series.genre}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Descrição */}
+                    {series.description && (
+                        <div className="mb-4 prose prose-sm max-w-none text-gray-700">
+                            <p>{series.description}</p>
+                        </div>
+                    )}
+
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2 mb-6">
+                        {series.tags && series.tags.length > 0 &&
+                            series.tags.map((tag) => (
+                                <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border border-[#E5E7EB]">
+                                    {tag}
+                                </span>
+                            ))
+                        }
+                    </div>
+
+                    {/* Botões de ações */}
+                    <SeriesActions series={series} isAuthor={isAuthor} />
+                </div>
+            </div>
+
+            {/* Seção de capítulos */}
+            <div className="p-6 border border-[#E5E7EB] mb-6">
+                <div className="flex flex-row justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-gray-900">
+                        Capítulos ({chapters.length})
+                    </h2>
+                    
+                    {/* Botão "Adicionar Capítulo" - apenas ícone no mobile */}
+                    {isAuthor && (
+                        <Link
+                            href={`/dashboard/new-chapter/${series.id}`}
+                            className="inline-flex items-center justify-center h-10 px-4 sm:px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-300 ease-in-out"
+                        >
+                            <Plus size={16} className="sm:mr-2" />
+                            <span className="hidden sm:inline">Adicionar Capítulo</span>
+                        </Link>
+                    )}
+                </div>
+
+                {chapters.length === 0 ? (
+                    <div className="bg-gray-50 p-6 rounded-md text-center">
+                        <p className="text-gray-600 mb-4">Nenhum capítulo disponível nesta série ainda.</p>
                         {isAuthor && (
                             <Link
                                 href={`/dashboard/new-chapter/${series.id}`}
-                                className="inline-flex items-center justify-center h-10 px-4 sm:px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-300 ease-in-out"
+                                className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200"
                             >
-                                <Plus size={16} className="sm:mr-2" />
-                                <span className="hidden sm:inline">Adicionar Capítulo</span>
+                                <Edit size={16} className="mr-2" />
+                                <span>Escrever Primeiro Capítulo</span>
                             </Link>
                         )}
                     </div>
-
-                    {chapters.length === 0 ? (
-                        <div className="bg-gray-50 p-6 rounded-md text-center">
-                            <p className="text-gray-600 mb-4">Nenhum capítulo disponível nesta série ainda.</p>
-                            {isAuthor && (
+                ) : (
+                    <div className="divide-y divide-[#E5E7EB]">
+                        {chapters.map((chapter, index) => (
+                            <div
+                                key={chapter.id}
+                                className="flex justify-between items-center py-4 hover:bg-gray-50 transition-all duration-300"
+                            >
                                 <Link
-                                    href={`/dashboard/new-chapter/${series.id}`}
-                                    className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200"
+                                    href={`/chapter/${generateSlug(chapter.title, chapter.id)}`}
+                                    className="flex-1 text-gray-900 hover:text-[#484DB5] transition-colors duration-300"
                                 >
-                                    <Edit size={16} className="mr-2" />
-                                    <span>Escrever Primeiro Capítulo</span>
-                                </Link>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="divide-y divide-[#E5E7EB]">
-                            {chapters.map((chapter, index) => (
-                                <div
-                                    key={chapter.id}
-                                    className="flex justify-between items-center py-4"
-                                >
-                                    <div className="flex-1">
-                                        <span className="text-sm font-medium text-gray-500 block">
-                                            Capítulo {chapter.chapter_number}
+                                    <span className="text-sm font-medium text-gray-500 block">
+                                        Capítulo {chapter.chapter_number}
+                                    </span>
+                                    <h3 className="text-lg font-medium">
+                                        {chapter.title}
+                                    </h3>
+                                    <div className="mt-1 text-sm text-gray-500">
+                                        <span>
+                                            {formatDate(chapter.created_at)}
                                         </span>
-                                        <h3 className="text-lg font-medium text-gray-900">
-                                            <Link
-                                                href={`/chapter/${generateSlug(chapter.title, chapter.id)}`}
-                                                className="hover:text-[#484DB5] transition-colors duration-200"
-                                            >
-                                                {chapter.title}
-                                            </Link>
-                                        </h3>
-                                        <div className="mt-1 text-sm text-gray-500">
-                                            <span>
-                                                {formatDate(chapter.created_at)}
-                                            </span>
-                                        </div>
                                     </div>
+                                </Link>
+
+                                <div className="flex gap-2">
+                                    <Link
+                                        href={`/chapter/${generateSlug(chapter.title, chapter.id)}`}
+                                        className="flex items-center justify-center h-10 w-10 text-gray-600 hover:text-[#484DB5] rounded-md border border-[#E5E7EB] hover:border-[#484DB5] transition-all duration-300 hover:-translate-y-1"
+                                        title="Ver Capítulo"
+                                    >
+                                        <Eye size={16} />
+                                    </Link>
 
                                     {isAuthor && (
-                                        <div className="flex gap-2">
+                                        <>
                                             <Link
                                                 href={`/dashboard/edit-chapter/${chapter.id}`}
-                                                className="flex items-center justify-center h-10 w-10 text-gray-600 hover:text-[#484DB5] rounded-md border border-[#E5E7EB] hover:border-[#484DB5] transition-all duration-200"
+                                                className="flex items-center justify-center h-10 w-10 text-gray-600 hover:text-[#484DB5] rounded-md border border-[#E5E7EB] hover:border-[#484DB5] transition-all duration-300 hover:-translate-y-1"
                                                 title="Editar Capítulo"
                                             >
                                                 <Edit size={16} />
@@ -317,27 +323,27 @@ export default function SeriesPage() {
                                                 onClick={() =>
                                                     handleDeleteChapter(chapter.id)
                                                 }
-                                                className="flex items-center justify-center h-10 w-10 text-gray-600 hover:text-red-600 rounded-md border border-[#E5E7EB] hover:border-red-300 transition-all duration-200"
+                                                className="flex items-center justify-center h-10 w-10 text-gray-600 hover:text-red-600 rounded-md border border-[#E5E7EB] hover:border-red-300 transition-all duration-300 hover:-translate-y-1"
                                                 title="Excluir Capítulo"
                                             >
                                                 <Trash2 size={16} />
                                             </button>
-                                        </div>
+                                        </>
                                     )}
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-                
-                {/* Seção de comentários */}
-                <div className="p-6">
-                    <Comments 
-                        contentId={id} 
-                        contentType="series" 
-                        userId={currentUserId}
-                    />
-                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+            
+            {/* Seção de comentários */}
+            <div className="p-6 border border-[#E5E7EB]">
+                <Comments 
+                    contentId={id} 
+                    contentType="series" 
+                    userId={currentUserId}
+                />
             </div>
         </div>
     );
