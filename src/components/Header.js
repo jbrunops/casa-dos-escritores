@@ -16,7 +16,8 @@ import {
     BookOpen,
     LogIn,
     UserPlus,
-    Bell
+    Bell,
+    Search
 } from "lucide-react";
 import NotificationBell from "./NotificationBell";
 import MenuItem from "./MenuItem";
@@ -36,6 +37,7 @@ export default function Header() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
+    const [searchTerm, setSearchTerm] = useState("");
     const mobileMenuRef = useRef(null);
     const supabase = createBrowserClient();
 
@@ -224,6 +226,15 @@ export default function Header() {
         setShowMobileMenu(!showMobileMenu);
     };
 
+    // Função para lidar com a pesquisa
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchTerm.trim() !== "") {
+            router.push(`/search?q=${encodeURIComponent(searchTerm)}`);
+            setSearchTerm("");
+        }
+    };
+
     return (
         <header className="bg-white border-b border-[#E5E7EB] w-full py-3 px-4 md:px-0 mb-[1.875rem] relative z-30">
             <div className="max-w-[75rem] mx-auto flex items-center justify-between">
@@ -256,6 +267,24 @@ export default function Header() {
                             Séries
                         </MenuItem>
                     </nav>
+                </div>
+
+                {/* Componente de busca */}
+                <div className="hidden md:flex flex-1 mx-4 max-w-md">
+                    <form onSubmit={handleSearch} className="w-full">
+                        <div className="relative">
+                            <input
+                                type="text"
+                                placeholder="Buscar histórias, séries, autores..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full h-10 pl-10 pr-4 rounded-md border border-[#E5E7EB] focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent transition-all duration-200"
+                            />
+                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                <Search size={18} />
+                            </div>
+                        </div>
+                    </form>
                 </div>
 
                 {/* Elementos para mobile */}
@@ -300,6 +329,22 @@ export default function Header() {
                                     >
                                         Séries
                                     </MenuItem>
+                                </li>
+                                <li className="p-3">
+                                    <form onSubmit={handleSearch} className="w-full">
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                placeholder="Buscar..."
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                className="w-full h-10 pl-10 pr-4 rounded-md border border-[#E5E7EB] focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent transition-all duration-200"
+                                            />
+                                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                                <Search size={18} />
+                                            </div>
+                                        </div>
+                                    </form>
                                 </li>
                                 {!user && (
                                     <>
