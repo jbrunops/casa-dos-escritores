@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
-import { Bell, Check, X, ArrowRight } from "lucide-react";
+import { Bell, Check, X, ArrowRight, MessageSquare, Reply, Heart, User, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { generateSlug } from "@/lib/utils";
 
@@ -252,17 +252,17 @@ export default function NotificationBell() {
     const getNotificationIcon = (type) => {
         switch (type) {
             case "comment":
-                return "💬";
+                return <MessageSquare size={20} className="text-[#484DB5]" />;
             case "reply":
-                return "↩️";
+                return <Reply size={20} className="text-[#484DB5]" />;
             case "like":
-                return "❤️";
+                return <Heart size={20} className="text-[#484DB5]" />;
             case "follow":
-                return "👤";
+                return <User size={20} className="text-[#484DB5]" />;
             case "chapter":
-                return "📖";
+                return <BookOpen size={20} className="text-[#484DB5]" />;
             default:
-                return "🔔";
+                return <Bell size={20} className="text-[#484DB5]" />;
         }
     };
 
@@ -273,7 +273,7 @@ export default function NotificationBell() {
                     className="relative flex items-center justify-center h-10 w-10 rounded-full hover:bg-gray-100 transition-colors duration-200"
                     aria-label="Notificações"
                 >
-                    <Bell size={isMobile ? 24 : 20} className="text-gray-700" />
+                    <Bell size={isMobile ? 24 : 20} className="text-[#484DB5]" />
                 </button>
             </div>
         );
@@ -287,9 +287,9 @@ export default function NotificationBell() {
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Notificações"
             >
-                <Bell size={isMobile ? 24 : 20} className="text-gray-700" />
+                <Bell size={isMobile ? 24 : 20} className="text-[#484DB5]" />
                 {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex items-center justify-center h-5 w-5 rounded-full bg-[#484DB5] text-white text-xs font-medium">
+                    <span className="absolute -top-1 -right-1 flex items-center justify-center h-5 w-5 rounded-full bg-red-500 text-white text-xs font-medium">
                         {unreadCount > 9 ? "9+" : unreadCount}
                     </span>
                 )}
@@ -333,7 +333,7 @@ export default function NotificationBell() {
                                         >
                                             <div className="flex items-start">
                                                 <div className="flex-shrink-0 mr-4">
-                                                    <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-lg">
+                                                    <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
                                                         {getNotificationIcon(notification.type)}
                                                     </div>
                                                 </div>

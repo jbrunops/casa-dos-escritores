@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import Link from "next/link";
-import { Bell, Check, CheckCheck, ArrowLeft, X, Filter, Clock, CheckCircle, Circle } from "lucide-react";
+import { Bell, Check, CheckCheck, ArrowLeft, X, Filter, Clock, CheckCircle, Circle, MessageSquare, Reply, Heart, User, BookOpen } from "lucide-react";
 import { generateSlug } from "@/lib/utils";
 
 export default function NotificationsPage() {
@@ -208,17 +208,17 @@ export default function NotificationsPage() {
     const getNotificationIcon = (type) => {
         switch (type) {
             case "comment":
-                return "💬";
+                return <MessageSquare size={20} className="text-[#484DB5]" />;
             case "reply":
-                return "↩️";
+                return <Reply size={20} className="text-[#484DB5]" />;
             case "like":
-                return "❤️";
+                return <Heart size={20} className="text-[#484DB5]" />;
             case "follow":
-                return "👤";
+                return <User size={20} className="text-[#484DB5]" />;
             case "chapter":
-                return "📖";
+                return <BookOpen size={20} className="text-[#484DB5]" />;
             default:
-                return "🔔";
+                return <Bell size={20} className="text-[#484DB5]" />;
         }
     };
 
@@ -349,7 +349,7 @@ export default function NotificationsPage() {
                                 >
                                     <div className="flex items-start">
                                         <div className="flex-shrink-0 mr-4">
-                                            <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center text-xl">
+                                            <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
                                                 {getNotificationIcon(notification.type)}
                                             </div>
                                         </div>
