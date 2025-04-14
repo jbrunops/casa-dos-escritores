@@ -150,8 +150,31 @@ export default function Header() {
     useEffect(() => {
         if (user) {
             fetchUnreadCount();
+            
+            // Configurar subscription para notificações em tempo real
+            const subscription = supabase
+                .channel("header_notifications")
+                .on(
+                    "postgres_changes",
+                    {
+                        event: "*", // INSERT, UPDATE, DELETE
+                        schema: "public",
+                        table: "notifications",
+                    },
+                    (payload) => {
+                        // Verificar se a notificação é para o usuário atual
+                        if (user && payload.new && payload.new.user_id === user.id) {
+                            fetchUnreadCount();
+                        }
+                    }
+                )
+                .subscribe();
+                
+            return () => {
+                subscription.unsubscribe();
+            };
         }
-    }, [user, fetchUnreadCount]);
+    }, [user, fetchUnreadCount, supabase]);
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
@@ -321,6 +344,20 @@ export default function Header() {
                                                 Meu Perfil
                                             </MenuItem>
                                         </li>
+                                        <li>
+                                            <MenuItem 
+                                                href="/notifications"
+                                                icon={<Bell size={20} />}
+                                                onClick={() => setShowMobileMenu(false)}
+                                            >
+                                                Notificações
+                                                {unreadCount > 0 && (
+                                                    <span className="ml-2 px-1.5 py-0.5 text-xs font-medium rounded-full bg-[#484DB5] text-white">
+                                                        {unreadCount}
+                                                    </span>
+                                                )}
+                                            </MenuItem>
+                                        </li>
                                         {isAdmin && (
                                             <li>
                                                 <MenuItem 
@@ -353,26 +390,31 @@ export default function Header() {
                 )}
 
                 {/* Autenticação / Perfil */}
-                <div className="hidden md:block">
+                <div className="hidden md:flex items-center">
                     {loading ? (
                         <div className="text-sm text-gray-500">Carregando...</div>
                     ) : user ? (
-                        <DropdownMenu
-                            trigger={
-                                <button
-                                    className="flex items-center text-[#484DB5] font-semibold h-10 rounded px-2"
-                                    onClick={() => setShowUserDropdown(!showUserDropdown)}
-                                >
-                                    <User size={18} className="mr-1.5" />
-                                    <span className="mr-1">{username || "Usuário"}</span>
-                                    <ChevronDown size={16} />
-                                </button>
-                            }
-                            isOpen={showUserDropdown}
-                            setIsOpen={setShowUserDropdown}
-                            items={userMenuItems}
-                            position="right"
-                        />
+                        <div className="flex items-center">
+                            {/* Adicionar o componente NotificationBell */}
+                            <NotificationBell />
+                            
+                            <DropdownMenu
+                                trigger={
+                                    <button
+                                        className="flex items-center text-[#484DB5] font-semibold h-10 rounded px-2 ml-2"
+                                        onClick={() => setShowUserDropdown(!showUserDropdown)}
+                                    >
+                                        <User size={18} className="mr-1.5" />
+                                        <span className="mr-1">{username || "Usuário"}</span>
+                                        <ChevronDown size={16} />
+                                    </button>
+                                }
+                                isOpen={showUserDropdown}
+                                setIsOpen={setShowUserDropdown}
+                                items={userMenuItems}
+                                position="right"
+                            />
+                        </div>
                     ) : (
                         <div className="flex items-center space-x-4">
                             <MenuItem href="/signup">

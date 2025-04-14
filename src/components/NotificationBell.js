@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
-import { Bell } from "lucide-react";
+import { Bell, Check, X, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { generateSlug } from "@/lib/utils";
 
@@ -211,97 +211,172 @@ export default function NotificationBell() {
         switch (notification.type) {
             case "comment":
             case "reply":
-                // Para histórias, usar slug
+                // Para histórias
                 if (notification.additional_data?.story_id) {
                     return `/story/${generateSlug(
                         notification.additional_data?.story_title || "",
                         notification.additional_data?.story_id
                     )}`;
                 }
-                // Para capítulos, manter apenas o ID por enquanto
-                return `/story/${notification.related_id}`;
+                // Para séries
+                if (notification.additional_data?.series_id) {
+                    return `/series/${notification.additional_data.series_id}`;
+                }
+                // Para capítulos
+                if (notification.additional_data?.chapter_id) {
+                    return `/chapter/${notification.additional_data.chapter_id}`;
+                }
+                // Fallback para o ID relacionado se disponível
+                return notification.related_id 
+                    ? `/story/${notification.related_id}` 
+                    : "/dashboard";
+            case "follow":
+                if (notification.additional_data?.username) {
+                    return `/profile/${notification.additional_data.username}`;
+                }
+                return "/profile";
+            case "like":
+                if (notification.additional_data?.story_id) {
+                    return `/story/${generateSlug(
+                        notification.additional_data?.story_title || "",
+                        notification.additional_data?.story_id
+                    )}`;
+                }
+                return "/dashboard";
             default:
-                return "#";
+                return "/dashboard";
+        }
+    };
+
+    // Obter ícone com base no tipo de notificação
+    const getNotificationIcon = (type) => {
+        switch (type) {
+            case "comment":
+                return "💬";
+            case "reply":
+                return "↩️";
+            case "like":
+                return "❤️";
+            case "follow":
+                return "👤";
+            case "chapter":
+                return "📖";
+            default:
+                return "🔔";
         }
     };
 
     if (loading) {
         return (
-            <div className="notification-bell-container">
-                <div className="notification-icon-wrapper">
-                    <Bell size={20} />
-                </div>
+            <div className="relative">
+                <button 
+                    className="relative flex items-center justify-center h-10 w-10 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                    aria-label="Notificações"
+                >
+                    <Bell size={isMobile ? 24 : 20} className="text-gray-700" />
+                </button>
             </div>
         );
     }
 
     // Mostrar apenas para usuários logados
     return (
-        <div className="notification-bell-container" ref={dropdownRef}>
+        <div className="relative z-50" ref={dropdownRef}>
             <button
-                className="notification-icon-wrapper"
+                className="relative flex items-center justify-center h-10 w-10 rounded-full hover:bg-gray-100 transition-colors duration-200"
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Notificações"
             >
-                <Bell size={isMobile ? 28 : 20} />
+                <Bell size={isMobile ? 24 : 20} className="text-gray-700" />
                 {unreadCount > 0 && (
-                    <span className="notification-badge">{unreadCount}</span>
+                    <span className="absolute -top-1 -right-1 flex items-center justify-center h-5 w-5 rounded-full bg-[#484DB5] text-white text-xs font-medium">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
                 )}
             </button>
 
             {isOpen && (
-                <div className="notifications-dropdown">
-                    <div className="notifications-header">
-                        <h3>Notificações</h3>
+                <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white rounded-lg shadow-lg border border-[#E5E7EB] overflow-hidden z-50">
+                    <div className="flex items-center justify-between p-4 border-b border-[#E5E7EB]">
+                        <h3 className="font-semibold text-gray-900">Notificações</h3>
                         {unreadCount > 0 && (
                             <button
                                 onClick={markAllAsRead}
-                                className="mark-read-button"
+                                className="text-xs font-medium text-[#484DB5] hover:text-opacity-80 transition-colors duration-200 flex items-center"
                             >
+                                <Check size={14} className="mr-1" />
                                 Marcar todas como lidas
                             </button>
                         )}
                     </div>
 
-                    {notifications.length === 0 ? (
-                        <div className="empty-notifications">
-                            <p>Você não tem notificações.</p>
-                        </div>
-                    ) : (
-                        <div className="notifications-list">
-                            {notifications.map((notification) => (
-                                <Link
-                                    href={getNotificationUrl(notification)}
-                                    key={notification.id}
-                                    className={`notification-item ${
-                                        !notification.is_read ? "unread" : ""
-                                    }`}
-                                    onClick={() => {
-                                        if (!notification.is_read) {
-                                            markAsRead(notification.id);
-                                        }
-                                        // Fechar dropdown ao clicar em notificação no mobile
-                                        if (isMobile) {
-                                            setIsOpen(false);
-                                        }
-                                    }}
-                                >
-                                    <div className="notification-content">
-                                        <div className="notification-text">
-                                            {notification.content}
-                                        </div>
-                                        <div className="notification-meta">
-                                            <span className="notification-time">
-                                                {formatNotificationDate(
-                                                    notification.created_at
+                    <div className="overflow-y-auto max-h-[70vh] md:max-h-[400px]">
+                        {notifications.length === 0 ? (
+                            <div className="p-6 text-center">
+                                <p className="text-gray-500">Nenhuma notificação</p>
+                            </div>
+                        ) : (
+                            <div>
+                                {notifications.map((notification) => (
+                                    <div
+                                        key={notification.id}
+                                        className={`relative hover:bg-gray-50 transition-colors duration-200 ${
+                                            !notification.is_read
+                                                ? "bg-blue-50"
+                                                : ""
+                                        }`}
+                                    >
+                                        <Link
+                                            href={getNotificationUrl(notification)}
+                                            className="block p-4"
+                                            onClick={() => markAsRead(notification.id)}
+                                        >
+                                            <div className="flex items-start">
+                                                <div className="flex-shrink-0 mr-4">
+                                                    <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-lg">
+                                                        {getNotificationIcon(notification.type)}
+                                                    </div>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm text-gray-900 font-medium line-clamp-2">
+                                                        {notification.content}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 mt-1">
+                                                        {formatNotificationDate(notification.created_at)}
+                                                    </p>
+                                                </div>
+                                                {!notification.is_read && (
+                                                    <div className="ml-2 mt-1 flex-shrink-0">
+                                                        <div className="h-2 w-2 rounded-full bg-[#484DB5]"></div>
+                                                    </div>
                                                 )}
-                                            </span>
-                                        </div>
+                                            </div>
+                                        </Link>
+                                        
+                                        {!notification.is_read && (
+                                            <button
+                                                onClick={() => markAsRead(notification.id)}
+                                                className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                                                aria-label="Marcar como lida"
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        )}
                                     </div>
-                                </Link>
-                            ))}
-                        </div>
-                    )}
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="border-t border-[#E5E7EB] p-3">
+                        <Link 
+                            href="/notifications"
+                            className="block w-full h-10 flex items-center justify-center text-sm font-medium text-[#484DB5] hover:bg-gray-50 rounded-md transition-colors duration-200"
+                        >
+                            Ver todas as notificações
+                            <ArrowRight size={16} className="ml-2" />
+                        </Link>
+                    </div>
                 </div>
             )}
         </div>

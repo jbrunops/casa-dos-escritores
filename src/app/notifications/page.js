@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import Link from "next/link";
-import { Bell, Check, CheckCheck, ArrowLeft } from "lucide-react";
+import { Bell, Check, CheckCheck, ArrowLeft, X, Filter, Clock, CheckCircle, Circle } from "lucide-react";
 import { generateSlug } from "@/lib/utils";
 
 export default function NotificationsPage() {
@@ -157,20 +157,30 @@ export default function NotificationsPage() {
         switch (notification.type) {
             case "comment":
             case "reply":
-                // Para histórias, usar slug
+                // Para histórias
                 if (notification.additional_data?.story_id) {
                     return `/story/${generateSlug(
                         notification.additional_data?.story_title || "",
                         notification.additional_data?.story_id
                     )}`;
                 }
-                // Para capítulos, manter apenas o ID por enquanto
-                return `/story/${notification.related_id}`;
+                // Para séries
+                if (notification.additional_data?.series_id) {
+                    return `/series/${notification.additional_data.series_id}`;
+                }
+                // Para capítulos
+                if (notification.additional_data?.chapter_id) {
+                    return `/chapter/${notification.additional_data.chapter_id}`;
+                }
+                // Fallback para o ID relacionado se disponível
+                return notification.related_id 
+                    ? `/story/${notification.related_id}` 
+                    : "/dashboard";
             case "follow":
                 if (notification.additional_data?.username) {
                     return `/profile/${notification.additional_data.username}`;
                 }
-                return `/profile`;
+                return "/profile";
             case "like":
                 if (notification.additional_data?.story_id) {
                     return `/story/${generateSlug(
@@ -178,7 +188,7 @@ export default function NotificationsPage() {
                         notification.additional_data?.story_id
                     )}`;
                 }
-                return `/dashboard`;
+                return "/dashboard";
             default:
                 return "/dashboard";
         }
@@ -194,128 +204,192 @@ export default function NotificationsPage() {
         return notifications;
     };
 
+    // Obter ícone com base no tipo de notificação
+    const getNotificationIcon = (type) => {
+        switch (type) {
+            case "comment":
+                return "💬";
+            case "reply":
+                return "↩️";
+            case "like":
+                return "❤️";
+            case "follow":
+                return "👤";
+            case "chapter":
+                return "📖";
+            default:
+                return "🔔";
+        }
+    };
+
     // Contagem de não lidas
     const unreadCount = notifications.filter(n => !n.is_read).length;
+    const filteredNotifications = getFilteredNotifications();
 
     return (
-        <div className="notifications-page">
-            <div className="notifications-container">
-                <div className="notifications-header">
-                    <div className="header-left">
+        <div className="flex flex-col mx-auto max-w-[75rem]">
+            {/* Cabeçalho da página */}
+            <header className="border-b border-[#E5E7EB] py-6 mb-6">
+                <div className="md:flex md:items-center md:justify-between px-4 md:px-0">
+                    <div className="flex items-center mb-4 md:mb-0">
                         <button 
-                            className="back-button" 
-                            onClick={() => router.back()}
+                            onClick={() => router.back()} 
+                            className="mr-3 h-8 w-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors duration-200"
                             aria-label="Voltar"
                         >
-                            <ArrowLeft size={20} />
+                            <ArrowLeft size={18} />
                         </button>
-                        <h1>Notificações</h1>
+                        
+                        <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+                            <Bell className="mr-3 text-[#484DB5]" />
+                            Notificações
+                            {unreadCount > 0 && (
+                                <span className="ml-3 px-2 py-1 text-xs font-medium rounded-full bg-[#484DB5] text-white">
+                                    {unreadCount} não lidas
+                                </span>
+                            )}
+                        </h1>
                     </div>
-                    <div className="header-actions">
+                    
+                    <div className="flex space-x-3">
                         {unreadCount > 0 && (
                             <button
-                                className="mark-all-button"
                                 onClick={markAllAsRead}
                                 disabled={markingAll}
+                                className="h-10 px-4 flex items-center justify-center bg-[#484DB5] hover:bg-opacity-90 text-white rounded-md text-sm font-medium transition-colors duration-200"
                             >
-                                {markingAll ? (
-                                    <span className="loading-spinner-small"></span>
-                                ) : (
+                                {markingAll ? "Processando..." : (
                                     <>
-                                        <CheckCheck size={16} />
-                                        <span>Marcar todas como lidas</span>
+                                        <CheckCheck size={16} className="mr-2" />
+                                        Marcar todas como lidas
                                     </>
                                 )}
                             </button>
                         )}
                     </div>
                 </div>
+            </header>
 
-                <div className="notifications-filter">
-                    <button 
-                        className={`filter-button ${filter === "all" ? "active" : ""}`}
-                        onClick={() => setFilter("all")}
-                    >
-                        Todas
-                    </button>
-                    <button 
-                        className={`filter-button ${filter === "unread" ? "active" : ""}`}
-                        onClick={() => setFilter("unread")}
-                    >
-                        Não lidas {unreadCount > 0 && `(${unreadCount})`}
-                    </button>
-                    <button 
-                        className={`filter-button ${filter === "read" ? "active" : ""}`}
-                        onClick={() => setFilter("read")}
-                    >
-                        Lidas
-                    </button>
-                </div>
+            {/* Filtros */}
+            <div className="mb-6 flex items-center space-x-2 px-4 md:px-0">
+                <Filter size={16} className="text-gray-500 mr-1" />
+                <span className="text-sm text-gray-500">Filtrar:</span>
+                
+                <button
+                    onClick={() => setFilter("all")}
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 ${
+                        filter === "all"
+                            ? "bg-[#484DB5] text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                >
+                    Todas
+                </button>
+                
+                <button
+                    onClick={() => setFilter("unread")}
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 ${
+                        filter === "unread"
+                            ? "bg-[#484DB5] text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                >
+                    <Circle size={14} className="mr-1 inline-block" />
+                    Não lidas
+                </button>
+                
+                <button
+                    onClick={() => setFilter("read")}
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 ${
+                        filter === "read"
+                            ? "bg-[#484DB5] text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                >
+                    <CheckCircle size={14} className="mr-1 inline-block" />
+                    Lidas
+                </button>
+            </div>
 
-                <div className="notifications-list-container">
-                    {loading ? (
-                        <div className="loading-container">
-                            <div className="loading-spinner"></div>
-                            <p>Carregando notificações...</p>
-                        </div>
-                    ) : getFilteredNotifications().length === 0 ? (
-                        <div className="empty-notifications">
-                            <Bell size={40} />
-                            <p>
-                                {filter === "all" 
-                                    ? "Você não tem notificações." 
-                                    : filter === "unread" 
-                                    ? "Não há notificações não lidas." 
-                                    : "Não há notificações lidas."}
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="notifications-list">
-                            {getFilteredNotifications().map((notification) => (
-                                <div
-                                    key={notification.id}
-                                    className={`notification-item ${
-                                        !notification.is_read ? "unread" : ""
-                                    }`}
+            {/* Lista de notificações */}
+            <div className="flex-1 px-4 md:px-0">
+                {loading ? (
+                    <div className="flex justify-center items-center py-10">
+                        <div className="w-10 h-10 border-4 border-[#484DB5] border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                ) : filteredNotifications.length === 0 ? (
+                    <div className="bg-white rounded-lg border border-[#E5E7EB] p-8 text-center">
+                        <Bell size={40} className="mx-auto text-gray-300 mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma notificação</h3>
+                        <p className="text-gray-500">
+                            {filter === "unread" 
+                                ? "Você não tem notificações não lidas." 
+                                : filter === "read" 
+                                    ? "Você não tem notificações lidas."
+                                    : "Você não tem notificações."}
+                        </p>
+                    </div>
+                ) : (
+                    <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
+                        {filteredNotifications.map((notification) => (
+                            <div
+                                key={notification.id}
+                                className={`relative border-b border-[#E5E7EB] last:border-b-0 ${
+                                    !notification.is_read ? "bg-blue-50" : ""
+                                }`}
+                            >
+                                <Link
+                                    href={getNotificationUrl(notification)}
+                                    className="block p-4 hover:bg-gray-50 transition-colors duration-200"
+                                    onClick={() => {
+                                        if (!notification.is_read) {
+                                            markAsRead(notification.id);
+                                        }
+                                    }}
                                 >
-                                    <div className="notification-content">
-                                        <Link
-                                            href={getNotificationUrl(notification)}
-                                            className="notification-link"
-                                            onClick={() => {
-                                                if (!notification.is_read) {
-                                                    markAsRead(notification.id);
-                                                }
-                                            }}
-                                        >
-                                            <div className="notification-text">
+                                    <div className="flex items-start">
+                                        <div className="flex-shrink-0 mr-4">
+                                            <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center text-xl">
+                                                {getNotificationIcon(notification.type)}
+                                            </div>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between mb-1">
+                                                <p className={`font-medium ${!notification.is_read ? "text-gray-900" : "text-gray-700"}`}>
+                                                    {notification.title || "Notificação"}
+                                                </p>
+                                                <div className="flex items-center text-gray-500 text-sm">
+                                                    <Clock size={14} className="mr-1" />
+                                                    {formatNotificationDate(notification.created_at)}
+                                                </div>
+                                            </div>
+                                            <p className="text-gray-700 mb-1">
                                                 {notification.content}
-                                            </div>
-                                            <div className="notification-meta">
-                                                <span>{formatNotificationDate(notification.created_at)}</span>
-                                            </div>
-                                        </Link>
-                                        
-                                        {!notification.is_read && (
-                                            <button 
-                                                className="mark-read-button"
-                                                onClick={() => markAsRead(notification.id)}
-                                                disabled={markingOne === notification.id}
-                                                aria-label="Marcar como lida"
-                                            >
-                                                {markingOne === notification.id ? (
-                                                    <span className="button-loading"></span>
-                                                ) : (
-                                                    <Check size={16} />
-                                                )}
-                                            </button>
-                                        )}
+                                            </p>
+                                            {!notification.is_read && (
+                                                <div className="flex items-center text-[#484DB5] text-xs font-medium mt-1">
+                                                    <Circle size={8} className="mr-1 fill-[#484DB5]" />
+                                                    Não lida
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                                </Link>
+                                
+                                {!notification.is_read && (
+                                    <button
+                                        onClick={() => markAsRead(notification.id)}
+                                        disabled={markingOne === notification.id}
+                                        className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                                        aria-label="Marcar como lida"
+                                    >
+                                        <Check size={16} />
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

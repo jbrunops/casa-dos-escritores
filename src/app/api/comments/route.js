@@ -67,11 +67,16 @@ export async function POST(request) {
             }
         }
 
+        // Inicializar variáveis para o autor do conteúdo e título
+        let contentAuthorId = null;
+        let contentTitle = "";
+        let contentType = "story";
+
         // Verificar se a história, série ou capítulo existe
         if (storyId) {
             const { data: storyExists, error: storyError } = await supabase
                 .from("stories")
-                .select("id")
+                .select("id, title, author_id")
                 .eq("id", storyId)
                 .single();
 
@@ -82,10 +87,15 @@ export async function POST(request) {
                     { status: 404 }
                 );
             }
+            
+            contentAuthorId = storyExists.author_id;
+            contentTitle = storyExists.title;
+            contentType = "story";
+            
         } else if (seriesId) {
             const { data: seriesExists, error: seriesError } = await supabase
                 .from("series")
-                .select("id")
+                .select("id, title, author_id")
                 .eq("id", seriesId)
                 .single();
 
@@ -96,10 +106,15 @@ export async function POST(request) {
                     { status: 404 }
                 );
             }
+            
+            contentAuthorId = seriesExists.author_id;
+            contentTitle = seriesExists.title;
+            contentType = "series";
+            
         } else if (chapterId) {
             const { data: chapterExists, error: chapterError } = await supabase
                 .from("chapters")
-                .select("id")
+                .select("id, title, author_id, series_id")
                 .eq("id", chapterId)
                 .single();
 
@@ -109,6 +124,23 @@ export async function POST(request) {
                     { error: "Capítulo não encontrado" },
                     { status: 404 }
                 );
+            }
+            
+            contentAuthorId = chapterExists.author_id;
+            contentTitle = chapterExists.title;
+            contentType = "chapter";
+            
+            // Se o capítulo pertence a uma série, buscar o título da série também
+            if (chapterExists.series_id) {
+                const { data: seriesData } = await supabase
+                    .from("series")
+                    .select("title")
+                    .eq("id", chapterExists.series_id)
+                    .single();
+                    
+                if (seriesData) {
+                    contentTitle = `${seriesData.title} - ${contentTitle}`;
+                }
             }
         }
 
@@ -144,6 +176,57 @@ export async function POST(request) {
                 },
                 { status: 500 }
             );
+        }
+
+        // Buscar informações do autor do comentário
+        const { data: commentAuthor } = await supabase
+            .from("profiles")
+            .select("username")
+            .eq("id", authorId)
+            .single();
+            
+        const authorUsername = commentAuthor?.username || "Alguém";
+        
+        // Enviar notificação ao autor do conteúdo (se não for o mesmo que comentou)
+        if (contentAuthorId && contentAuthorId !== authorId) {
+            // Determinar o tipo de notificação com base no tipo de conteúdo
+            const notificationType = parentId ? "reply" : "comment";
+            
+            // Criar texto da notificação
+            let notificationContent = `${authorUsername} comentou em`;
+            
+            if (contentType === "story") {
+                notificationContent = `${authorUsername} comentou em sua história "${contentTitle}"`;
+            } else if (contentType === "series") {
+                notificationContent = `${authorUsername} comentou em sua série "${contentTitle}"`;
+            } else if (contentType === "chapter") {
+                notificationContent = `${authorUsername} comentou em seu capítulo "${contentTitle}"`;
+            }
+            
+            // Dados adicionais para a notificação
+            const additionalData = {};
+            
+            if (storyId) {
+                additionalData.story_id = storyId;
+                additionalData.story_title = contentTitle;
+            } else if (seriesId) {
+                additionalData.series_id = seriesId;
+                additionalData.series_title = contentTitle;
+            } else if (chapterId) {
+                additionalData.chapter_id = chapterId;
+                additionalData.chapter_title = contentTitle;
+            }
+            
+            // Inserir notificação para o autor do conteúdo
+            await supabase.from("notifications").insert({
+                user_id: contentAuthorId,
+                type: notificationType,
+                content: notificationContent,
+                related_id: newComment.id,
+                is_read: false,
+                created_at: new Date().toISOString(),
+                additional_data: additionalData
+            });
         }
 
         return NextResponse.json({
