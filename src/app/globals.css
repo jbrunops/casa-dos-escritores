@@ -67,7 +67,7 @@ a:not(.no-hover):hover {
   }
   
   .max-w-\[75rem\] {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    /* padding-left: 1rem; */
+    /* padding-right: 1rem; */
   }
 } 
