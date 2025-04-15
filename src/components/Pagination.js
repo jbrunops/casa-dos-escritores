@@ -41,26 +41,28 @@ export default function Pagination({ currentPage, totalPages, baseUrl }) {
     const pageNumbers = getPageNumbers();
 
     return (
-        <div className="pagination">
+        <div className="flex items-center justify-center space-x-2">
             {/* Botão Anterior */}
             {currentPage > 1 ? (
                 <Link
                     href={`${baseUrl}?page=${currentPage - 1}`}
-                    className="pagination-btn prev"
+                    className="h-10 px-4 flex items-center justify-center border border-[#E5E7EB] rounded-md text-gray-700 hover:bg-gray-50 transition-all duration-200"
                 >
                     Anterior
                 </Link>
             ) : (
-                <span className="pagination-btn prev disabled">Anterior</span>
+                <span className="h-10 px-4 flex items-center justify-center border border-[#E5E7EB] rounded-md text-gray-400 bg-gray-50 opacity-60 cursor-not-allowed">
+                    Anterior
+                </span>
             )}
 
             {/* Números das páginas */}
-            <div className="pagination-numbers">
+            <div className="flex items-center space-x-1">
                 {pageNumbers.map((page, index) =>
                     page === "..." ? (
                         <span
                             key={`ellipsis-${index}`}
-                            className="pagination-ellipsis"
+                            className="h-10 w-10 flex items-center justify-center text-gray-500"
                         >
                             ...
                         </span>
@@ -68,8 +70,10 @@ export default function Pagination({ currentPage, totalPages, baseUrl }) {
                         <Link
                             key={page}
                             href={`${baseUrl}?page=${page}`}
-                            className={`pagination-number ${
-                                currentPage === page ? "active" : ""
+                            className={`h-10 w-10 flex items-center justify-center rounded-md transition-all duration-200 ${
+                                currentPage === page 
+                                ? "bg-[#484DB5] text-white" 
+                                : "text-gray-700 border border-[#E5E7EB] hover:bg-gray-50"
                             }`}
                         >
                             {page}
@@ -82,12 +86,14 @@ export default function Pagination({ currentPage, totalPages, baseUrl }) {
             {currentPage < totalPages ? (
                 <Link
                     href={`${baseUrl}?page=${currentPage + 1}`}
-                    className="pagination-btn next"
+                    className="h-10 px-4 flex items-center justify-center border border-[#E5E7EB] rounded-md text-gray-700 hover:bg-gray-50 transition-all duration-200"
                 >
                     Próximo
                 </Link>
             ) : (
-                <span className="pagination-btn next disabled">Próximo</span>
+                <span className="h-10 px-4 flex items-center justify-center border border-[#E5E7EB] rounded-md text-gray-400 bg-gray-50 opacity-60 cursor-not-allowed">
+                    Próximo
+                </span>
             )}
         </div>
     );

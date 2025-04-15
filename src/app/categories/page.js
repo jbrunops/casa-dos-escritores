@@ -10,14 +10,24 @@ export default async function CategoriesPage() {
     const supabase = await createServerSupabaseClient();
 
     // Buscar categorias únicas das histórias
-    const { data } = await supabase
+    const { data: storyCategories } = await supabase
         .from("stories")
         .select("category")
         .eq("is_published", true)
         .not("category", "is", null);
 
-    // Extrair categorias únicas
-    const categories = [...new Set(data?.map((item) => item.category))]
+    // Buscar categorias únicas das séries (campo genre)
+    const { data: seriesCategories } = await supabase
+        .from("series")
+        .select("genre")
+        .not("genre", "is", null);
+
+    // Extrair e combinar categorias únicas de histórias e séries
+    const storyCategList = storyCategories?.map(item => item.category) || [];
+    const seriesCategList = seriesCategories?.map(item => item.genre) || [];
+    const allCategories = [...storyCategList, ...seriesCategList];
+    
+    const categories = [...new Set(allCategories)]
         .filter(Boolean)
         .sort();
 
@@ -52,8 +62,30 @@ export default async function CategoriesPage() {
     const displayCategories =
         categories.length > 0 ? categories : defaultCategories;
 
+    // Contar publicações por categoria
+    const categoryCountMap = {};
+    
+    // Inicializar contadores para todas as categorias
+    displayCategories.forEach(category => {
+        categoryCountMap[category] = 0;
+    });
+    
+    // Contar histórias por categoria
+    storyCategories?.forEach(item => {
+        if (item.category && categoryCountMap.hasOwnProperty(item.category)) {
+            categoryCountMap[item.category]++;
+        }
+    });
+    
+    // Contar séries por categoria (genre)
+    seriesCategories?.forEach(item => {
+        if (item.genre && categoryCountMap.hasOwnProperty(item.genre)) {
+            categoryCountMap[item.genre]++;
+        }
+    });
+
     return (
-        <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-[1.875rem]">
+        <div className="max-w-[75rem] mx-auto py-[1.875rem] sm:px-0 px-4">
             <h1 className="text-3xl font-bold text-black mb-[1.875rem]">Todas as Categorias</h1>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[1.875rem]">
@@ -66,7 +98,12 @@ export default async function CategoriesPage() {
                         className="flex flex-col h-auto py-4 px-5 bg-white border border-[#E5E7EB] rounded-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:border-gray-300 relative overflow-hidden group"
                     >
                         <div className="flex items-center justify-between mb-2 z-10">
-                            <h2 className="text-lg font-medium text-gray-900">{category}</h2>
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-lg font-medium text-gray-900">{category}</h2>
+                                <span className="inline-flex items-center justify-center min-w-[1.5rem] h-[1.5rem] text-xs font-medium text-white bg-[#484DB5] rounded-full px-1.5">
+                                    {categoryCountMap[category] || 0}
+                                </span>
+                            </div>
                             <span className="text-[#484DB5] transition-transform duration-300 transform group-hover:translate-x-1">→</span>
                         </div>
                         <p className="text-sm text-gray-600 z-10">
