@@ -127,6 +127,11 @@ export default function NewChapterPage() {
                 console.error("Erro ao atualizar timestamp da série:", updateError);
             }
 
+            // Notificar seguidores sobre o novo capítulo
+            if (data && data[0]) {
+                await notifyFollowers(user.id, data[0].id, title, seriesId, series?.title);
+            }
+
             // Redirecionar após uma breve pausa
             setTimeout(() => {
                 router.push(`/series/${seriesId}`);
@@ -142,6 +147,55 @@ export default function NewChapterPage() {
                 success: false,
                 message: err.message || "Ocorreu um erro ao salvar o capítulo"
             };
+        }
+    };
+
+    // Função para notificar seguidores sobre um novo capítulo
+    const notifyFollowers = async (authorId, chapterId, chapterTitle, seriesId, seriesTitle) => {
+        try {
+            // Obter todos os seguidores do autor
+            const { data: followers, error: followersError } = await supabase
+                .from('follows')
+                .select('follower_id')
+                .eq('following_id', authorId);
+                
+            if (followersError) throw followersError;
+            
+            if (followers && followers.length > 0) {
+                // Obter detalhes do autor para inserir nas notificações
+                const { data: authorData, error: authorError } = await supabase
+                    .from('profiles')
+                    .select('username')
+                    .eq('id', authorId)
+                    .single();
+                    
+                if (authorError) throw authorError;
+                
+                // Criar notificações em lote para todos os seguidores
+                const notifications = followers.map(follower => ({
+                    user_id: follower.follower_id,
+                    type: 'new_chapter',
+                    sender_id: authorId,
+                    is_read: false,
+                    additional_data: {
+                        chapter_id: chapterId,
+                        chapter_title: chapterTitle,
+                        series_id: seriesId,
+                        series_title: seriesTitle,
+                        username: authorData.username
+                    }
+                }));
+                
+                // Inserir todas as notificações
+                const { error: notificationError } = await supabase
+                    .from('notifications')
+                    .insert(notifications);
+                    
+                if (notificationError) throw notificationError;
+            }
+        } catch (error) {
+            console.error('Erro ao notificar seguidores:', error);
+            // Não propagar o erro, para não interromper o fluxo principal
         }
     };
 

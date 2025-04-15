@@ -65,6 +65,11 @@ export default function NewSeriesPage() {
 
             if (error) throw error;
 
+            // Notificar seguidores sobre a nova série
+            if (data && data[0]) {
+                await notifyFollowers(user.id, data[0].id, title);
+            }
+
             // Redirecionar após breve pausa
             setTimeout(() => {
                 router.push(`/dashboard/new-chapter/${data[0].id}`);
@@ -80,6 +85,53 @@ export default function NewSeriesPage() {
                 success: false,
                 message: err.message || "Ocorreu um erro ao criar a série"
             };
+        }
+    };
+
+    // Função para notificar seguidores sobre uma nova série
+    const notifyFollowers = async (authorId, seriesId, seriesTitle) => {
+        try {
+            // Obter todos os seguidores do autor
+            const { data: followers, error: followersError } = await supabase
+                .from('follows')
+                .select('follower_id')
+                .eq('following_id', authorId);
+                
+            if (followersError) throw followersError;
+            
+            if (followers && followers.length > 0) {
+                // Obter detalhes do autor para inserir nas notificações
+                const { data: authorData, error: authorError } = await supabase
+                    .from('profiles')
+                    .select('username')
+                    .eq('id', authorId)
+                    .single();
+                    
+                if (authorError) throw authorError;
+                
+                // Criar notificações em lote para todos os seguidores
+                const notifications = followers.map(follower => ({
+                    user_id: follower.follower_id,
+                    type: 'new_story', // Usando o mesmo tipo para simplificar
+                    sender_id: authorId,
+                    is_read: false,
+                    additional_data: {
+                        series_id: seriesId,
+                        story_title: `Série: ${seriesTitle}`, // Para compatibilidade com o componente existente
+                        username: authorData.username
+                    }
+                }));
+                
+                // Inserir todas as notificações
+                const { error: notificationError } = await supabase
+                    .from('notifications')
+                    .insert(notifications);
+                    
+                if (notificationError) throw notificationError;
+            }
+        } catch (error) {
+            console.error('Erro ao notificar seguidores:', error);
+            // Não propagar o erro, para não interromper o fluxo principal
         }
     };
 

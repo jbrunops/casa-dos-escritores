@@ -32,6 +32,11 @@ export default function NewStoryPage() {
 
             if (error) throw error;
 
+            // Se a história foi publicada (não é rascunho), notificar seguidores
+            if (!isDraft && data[0]) {
+                await notifyFollowers(user.id, data[0].id, title);
+            }
+
             // Redirecionar após uma breve pausa
             setTimeout(() => {
                 if (isDraft) {
@@ -53,6 +58,53 @@ export default function NewStoryPage() {
                 success: false,
                 message: err.message || "Ocorreu um erro ao salvar a história"
             };
+        }
+    };
+
+    // Função para notificar seguidores sobre uma nova história
+    const notifyFollowers = async (authorId, storyId, storyTitle) => {
+        try {
+            // Obter todos os seguidores do autor
+            const { data: followers, error: followersError } = await supabase
+                .from('follows')
+                .select('follower_id')
+                .eq('following_id', authorId);
+                
+            if (followersError) throw followersError;
+            
+            if (followers && followers.length > 0) {
+                // Obter detalhes do autor para inserir nas notificações
+                const { data: authorData, error: authorError } = await supabase
+                    .from('profiles')
+                    .select('username')
+                    .eq('id', authorId)
+                    .single();
+                    
+                if (authorError) throw authorError;
+                
+                // Criar notificações em lote para todos os seguidores
+                const notifications = followers.map(follower => ({
+                    user_id: follower.follower_id,
+                    type: 'new_story',
+                    sender_id: authorId,
+                    is_read: false,
+                    additional_data: {
+                        story_id: storyId,
+                        story_title: storyTitle,
+                        username: authorData.username
+                    }
+                }));
+                
+                // Inserir todas as notificações
+                const { error: notificationError } = await supabase
+                    .from('notifications')
+                    .insert(notifications);
+                    
+                if (notificationError) throw notificationError;
+            }
+        } catch (error) {
+            console.error('Erro ao notificar seguidores:', error);
+            // Não propagar o erro, para não interromper o fluxo principal
         }
     };
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
-import { Bell, Check, X, ArrowRight, MessageSquare, Reply, Heart, User, BookOpen } from "lucide-react";
+import { Bell, Check, X, ArrowRight, MessageSquare, Reply, Heart, User, BookOpen, BookText } from "lucide-react";
 import Link from "next/link";
 import { generateSlug } from "@/lib/utils";
 
@@ -206,6 +206,26 @@ export default function NotificationBell() {
         });
     };
 
+    // Determinar ícone com base no tipo de notificação
+    const getNotificationIcon = (type) => {
+        switch (type) {
+            case "comment":
+                return <MessageSquare size={20} className="text-[#484DB5]" />;
+            case "reply":
+                return <Reply size={20} className="text-[#484DB5]" />;
+            case "like":
+                return <Heart size={20} className="text-[#484DB5]" />;
+            case "follow":
+                return <User size={20} className="text-[#484DB5]" />;
+            case "new_story":
+                return <BookText size={20} className="text-[#484DB5]" />;
+            case "new_chapter":
+                return <BookOpen size={20} className="text-[#484DB5]" />;
+            default:
+                return <Bell size={20} className="text-[#484DB5]" />;
+        }
+    };
+
     // Determinar URL de redirecionamento com base no tipo de notificação
     const getNotificationUrl = (notification) => {
         switch (notification.type) {
@@ -243,26 +263,101 @@ export default function NotificationBell() {
                     )}`;
                 }
                 return "/dashboard";
+            case "new_story":
+                if (notification.additional_data?.story_id) {
+                    return `/story/${generateSlug(
+                        notification.additional_data?.story_title || "",
+                        notification.additional_data?.story_id
+                    )}`;
+                }
+                return "/dashboard";
+            case "new_chapter":
+                if (notification.additional_data?.chapter_id) {
+                    return `/chapter/${notification.additional_data.chapter_id}`;
+                }
+                if (notification.additional_data?.series_id) {
+                    return `/series/${notification.additional_data.series_id}`;
+                }
+                return "/dashboard";
             default:
                 return "/dashboard";
         }
     };
 
-    // Obter ícone com base no tipo de notificação
-    const getNotificationIcon = (type) => {
+    // Renderizar conteúdo da notificação com base no tipo
+    const renderNotificationContent = (notification) => {
+        const { type, additional_data, profiles } = notification;
+        const authorName = profiles?.username || "Usuário";
+    
         switch (type) {
             case "comment":
-                return <MessageSquare size={20} className="text-[#484DB5]" />;
+                return (
+                    <>
+                        <span className="font-medium">{authorName}</span>
+                        <span> comentou na sua história </span>
+                        <span className="font-medium">
+                            {additional_data?.story_title || ""}
+                        </span>
+                    </>
+                );
             case "reply":
-                return <Reply size={20} className="text-[#484DB5]" />;
+                return (
+                    <>
+                        <span className="font-medium">{authorName}</span>
+                        <span> respondeu ao seu comentário</span>
+                    </>
+                );
             case "like":
-                return <Heart size={20} className="text-[#484DB5]" />;
+                return (
+                    <>
+                        <span className="font-medium">{authorName}</span>
+                        <span> curtiu sua história </span>
+                        <span className="font-medium">
+                            {additional_data?.story_title || ""}
+                        </span>
+                    </>
+                );
             case "follow":
-                return <User size={20} className="text-[#484DB5]" />;
-            case "chapter":
-                return <BookOpen size={20} className="text-[#484DB5]" />;
+                return (
+                    <>
+                        <span className="font-medium">{authorName}</span>
+                        <span> começou a seguir você</span>
+                    </>
+                );
+            case "new_story":
+                return (
+                    <>
+                        <span className="font-medium">{authorName}</span>
+                        <span> publicou uma nova história: </span>
+                        <span className="font-medium">
+                            {additional_data?.story_title || "Nova história"}
+                        </span>
+                    </>
+                );
+            case "new_chapter":
+                return (
+                    <>
+                        <span className="font-medium">{authorName}</span>
+                        <span> publicou um novo capítulo: </span>
+                        <span className="font-medium">
+                            {additional_data?.chapter_title || "Novo capítulo"}
+                        </span>
+                        {additional_data?.series_title && (
+                            <>
+                                <span> em </span>
+                                <span className="font-medium">
+                                    {additional_data.series_title}
+                                </span>
+                            </>
+                        )}
+                    </>
+                );
             default:
-                return <Bell size={20} className="text-[#484DB5]" />;
+                return (
+                    <>
+                        <span>Nova notificação</span>
+                    </>
+                );
         }
     };
 
@@ -339,7 +434,7 @@ export default function NotificationBell() {
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-sm text-gray-900 font-medium line-clamp-2">
-                                                        {notification.content}
+                                                        {renderNotificationContent(notification)}
                                                     </p>
                                                     <p className="text-xs text-gray-500 mt-1">
                                                         {formatNotificationDate(notification.created_at)}

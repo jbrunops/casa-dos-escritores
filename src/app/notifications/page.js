@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import Link from "next/link";
-import { Bell, Check, CheckCheck, ArrowLeft, X, Filter, Clock, CheckCircle, Circle, MessageSquare, Reply, Heart, User, BookOpen } from "lucide-react";
+import { Bell, Check, CheckCheck, ArrowLeft, X, Filter, Clock, CheckCircle, Circle, MessageSquare, Reply, Heart, User, BookOpen, BookText } from "lucide-react";
 import { generateSlug } from "@/lib/utils";
 
 export default function NotificationsPage() {
@@ -215,10 +215,89 @@ export default function NotificationsPage() {
                 return <Heart size={20} className="text-[#484DB5]" />;
             case "follow":
                 return <User size={20} className="text-[#484DB5]" />;
-            case "chapter":
+            case "new_story":
+                return <BookText size={20} className="text-[#484DB5]" />;
+            case "new_chapter":
                 return <BookOpen size={20} className="text-[#484DB5]" />;
             default:
                 return <Bell size={20} className="text-[#484DB5]" />;
+        }
+    };
+
+    // Renderizar conteúdo da notificação com base no tipo
+    const renderNotificationContent = (notification) => {
+        const { type, additional_data, profiles } = notification;
+        const authorName = profiles?.username || "Usuário";
+    
+        switch (type) {
+            case "comment":
+                return (
+                    <>
+                        <span className="font-medium">{authorName}</span>
+                        <span> comentou na sua história </span>
+                        <span className="font-medium">
+                            {additional_data?.story_title || ""}
+                        </span>
+                    </>
+                );
+            case "reply":
+                return (
+                    <>
+                        <span className="font-medium">{authorName}</span>
+                        <span> respondeu ao seu comentário</span>
+                    </>
+                );
+            case "like":
+                return (
+                    <>
+                        <span className="font-medium">{authorName}</span>
+                        <span> curtiu sua história </span>
+                        <span className="font-medium">
+                            {additional_data?.story_title || ""}
+                        </span>
+                    </>
+                );
+            case "follow":
+                return (
+                    <>
+                        <span className="font-medium">{authorName}</span>
+                        <span> começou a seguir você</span>
+                    </>
+                );
+            case "new_story":
+                return (
+                    <>
+                        <span className="font-medium">{authorName}</span>
+                        <span> publicou uma nova história: </span>
+                        <span className="font-medium">
+                            {additional_data?.story_title || "Nova história"}
+                        </span>
+                    </>
+                );
+            case "new_chapter":
+                return (
+                    <>
+                        <span className="font-medium">{authorName}</span>
+                        <span> publicou um novo capítulo: </span>
+                        <span className="font-medium">
+                            {additional_data?.chapter_title || "Novo capítulo"}
+                        </span>
+                        {additional_data?.series_title && (
+                            <>
+                                <span> em </span>
+                                <span className="font-medium">
+                                    {additional_data.series_title}
+                                </span>
+                            </>
+                        )}
+                    </>
+                );
+            default:
+                return (
+                    <>
+                        <span>Nova notificação</span>
+                    </>
+                );
         }
     };
 
@@ -354,24 +433,12 @@ export default function NotificationsPage() {
                                             </div>
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex justify-between mb-1">
-                                                <p className={`font-medium ${!notification.is_read ? "text-gray-900" : "text-gray-700"}`}>
-                                                    {notification.title || "Notificação"}
-                                                </p>
-                                                <div className="flex items-center text-gray-500 text-sm">
-                                                    <Clock size={14} className="mr-1" />
-                                                    {formatNotificationDate(notification.created_at)}
-                                                </div>
+                                            <div className="text-sm font-medium text-gray-900 line-clamp-3">
+                                                {renderNotificationContent(notification)}
                                             </div>
-                                            <p className="text-gray-700 mb-1">
-                                                {notification.content}
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                {formatNotificationDate(notification.created_at)}
                                             </p>
-                                            {!notification.is_read && (
-                                                <div className="flex items-center text-[#484DB5] text-xs font-medium mt-1">
-                                                    <Circle size={8} className="mr-1 fill-[#484DB5]" />
-                                                    Não lida
-                                                </div>
-                                            )}
                                         </div>
                                     </div>
                                 </Link>

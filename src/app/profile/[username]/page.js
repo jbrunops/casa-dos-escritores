@@ -13,8 +13,11 @@ import {
     BookText,
     Clock,
     Award,
-    Calendar 
+    Calendar,
+    UserPlus,
+    Users 
 } from "lucide-react";
+import UserFollowButton from "@/components/UserFollowButton";
 
 export async function generateMetadata({ params }) {
     const username = await Promise.resolve(params.username);
@@ -62,7 +65,33 @@ export default async function ProfilePage({ params }) {
 
         // Verificar sessão
         const { data } = await supabase.auth.getSession();
-        const isOwnProfile = data.session?.user?.id === profile.id;
+        const session = data.session;
+        const isOwnProfile = session?.user?.id === profile.id;
+
+        // Buscar contagem de seguidores
+        const { count: followersCount } = await supabase
+            .from('follows')
+            .select('*', { count: 'exact', head: true })
+            .eq('following_id', profile.id);
+            
+        // Buscar contagem de seguindo
+        const { count: followingCount } = await supabase
+            .from('follows')
+            .select('*', { count: 'exact', head: true })
+            .eq('follower_id', profile.id);
+            
+        // Verificar se o usuário logado segue este perfil
+        let isFollowing = false;
+        if (session?.user) {
+            const { data: followData } = await supabase
+                .from('follows')
+                .select('id')
+                .eq('follower_id', session.user.id)
+                .eq('following_id', profile.id)
+                .maybeSingle();
+                
+            isFollowing = !!followData;
+        }
 
         // Calcular visualizações
         const totalViews =
@@ -132,10 +161,28 @@ export default async function ProfilePage({ params }) {
                         <div className="flex-grow text-center md:text-left">
                             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{profile.username}</h1>
                             
-                            {/* Membro desde */}
-                            <div className="flex items-center justify-center md:justify-start text-gray-600 mb-4">
-                                <Calendar size={16} className="mr-1" />
-                                <span>Membro desde {joinDate}</span>
+                            {/* Membro desde e seguidores */}
+                            <div className="flex flex-wrap items-center justify-center md:justify-start text-gray-600 mb-4 gap-4">
+                                <div className="flex items-center">
+                                    <Calendar size={16} className="mr-1" />
+                                    <span>Membro desde {joinDate}</span>
+                                </div>
+                                
+                                <Link 
+                                    href={`/profile/${username}/followers`}
+                                    className="flex items-center text-[#484DB5] hover:underline"
+                                >
+                                    <UserPlus size={16} className="mr-1" />
+                                    <span>{followersCount || 0} seguidores</span>
+                                </Link>
+                                
+                                <Link 
+                                    href={`/profile/${username}/following`}
+                                    className="flex items-center text-[#484DB5] hover:underline"
+                                >
+                                    <Users size={16} className="mr-1" />
+                                    <span>Segue {followingCount || 0}</span>
+                                </Link>
                             </div>
 
                             {/* Bio */}
@@ -198,17 +245,23 @@ export default async function ProfilePage({ params }) {
                             </div>
 
                             {/* Actions */}
-                            {isOwnProfile && (
-                                <div>
+                            <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                                {isOwnProfile ? (
                                     <Link
                                         href="/profile/edit"
-                                        className="inline-flex items-center justify-center h-10 px-6 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90"
+                                        className="inline-flex items-center justify-center h-10 px-6 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200"
                                     >
                                         <Edit size={16} className="mr-2" />
                                         <span>Editar Perfil</span>
                                     </Link>
-                                </div>
-                            )}
+                                ) : (
+                                    <UserFollowButton 
+                                        profileId={profile.id} 
+                                        isFollowing={isFollowing}
+                                        username={profile.username}
+                                    />
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
