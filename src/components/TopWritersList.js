@@ -6,7 +6,7 @@ function WriterRankItem({ writer, rank }) {
     return (
         <div
             key={writer.author_id} // Usar author_id como chave
-            className="flex items-center py-3 px-0 md:px-3 rounded-lg border border-[#E5E7EB] hover:shadow-sm transition-shadow"
+            className="flex items-center p-4 md:py-3 md:px-3 rounded-lg border border-[#E5E7EB] hover:shadow-sm transition-shadow"
         >
             <span className="font-bold text-xl w-8 text-center mr-3 text-[#484DB5] shrink-0">
                 {rank}
