@@ -38,7 +38,7 @@ function WriterRankItem({ writer, rank }) {
                 <div className="flex flex-wrap items-center space-x-3 text-sm text-gray-600 mt-1">
                     <span className="inline-flex items-center">
                         <BookText size={14} className="mr-1 text-gray-500 shrink-0" />
-                        {writer.publication_count} {writer.publication_count === 1 ? 'publicação' : 'publicações'}
+                        {writer.content_count} {writer.content_count === 1 ? 'publicação' : 'publicações'}
                     </span>
                 </div>
             </div>
@@ -54,7 +54,7 @@ export default function TopWritersList({ writers }) {
     return (
         <div className="space-y-3">
             {writers.map((writer, index) => (
-                <WriterRankItem writer={writer} rank={index + 1} key={writer.author_id} />
+                <WriterRankItem writer={writer} rank={index + 1} key={writer.id} />
             ))}
         </div>
     );

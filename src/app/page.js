@@ -16,20 +16,25 @@ export default async function HomePage() {
         { data: mostCommentedContent, error: commentedError },
         { data: topWriters, error: writersError }
     ] = await Promise.all([
-        supabase.rpc('get_recent_content', { limit_count: 10 }),
-        supabase.rpc('get_most_commented_content', { limit_count: 10 }),
-        supabase.rpc('get_top_writers', { limit_count: 10 })
+        supabase.rpc('get_recent_content', { p_limit: 10, p_offset: 0 }),
+        supabase.rpc('get_most_commented_content', { p_limit: 10, p_offset: 0 }),
+        supabase.rpc('get_top_writers', { p_limit: 10, p_offset: 0 })
     ]);
 
-    // Log de erros (opcional, mas recomendado)
-    if (recentError) console.error("Erro ao buscar conteúdo recente:", recentError);
-    if (commentedError) console.error("Erro ao buscar conteúdo mais comentado:", commentedError);
-    if (writersError) console.error("Erro ao buscar top escritores:", writersError);
+    // Logar os dados recebidos *antes* de checar erros
+    console.log("[ Server ] Dados recebidos - Recentes:", JSON.stringify(recentContent, null, 2));
+    console.log("[ Server ] Dados recebidos - Comentados:", JSON.stringify(mostCommentedContent, null, 2));
+    console.log("[ Server ] Dados recebidos - Escritores:", JSON.stringify(topWriters, null, 2));
+
+    // Ajustar logs de erro
+    if (recentError) console.error("[ Server ] Erro ao buscar conteúdo recente:", JSON.stringify(recentError, null, 2));
+    if (commentedError) console.error("[ Server ] Erro ao buscar conteúdo mais comentado:", JSON.stringify(commentedError, null, 2));
+    if (writersError) console.error("[ Server ] Erro ao buscar top escritores:", JSON.stringify(writersError, null, 2));
 
     return (
         <>
             {/* Seção de 3 colunas */}
-            <section className="max-w-[75rem] mx-auto md:px-0 three-columns-section">
+            <section className="max-w-[75rem] mx-auto px-4 md:px-0 three-columns-section">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Coluna 1: Histórias Recentes */}
                     <div className="column">

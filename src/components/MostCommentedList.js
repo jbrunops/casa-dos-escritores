@@ -45,7 +45,7 @@ export default function MostCommentedList({ contentList }) {
                         className="block relative py-4 px-0 md:px-4 rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
                     >
                         <div className="absolute top-0 right-0 px-2 py-1 bg-[#484DB5] text-white text-xs rounded-tr-lg">
-                            Capítulo {content.calculated_chapter_number || '?'}
+                            Capítulo {content.chapter_number || '?'}
                         </div>
                         <h3 className="font-semibold text-lg mt-2 mb-3">{content.title}</h3>
                         <div className="flex items-center text-sm text-gray-600 mt-1 mb-2">

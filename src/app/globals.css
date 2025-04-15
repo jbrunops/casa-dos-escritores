@@ -62,8 +62,8 @@ a:not(.no-hover):hover {
   }
   
   section > div {
-    /* padding-left: 1rem;  Removido */
-    /* padding-right: 1rem; Removido */
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
   
   .max-w-\[75rem\] {
