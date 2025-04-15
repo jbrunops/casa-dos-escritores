@@ -99,3 +99,24 @@ export function calculateReadingTime(content) {
   // Assumir média de 200 palavras por minuto
   return Math.max(1, Math.round(wordCount / 200));
 }
+
+/**
+ * Cria um resumo de texto a partir de conteúdo HTML
+ * @param {string} htmlContent - Conteúdo HTML
+ * @param {number} [maxLength=150] - Tamanho máximo do resumo
+ * @returns {string} Resumo em texto plano
+ */
+export const createSummary = (htmlContent, maxLength = 150) => {
+    // Remover todas as tags HTML
+    const textContent = htmlContent?.replace(/<[^>]*>/g, "") || "";
+
+    // Limitar o tamanho e adicionar reticências se necessário
+    if (textContent.length <= maxLength) {
+        return textContent;
+    }
+
+    // Cortar no final de uma palavra
+    let summary = textContent.substring(0, maxLength);
+    summary = summary.substring(0, summary.lastIndexOf(" "));
+    return `${summary}...`;
+};

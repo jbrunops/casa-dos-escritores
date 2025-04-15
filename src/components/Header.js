@@ -236,8 +236,8 @@ export default function Header() {
     };
 
     return (
-        <header className="bg-white border-b border-[#E5E7EB] w-full py-3 px-4 md:px-0 mb-[1.875rem] relative z-30">
-            <div className="max-w-[75rem] mx-auto flex items-center justify-between">
+        <header className="bg-white border-b border-[#E5E7EB] w-full py-3 mb-[1.875rem] relative z-30">
+            <div className="max-w-[75rem] mx-auto flex items-center justify-between px-4 md:px-0">
                 {/* Logo e navegação principal agrupados */}
                 <div className="flex items-center">
                     {/* Logo */}
