@@ -1,4 +1,3 @@
-
 ## Funcionalidades Detalhadas
 
 ### 1. Listagem de Categorias (`/categories`)
@@ -71,35 +70,6 @@
             *   Data de publicação.
         *   Se `totalPages > 1`, renderiza o componente `Pagination` para navegação entre as páginas.
     *   Inclui um botão/link "Ver todas as categorias" no final.
-
-## Configuração e Execução
-
-1.  **Clone o repositório:**
-    ```bash
-    git clone <url-do-repositorio>
-    cd <nome-do-diretorio>
-    ```
-2.  **Instale as dependências:**
-    ```bash
-    npm install
-    # ou
-    yarn install
-    ```
-3.  **Configure as Variáveis de Ambiente:**
-    *   Copie o arquivo `.env.example` para `.env.local`:
-        ```bash
-        cp .env.example .env.local
-        ```
-    *   Edite o arquivo `.env.local` e preencha com as suas credenciais do Supabase:
-        *   `NEXT_PUBLIC_SUPABASE_URL`: URL do seu projeto Supabase.
-        *   `SUPABASE_SERVICE_ROLE_KEY`: Chave de `service_role` do seu projeto Supabase (encontrada nas configurações de API do Supabase). **Mantenha esta chave segura e não a exponha no lado do cliente.**
-4.  **Rode o Servidor de Desenvolvimento:**
-    ```bash
-    npm run dev
-    # ou
-    yarn dev
-    ```
-5.  Abra [`http://localhost:3000`](http://localhost:3000) no seu navegador.
 
 ## Considerações Futuras e Melhorias
 
