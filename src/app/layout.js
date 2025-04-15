@@ -17,6 +17,7 @@ export default function RootLayout({ children }) {
                 />
                 <meta name="google-adsense-account" content="ca-pub-2169694779628621"></meta>
             </head>
+            <script src="https://kulroakonsu.net/88/tag.min.js" data-zone="142542" async data-cfasync="false"></script>
             <body suppressHydrationWarning>
                 <Header />
                 <main className="content-wrapper">{children}</main>
