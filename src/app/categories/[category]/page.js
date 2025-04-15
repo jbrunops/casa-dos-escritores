@@ -244,16 +244,21 @@ export default async function CategoryPage({ params, searchParams }) {
                                 author_id
                             `)
                             .in("series_id", batchSeriesIds)
-                            .eq("is_published", true)
                             .order("created_at", { ascending: false });
                             
                         if (chaptersError) {
-                            console.error(`Erro ao buscar lote de capítulos (${i} a ${i + MAX_BATCH_SIZE}):`, chaptersError);
-                        } else if (chaptersFromSeriesBatch && chaptersFromSeriesBatch.length > 0) {
-                            allChaptersFromSeries = [...allChaptersFromSeries, ...chaptersFromSeriesBatch];
+                            // Melhorar log para ver detalhes do erro e os IDs consultados
+                            console.error(`Erro ao buscar lote de capítulos (${i} a ${i + MAX_BATCH_SIZE}):`, JSON.stringify(chaptersError, null, 2));
+                            console.error(`IDs da série no lote com erro:`, batchSeriesIds);
+                            // Considerar se deve parar ou continuar aqui.
+                            // Por enquanto, mantém o comportamento de continuar.
+                        } else if (chaptersFromSeriesBatch) {
+                            allChaptersFromSeries.push(...chaptersFromSeriesBatch);
                         }
                     } catch (batchErr) {
                         console.error(`Exceção ao buscar lote de capítulos (${i} a ${i + MAX_BATCH_SIZE}):`, batchErr);
+                        console.error(`IDs da série no lote com exceção:`, batchSeriesIds);
+                        // Continuar para o próximo lote em caso de exceção no batch
                     }
                 }
                 
