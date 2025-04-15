@@ -29,7 +29,7 @@ export default async function HomePage() {
     return (
         <>
             {/* Seção de 3 colunas */}
-            <section className="max-w-[75rem] mx-auto px-4 md:px-0 three-columns-section">
+            <section className="max-w-[75rem] mx-auto md:px-0 three-columns-section">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Coluna 1: Histórias Recentes */}
                     <div className="column">
