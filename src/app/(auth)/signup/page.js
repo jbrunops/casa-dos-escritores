@@ -106,12 +106,8 @@ export default function SignupPage() {
 
             // Se há necessidade de confirmar o email
             if (!data.session) {
-                setSuccess(true);
-                setWarning(
-                    (prev) =>
-                        prev ||
-                        "Por favor, verifique seu email para confirmar sua conta"
-                );
+                // Remover qualquer warning para evitar mensagens duplicadas
+                setWarning(null);
 
                 // Redirecionar para login após breve pausa
                 setTimeout(() => {
@@ -162,7 +158,7 @@ export default function SignupPage() {
                     </div>
                 )}
                 
-                {warning && (
+                {warning && !success && (
                     <div className="flex items-center p-4 text-yellow-700 bg-yellow-50 rounded-lg">
                         <AlertTriangle size={18} className="mr-2" />
                         {warning}
@@ -172,8 +168,7 @@ export default function SignupPage() {
                 {success && (
                     <div className="flex items-center p-4 text-green-700 bg-green-50 rounded-lg">
                         <CheckCircle size={18} className="mr-2" />
-                        Conta criada com sucesso!{" "}
-                        {warning ? warning : "Redirecionando..."}
+                        Conta criada com sucesso! Por favor, verifique seu email para confirmar sua conta
                     </div>
                 )}
 
