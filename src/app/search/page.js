@@ -57,6 +57,47 @@ export default async function SearchPage({ searchParams }) {
             throw error;
         }
 
+        // Buscar séries que correspondem à consulta
+        const { data: series, error: seriesError } = await supabase
+            .from("series")
+            .select(
+                `
+                id,
+                title,
+                description,
+                cover_url,
+                author_id,
+                created_at
+            `
+            )
+            .ilike("title", `%${query}%`)
+            .order("created_at", { ascending: false });
+
+        if (seriesError) {
+            throw seriesError;
+        }
+
+        // Buscar capítulos que correspondem à consulta
+        const { data: chapters, error: chaptersError } = await supabase
+            .from("chapters")
+            .select(
+                `
+                id,
+                title,
+                content,
+                series_id,
+                created_at
+            `
+            )
+            .or(
+                `title.ilike.%${query}%,content.ilike.%${query}%`
+            )
+            .order("created_at", { ascending: false });
+
+        if (chaptersError) {
+            throw chaptersError;
+        }
+
         // Buscar perfis de usuário que correspondem à consulta
         const { data: profiles, error: profilesError } = await supabase
             .from("profiles")
@@ -141,9 +182,65 @@ export default async function SearchPage({ searchParams }) {
                 </div>
 
                 <div className="text-sm text-gray-500 mb-6">
-                    Encontrados {stories.length + (profiles?.length || 0)}{" "}
-                    resultados
+                    Encontrados {stories.length + (profiles?.length || 0) + (series?.length || 0) + (chapters?.length || 0)} resultados
                 </div>
+
+                {/* Resultados de séries */}
+                {series && series.length > 0 && (
+                  <div className="mb-8">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Séries</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {series.map((serie) => (
+                        <Link
+                          href={`/series/${generateSlug(serie.title, serie.id)}`}
+                          key={serie.id}
+                          className="flex items-start p-4 bg-white rounded-lg border border-[#E5E7EB] hover:shadow-md transition-all duration-200"
+                        >
+                          {serie.cover_url ? (
+                            <img
+                              src={serie.cover_url}
+                              alt={serie.title}
+                              className="w-12 h-12 rounded-full object-cover mr-4"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-[#484DB5] text-white flex items-center justify-center font-medium mr-4">
+                              {serie.title.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <div>
+                            <h3 className="font-medium text-gray-900">{serie.title}</h3>
+                            {serie.description && (
+                              <p className="text-sm text-gray-500 line-clamp-2">
+                                {serie.description}
+                              </p>
+                            )}
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Resultados de capítulos */}
+                {chapters && chapters.length > 0 && (
+                  <div className="mb-8">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Capítulos</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {chapters.map((chapter) => (
+                        <Link
+                          href={`/chapter/${generateSlug(chapter.title, chapter.id)}`}
+                          key={chapter.id}
+                          className="flex flex-col p-4 bg-white rounded-lg border border-[#E5E7EB] hover:shadow-md transition-all duration-200"
+                        >
+                          <h3 className="font-medium text-gray-900">{chapter.title}</h3>
+                          <p className="text-sm text-gray-500 line-clamp-2">
+                            {createSummary(chapter.content)}
+                          </p>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Resultados de perfis */}
                 {profiles && profiles.length > 0 && (
