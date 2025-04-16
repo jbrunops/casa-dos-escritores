@@ -52,83 +52,77 @@ export default async function SearchPage({ searchParams }) {
     const supabase = await createServerSupabaseClient();
 
     try {
-        // Buscar histórias que correspondem à consulta
-        const { data: stories, error } = await supabase
-            .from("stories")
-            .select(
+        // Executar todas as buscas em paralelo para maior desempenho
+        const [
+            { data: stories, error: storiesError },
+            { data: series, error: seriesError },
+            { data: chapters, error: chaptersError },
+            { data: profiles, error: profilesError }
+        ] = await Promise.all([
+            supabase
+                .from("stories")
+                .select(
+                    `
+                    id,
+                    title,
+                    content,
+                    created_at,
+                    category,
+                    profiles(username)
                 `
-                id,
-                title,
-                content,
-                created_at,
-                category,
-                profiles(username)
-            `
-            )
-            .eq("is_published", true)
-            .or(
-                `title.ilike.%${query}%,content.ilike.%${query}%,category.ilike.%${query}%`
-            )
-            .order("created_at", { ascending: false });
-
-        if (error) {
-            throw error;
-        }
-
-        // Buscar séries que correspondem à consulta
-        const { data: series, error: seriesError } = await supabase
-            .from("series")
-            .select(
+                )
+                .eq("is_published", true)
+                .or(
+                    `title.ilike.%${query}%,content.ilike.%${query}%,category.ilike.%${query}%`
+                )
+                .order("created_at", { ascending: false }),
+            supabase
+                .from("series")
+                .select(
+                    `
+                    id,
+                    title,
+                    description,
+                    cover_url,
+                    author_id,
+                    created_at
                 `
-                id,
-                title,
-                description,
-                cover_url,
-                author_id,
-                created_at
-            `
-            )
-            .ilike("title", `%${query}%`)
-            .order("created_at", { ascending: false });
-
-        if (seriesError) {
-            throw seriesError;
-        }
-
-        // Buscar capítulos que correspondem à consulta
-        const { data: chapters, error: chaptersError } = await supabase
-            .from("chapters")
-            .select(
+                )
+                .ilike("title", `%${query}%`)
+                .order("created_at", { ascending: false }),
+            supabase
+                .from("chapters")
+                .select(
+                    `
+                    id,
+                    title,
+                    content,
+                    series_id,
+                    created_at
                 `
-                id,
-                title,
-                content,
-                series_id,
-                created_at
-            `
-            )
-            .or(
-                `title.ilike.%${query}%,content.ilike.%${query}%`
-            )
-            .order("created_at", { ascending: false });
-
-        if (chaptersError) {
-            throw chaptersError;
-        }
-
-        // Buscar perfis de usuário que correspondem à consulta
-        const { data: profiles, error: profilesError } = await supabase
-            .from("profiles")
-            .select(
+                )
+                .or(
+                    `title.ilike.%${query}%,content.ilike.%${query}%`
+                )
+                .order("created_at", { ascending: false }),
+            supabase
+                .from("profiles")
+                .select(
+                    `
+                    id,
+                    username,
+                    bio,
+                    avatar_url
                 `
-                id,
-                username,
-                bio,
-                avatar_url
-            `
-            )
-            .ilike("username", `%${query}%`)
-            .limit(10);
+                )
+                .ilike("username", `%${query}%`)
+                .limit(10)
+        ]);
+
+        if (storiesError) throw storiesError;
+        if (seriesError) throw seriesError;
+        if (chaptersError) throw chaptersError;
+        if (profilesError) console.error("Erro ao buscar perfis:", profilesError);
 
         if (profilesError) {
             console.error("Erro ao buscar perfis:", profilesError);
