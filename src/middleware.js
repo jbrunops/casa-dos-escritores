@@ -20,18 +20,10 @@ export async function middleware(request) {
                         return request.cookies.get(name)?.value;
                     },
                     set(name, value, options) {
-                        response.cookies.set({
-                            name,
-                            value,
-                            ...options,
-                        });
+                        response.cookies.set(name, value, options);
                     },
                     remove(name, options) {
-                        response.cookies.set({
-                            name,
-                            value: "",
-                            ...options,
-                        });
+                        response.cookies.set(name, "", { ...options, maxAge: 0 });
                     },
                 },
             }
