@@ -31,6 +31,24 @@ export default async function SearchPage({ searchParams }) {
         );
     }
 
+    // Evitar buscas com termos muito curtos
+    if (query.length < 3) {
+        return (
+            <div className="mx-auto max-w-[75rem] px-4 md:px-0 py-8">
+                <h1 className="text-2xl font-bold text-gray-900 mb-6">Pesquisa</h1>
+                <div className="bg-white rounded-lg border border-[#E5E7EB] p-8 text-center mb-6">
+                    <Search size={40} className="mx-auto text-gray-300 mb-4" />
+                    <p className="text-gray-500 mb-6">
+                        Por favor, digite pelo menos 3 caracteres para pesquisar.
+                    </p>
+                    <Link href="/" className="inline-flex items-center justify-center h-10 px-6 rounded-md bg-[#484DB5] text-white font-medium hover:bg-opacity-90 transition-all duration-200">
+                        Voltar para o início
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
     const supabase = await createServerSupabaseClient();
 
     try {
