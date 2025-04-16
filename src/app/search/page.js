@@ -49,6 +49,12 @@ export default async function SearchPage({ searchParams }) {
         );
     }
 
+    // Paginação
+    const PAGE_SIZE = 20;
+    const page = searchParams.page ? parseInt(searchParams.page) : 1;
+    const from = (page - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+
     const supabase = await createServerSupabaseClient();
 
     try {
@@ -116,7 +122,7 @@ export default async function SearchPage({ searchParams }) {
                 `
                 )
                 .ilike("username", `%${query}%`)
-                .limit(10)
+                .range(from, to)
         ]);
 
         if (storiesError) throw storiesError;
@@ -352,7 +358,25 @@ export default async function SearchPage({ searchParams }) {
                     )}
                 </div>
 
-                <div className="flex justify-center mt-8">
+                <div className="flex flex-col items-center gap-4 mt-8">
+                    <div className="flex gap-4">
+                        {page > 1 && (
+                            <Link
+                                href={`/search?q=${encodeURIComponent(query)}&page=${page - 1}`}
+                                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition"
+                            >
+                                Página Anterior
+                            </Link>
+                        )}
+                        {(stories?.length === PAGE_SIZE || series?.length === PAGE_SIZE || chapters?.length === PAGE_SIZE || profiles?.length === PAGE_SIZE) && (
+                            <Link
+                                href={`/search?q=${encodeURIComponent(query)}&page=${page + 1}`}
+                                className="px-4 py-2 bg-[#484DB5] text-white rounded hover:bg-opacity-90 transition"
+                            >
+                                Próxima Página
+                            </Link>
+                        )}
+                    </div>
                     <Link href="/" className="inline-flex items-center justify-center h-10 px-6 rounded-md border border-[#E5E7EB] text-gray-700 font-medium hover:bg-gray-50 transition-all duration-200">
                         Voltar para o início
                     </Link>
