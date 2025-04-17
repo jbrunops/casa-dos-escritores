@@ -25,8 +25,10 @@ interface ContentEditorProps {
     description?: string;
     category?: string;
     seriesId?: string | null;
+    chapterNumber?: number;
     onBack?: (() => void) | null;
-    onSubmit?: (() => void) | null;
+    // Permite função assíncrona com argumentos de formulário
+    onSubmit?: ((formData: any) => void | Promise<void>) | null;
     backPath?: string;
     backLabel?: string;
     headerTitle?: string;
