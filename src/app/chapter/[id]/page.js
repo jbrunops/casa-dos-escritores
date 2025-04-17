@@ -1,10 +1,10 @@
 import Link from "next/link";
-import Comments from "@/components/Comments";
+import Comments from "@/components/Comments"; // agora usando .tsx
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import StoryContent from "@/components/StoryContent";
 import { ArrowLeft, ArrowRight, BookOpen, ListOrdered } from "lucide-react";
 import Script from "next/script";
-import { extractIdFromSlug, generateSlug } from "@/lib/utils";
+import { extractIdFromSlug, generateSlug } from "@/lib/utils"; // agora usando utils.ts
 
 export async function generateMetadata({ params }) {
     // Buscar informações do capítulo para o título da página

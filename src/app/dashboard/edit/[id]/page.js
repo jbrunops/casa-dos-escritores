@@ -20,7 +20,7 @@ import {
     BookOpen,
     RefreshCw,
 } from "lucide-react";
-import { generateSlug } from "@/lib/utils";
+import { generateSlug } from "@/lib/utils"; // agora usando utils.ts
 
 export default function EditContentPage() {
     const router = useRouter();

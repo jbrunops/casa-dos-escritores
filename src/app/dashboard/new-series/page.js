@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
-import ContentEditor from "@/components/ContentEditor";
+import ContentEditor from "@/components/ContentEditor"; // agora usando .tsx
 
 export default function NewSeriesPage() {
     const router = useRouter();

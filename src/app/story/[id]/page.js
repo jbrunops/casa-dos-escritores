@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import Comments from "@/components/Comments";
+import Comments from "@/components/Comments"; // agora usando .tsx
 import StoryContent from "@/components/StoryContent";
-import { extractIdFromSlug, formatDate, calculateReadingTime } from "@/lib/utils";
+import { extractIdFromSlug, formatDate, calculateReadingTime } from "@/lib/utils"; // agora usando utils.ts
 import { Eye } from "lucide-react";
 
 export async function generateMetadata({ params }) {

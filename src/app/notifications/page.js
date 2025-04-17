@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import Link from "next/link";
 import { Bell, Check, CheckCheck, ArrowLeft, X, Filter, Clock, CheckCircle, Circle, MessageSquare, Reply, Heart, User, BookOpen, BookText } from "lucide-react";
-import { generateSlug } from "@/lib/utils";
+import { generateSlug } from "@/lib/utils"; // agora usando utils.ts
 
 export default function NotificationsPage() {
     const [notifications, setNotifications] = useState([]);

@@ -2,7 +2,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { generateSlug } from "@/lib/utils";
+import { generateSlug } from "@/lib/utils"; // agora usando utils.ts
 import { ArrowLeft, Search } from "lucide-react";
 
 export const metadata = {

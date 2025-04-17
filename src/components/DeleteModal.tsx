@@ -1,46 +1,44 @@
-// src/components/DeleteModal.js
 "use client";
 
 import { useEffect } from "react";
 
-export default function DeleteModal({ isOpen, onClose, onConfirm, title }) {
-    // Prevenir scroll quando o modal estiver aberto
+interface DeleteModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    title: string;
+}
+
+export default function DeleteModal({ isOpen, onClose, onConfirm, title }: DeleteModalProps) {
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = "hidden";
         } else {
             document.body.style.overflow = "unset";
         }
-
         return () => {
             document.body.style.overflow = "unset";
         };
     }, [isOpen]);
 
-    // Fechar com a tecla ESC
     useEffect(() => {
-        const handleEsc = (event) => {
+        const handleEsc = (event: KeyboardEvent) => {
             if (event.key === "Escape") {
                 onClose();
             }
         };
-
         if (isOpen) {
             document.addEventListener("keydown", handleEsc);
         }
-
         return () => {
             document.removeEventListener("keydown", handleEsc);
         };
     }, [isOpen, onClose]);
 
     if (!isOpen) return null;
-
-    // Impedir que cliques no conteúdo do modal fechem o modal
-    const handleContentClick = (e) => {
+    const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
     };
-
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-container" onClick={handleContentClick}>
@@ -49,8 +47,7 @@ export default function DeleteModal({ isOpen, onClose, onConfirm, title }) {
                 </div>
                 <div className="modal-body">
                     <p>
-                        Tem certeza que deseja excluir esta história? Esta ação
-                        não pode ser desfeita.
+                        Tem certeza que deseja excluir esta história? Esta ação não pode ser desfeita.
                     </p>
                 </div>
                 <div className="modal-actions">

@@ -1,6 +1,7 @@
 "use client";
 
 import MobileSeries from "./MobileSeries";
+import Editor from "@/components/Editor"; // agora usando .tsx
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
@@ -19,10 +20,10 @@ import {
     Bell,
     Search
 } from "lucide-react";
-import NotificationBell from "./NotificationBell";
+import NotificationBell from "@/components/NotificationBell";
 import MenuItem from "./MenuItem";
-import DropdownMenu from "./DropdownMenu";
-import CategoryDropdown from "./CategoryDropdown";
+import DropdownMenu from "@/components/DropdownMenu"; // agora usando .tsx
+import CategoryDropdown from "@/components/CategoryDropdown"; // agora usando .tsx
 
 export default function Header() {
     const pathname = usePathname();

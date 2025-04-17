@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { Edit, BookOpen, Share2, MessageSquare, BookText, Book } from "lucide-react";
-import SeriesHighlights from "@/components/SeriesHighlights";
-import { generateSlug, createSummary, formatDate } from "@/lib/utils";
-import RecentContentList from "@/components/RecentContentList";
-import MostCommentedList from "@/components/MostCommentedList";
+import SeriesHighlights from "@/components/SeriesHighlights"; // agora usando .tsx
+import { generateSlug, createSummary, formatDate } from "@/lib/utils"; // agora usando utils.ts
+import RecentContentList from "@/components/RecentContentList"; // agora usando .tsx
+import MostCommentedList from "@/components/MostCommentedList"; // agora usando .tsx
 import TopWritersList from "@/components/TopWritersList";
 
 export default async function HomePage() {
