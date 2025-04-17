@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import Pagination from "@/components/Pagination";
-import { generateSlug } from "@/lib/utils"; // agora usando utils.ts
+import { generateSlug } from "@/lib/utils";
 
 const PAGE_SIZE = 12; // Número de séries por página
 

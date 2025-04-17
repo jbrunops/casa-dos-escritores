@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
-import SeriesActions from "@/components/SeriesActions";
+import SeriesActions from "@/components/SeriesActions"; // agora usando .tsx
 import Comments from "@/components/Comments"; // agora usando .tsx
 import { Eye, BookOpen, Calendar, User, Edit, Trash2, Plus } from "lucide-react";
 import { useParams } from "next/navigation";

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import Link from "next/link";
+import ContentEditor from "@/components/ContentEditor";
 import { ArrowLeft, Save, AlertTriangle, CheckCircle2, Image, X } from "lucide-react";
 
 export default function EditSeriesPage() {

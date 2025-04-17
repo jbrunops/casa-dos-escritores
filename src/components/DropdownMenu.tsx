@@ -1,8 +1,7 @@
 "use client";
-
 import React, { useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
-import MenuItem from "./MenuItem";
+import MenuItem from "@/components/MenuItem"; // agora usando .tsx
 
 interface DropdownMenuItem {
   label: string;

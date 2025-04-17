@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
-import ContentEditor from "@/components/ContentEditor"; // agora usando .tsx
-import { generateSlug } from "@/lib/utils"; // agora usando utils.ts
+import ContentEditor from "@/components/ContentEditor";
+import { generateSlug } from "@/lib/utils";
 
 export default function NewStoryPage() {
     const router = useRouter();

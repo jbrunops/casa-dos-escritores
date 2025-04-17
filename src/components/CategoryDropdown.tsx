@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
-import MenuItem from "./MenuItem";
+import MenuItem from "@/components/MenuItem"; // agora usando .tsx
 
 interface CategoryDropdownProps {
   icon?: React.ReactNode;

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
-import ContentEditor from "@/components/ContentEditor"; // agora usando .tsx
+import ContentEditor from "@/components/ContentEditor";
 
 export default function EditChapterPage() {
     const router = useRouter();

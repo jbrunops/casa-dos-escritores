@@ -4,10 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import Link from "next/link";
-import DeleteModal from "@/components/DeleteModal"; // agora usando .tsx
-import MostCommentedList from "@/components/MostCommentedList"; // agora usando .tsx
-import RecentContentList from "@/components/RecentContentList"; // agora usando .tsx
-import SeriesHighlights from "@/components/SeriesHighlights"; // agora usando .tsx
+import Pagination from "@/components/Pagination";
+import Comments from "@/components/Comments";
+import StoryContent from "@/components/StoryContent";
+import DeleteModal from "@/components/DeleteModal"; 
+import MostCommentedList from "@/components/MostCommentedList"; 
+import RecentContentList from "@/components/RecentContentList"; 
+import SeriesHighlights from "@/components/SeriesHighlights"; 
 import {
     PlusCircle,
     Trash2,
@@ -19,7 +22,7 @@ import {
     Layers,
     Plus,
 } from "lucide-react";
-import { generateSlug } from "@/lib/utils"; // agora usando utils.ts
+import { generateSlug } from "@/lib/utils";
 
 export default function DashboardPage() {
     const [series, setSeries] = useState([]);
