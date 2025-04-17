@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import { Bell, Check, X, ArrowRight, MessageSquare, Reply, Heart, User, BookOpen, BookText } from "lucide-react";
 import Link from "next/link";
-import { generateSlug } from "@/lib/utils";
+import { generateSlug } from "@/lib/utils"; // agora usando utils.ts
 
 export default function NotificationBell() {
     const [notifications, setNotifications] = useState([]);

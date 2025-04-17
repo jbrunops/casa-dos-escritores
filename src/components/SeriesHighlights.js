@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import { Book, ChevronRight } from "lucide-react";
-import { generateSlug } from "@/lib/utils";
+import { generateSlug } from "@/lib/utils"; // agora usando utils.ts
 
 export default function SeriesHighlights() {
     const [series, setSeries] = useState([]);

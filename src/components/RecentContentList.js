@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { createSummary, formatDate, generateSlug } from '@/lib/utils';
+import { createSummary, formatDate, generateSlug } from '@/lib/utils'; // agora usando utils.ts
 import { Book } from 'lucide-react';
 
 export default function RecentContentList({ contentList }) {
