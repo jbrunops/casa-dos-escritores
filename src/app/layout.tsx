@@ -2,6 +2,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Link from "next/link";
 import { ReactNode } from "react";
+import DashboardPage from "./dashboard/page";
 
 export const metadata = {
     title: "Plataforma para Escritores",
