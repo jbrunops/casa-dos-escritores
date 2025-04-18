@@ -5,8 +5,8 @@ import { ReactNode } from "react";
 import DashboardPage from "./dashboard/page";
 
 export const metadata = {
-    title: "Plataforma para Escritores",
-    description: "Compartilhe suas histórias com o mundo",
+    title: "Casa dos Escritores: Publique Livros, Encontre Leitores e Cresça",
+    description: "Publique seu livro, conecte-se com outros autores e encontre leitores na Casa dos Escritores, a maior comunidade para escritores do Brasil.",
 };
 
 interface RootLayoutProps {
@@ -22,6 +22,17 @@ export default function RootLayout({ children }: RootLayoutProps) {
                     rel="stylesheet"
                 />
                 <meta name="google-adsense-account" content="ca-pub-2169694779628621"></meta>
+                {/* SEO e Social Media Optimization */}
+                <meta property="og:title" content="Casa dos Escritores: Publique Livros, Encontre Leitores e Cresça" />
+                <meta property="og:description" content="Publique seu livro, conecte-se com outros autores e encontre leitores na Casa dos Escritores, a maior comunidade para escritores do Brasil." />
+                <meta property="og:image" content="/casadosescritores.png" />
+                <meta property="og:url" content="https://casadosescritores.com.br/" />
+                <meta property="og:type" content="website" />
+                {/* Twitter Card */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Casa dos Escritores: Publique Livros, Encontre Leitores e Cresça" />
+                <meta name="twitter:description" content="Publique seu livro, conecte-se com outros autores e encontre leitores na Casa dos Escritores, a maior comunidade para escritores do Brasil." />
+                <meta name="twitter:image" content="/casadosescritores.png" />
             </head>
             <body suppressHydrationWarning>
                 <Header />
