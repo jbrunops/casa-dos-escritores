@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { createServerSupabaseClient } from "@/lib/supabase-server"; // USO CORRETO: este arquivo é server-side.
 import { Edit, BookOpen, Share2, MessageSquare, BookText, Book } from "lucide-react";
 import SeriesHighlights from "@/components/SeriesHighlights";
 import { generateSlug, createSummary, formatDate } from "@/lib/utils";

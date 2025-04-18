@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { createServerSupabaseClient } from "@/lib/supabase-server"; // USO CORRETO: este arquivo é server-side.
 import { notFound } from "next/navigation";
 import Pagination from "@/components/Pagination";
 import { generateSlug } from "@/lib/utils";

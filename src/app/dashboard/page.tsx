@@ -1,64 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { createBrowserClient } from "@/lib/supabase-browser";
-import Link from "next/link";
-import Pagination from "@/components/Pagination";
-import Comments from "@/components/Comments";
-import StoryContent from "@/components/StoryContent";
-import DeleteModal from "@/components/DeleteModal";
-import MostCommentedList from "@/components/MostCommentedList";
-import RecentContentList from "@/components/RecentContentList";
-import SeriesHighlights from "@/components/SeriesHighlights";
-import {
-    PlusCircle,
-    Trash2,
-    Edit3,
-    Eye,
-    RefreshCw,
-    BookOpen,
-    MessageSquare,
-    Layers,
-    Plus,
-} from "lucide-react";
-import { generateSlug } from "@/lib/utils";
+import { StoryCard } from '../../components/StoryCard';
+import { useStoryStore } from '../../lib/storyStore';
 
-interface Profile {
-    id: string;
-    username: string;
-    avatar_url?: string;
-    bio?: string;
-}
+const DashboardPage = () => {
+  const stories = useStoryStore((state) => state.stories);
 
-interface Story {
-    id: string;
-    title: string;
-    content: string;
-    category: string;
-    created_at: string;
-    views: number;
-    comments_count: number;
-    is_published: boolean;
-}
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">Histórias</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {stories.map((story) => (
+          <StoryCard key={story.id} story={story} />
+        ))}
+      </div>
+    </div>
+  );
+};
 
-interface Series {
-    id: string;
-    title: string;
-    description: string;
-    cover_url?: string;
-    created_at: string;
-    stories_count: number;
-}
+export default DashboardPage;
 
-interface Stats {
-    totalStories: number;
-    publishedStories: number;
-    totalViews: number;
-    totalComments: number;
-}
-
-interface DeleteModalState {
     open: boolean;
     storyId: string | null;
     title: string;

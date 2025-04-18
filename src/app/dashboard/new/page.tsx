@@ -1,11 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft, BookOpen, Layers, ArrowRight } from "lucide-react";
+import dynamic from 'next/dynamic';
+import { useStoryStore } from '../../lib/storyStore';
 
-export default function ContentTypePage() {
+const StoryForm = dynamic(() => import('../../components/StoryForm'), { ssr: false });
+
+const NewStoryPage = () => {
+  const addStory = useStoryStore((state) => state.addStory);
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">Nova História</h1>
+      <StoryForm onSubmit={(story) => {
+        addStory(story);
+        // Redirecionar ou mostrar feedback após salvar
+        alert('História salva com sucesso!');
+      }} />
+    </div>
+  );
+};
+
+export default NewStoryPage;
+
     const [selectedType, setSelectedType] = useState<string|null>(null);
     const router = useRouter();
 

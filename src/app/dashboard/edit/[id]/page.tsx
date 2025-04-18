@@ -1,32 +1,45 @@
-// src/app/dashboard/edit/[id]/page.tsx
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { createBrowserClient } from "@/lib/supabase-browser";
-import TipTapEditor from "@/components/TipTapEditor";
-import Link from "next/link";
-import DeleteModal from "@/components/DeleteModal";
-import {
-    ArrowLeft,
-    Save,
-    Eye,
-    Trash2,
-    AlertTriangle,
-    CheckCircle2,
-    Send,
-    FileText,
-    Clock,
-    BookOpen,
-    RefreshCw,
-} from "lucide-react";
-import { generateSlug } from "@/lib/utils";
+import React, { useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useStoryStore } from '../../../lib/storyStore';
+import dynamic from 'next/dynamic';
 
-interface EditContentPageParams {
-    id: string;
-}
+const StoryForm = dynamic(() => import('../../../components/StoryForm'), { ssr: false });
 
-export default function EditContentPage() {
+const EditStoryPage = () => {
+  const params = useParams();
+  const router = useRouter();
+  const storyId = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const story = useStoryStore((state) => state.stories.find(s => s.id === storyId));
+  const updateStory = useStoryStore((state) => state.updateStory);
+
+  const [saved, setSaved] = useState(false);
+
+  if (!story) {
+    return <div className="container mx-auto px-4 py-8">História não encontrada.</div>;
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">Editar História</h1>
+      <StoryForm
+        initialStory={story}
+        onSubmit={(updated) => {
+          updateStory(updated);
+          setSaved(true);
+          setTimeout(() => router.push(`/dashboard/${story.id}`), 1000);
+        }}
+      />
+      {saved && (
+        <div className="mt-4 text-green-600 font-semibold">História atualizada com sucesso! Redirecionando...</div>
+      )}
+    </div>
+  );
+};
+
+export default EditStoryPage;
+
     const router = useRouter();
     const params = useParams() as EditContentPageParams;
     const id = params.id;

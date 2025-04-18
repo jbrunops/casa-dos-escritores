@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Comments from "@/components/Comments";
-import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { createServerSupabaseClient } from "@/lib/supabase-server"; // USO CORRETO: este arquivo é server-side.
 import StoryContent from "@/components/StoryContent";
 import { ArrowLeft, ArrowRight, BookOpen, ListOrdered } from "lucide-react";
 import Script from "next/script";

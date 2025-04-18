@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { createServerSupabaseClient } from "@/lib/supabase-server"; // USO CORRETO: este arquivo é server-side.
 import { ArrowLeft, UserPlus } from "lucide-react";
 import UserFollowButton from "@/components/UserFollowButton";
 
