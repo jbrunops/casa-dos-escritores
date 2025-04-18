@@ -18,7 +18,7 @@ export default function ContentTypePage() {
     };
 
     return (
-        <div className="max-w-[75rem] mx-auto px-4 sm:px-6 py-8">
+        <div className="max-w-[75rem] mx-auto w-full px-4 md:px-0 py-8">
             <div className="mb-6">
                 <h1 className="text-2xl font-bold text-gray-900">O que você deseja criar?</h1>
                 <p className="text-gray-600 mt-2">
@@ -27,7 +27,7 @@ export default function ContentTypePage() {
             </div>
 
             <div className="mb-6">
-                <Link href="/dashboard" className="inline-flex items-center text-[#484DB5] hover:text-opacity-80 transition-all duration-200">
+                <Link href="/dashboard" className="inline-flex items-center text-primary hover:text-opacity-80 transition-all duration-200">
                     <ArrowLeft size={16} className="mr-2" />
                     <span>Voltar ao Dashboard</span>
                 </Link>
@@ -37,15 +37,15 @@ export default function ContentTypePage() {
                 <div
                     className={`border rounded-lg p-6 cursor-pointer transition-all duration-200 hover:shadow-md ${
                         selectedType === "single" 
-                        ? "border-[#484DB5] bg-[#484DB5]/5" 
-                        : "border-[#E5E7EB]"
+                        ? "border-[#484DB5] bg-primary/5" 
+                        : "border-[#C4C4C4]"
                     }`}
                     onClick={() => setSelectedType("single")}
                 >
                     <div className="flex justify-center mb-4">
                         <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
                             selectedType === "single" 
-                            ? "bg-[#484DB5]/10 text-[#484DB5]" 
+                            ? "bg-primary/10 text-primary" 
                             : "bg-gray-100 text-gray-500"
                         }`}>
                             <BookOpen size={32} />
@@ -58,7 +58,7 @@ export default function ContentTypePage() {
                     </p>
                     <ul className="space-y-2 text-sm">
                         <li className="flex items-center">
-                            <span className="w-2 h-2 bg-[#484DB5] rounded-full mr-2"></span>
+                            <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
                             Simples e rápido de publicar
                         </li>
                     </ul>
@@ -66,15 +66,15 @@ export default function ContentTypePage() {
                 <div
                     className={`border rounded-lg p-6 cursor-pointer transition-all duration-200 hover:shadow-md ${
                         selectedType === "series" 
-                        ? "border-[#484DB5] bg-[#484DB5]/5" 
-                        : "border-[#E5E7EB]"
+                        ? "border-[#484DB5] bg-primary/5" 
+                        : "border-[#C4C4C4]"
                     }`}
                     onClick={() => setSelectedType("series")}
                 >
                     <div className="flex justify-center mb-4">
                         <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
                             selectedType === "series" 
-                            ? "bg-[#484DB5]/10 text-[#484DB5]" 
+                            ? "bg-primary/10 text-primary" 
                             : "bg-gray-100 text-gray-500"
                         }`}>
                             <Layers size={32} />
@@ -86,7 +86,7 @@ export default function ContentTypePage() {
                     </p>
                     <ul className="space-y-2 text-sm">
                         <li className="flex items-center">
-                            <span className="w-2 h-2 bg-[#484DB5] rounded-full mr-2"></span>
+                            <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
                             Controle de capítulos
                         </li>
                     </ul>
@@ -94,7 +94,7 @@ export default function ContentTypePage() {
             </div>
 
             <button
-                className="bg-[#484DB5] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#3b3f92] transition-all duration-200 disabled:opacity-50"
+                className="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#3b3f92] transition-all duration-200 disabled:opacity-50"
                 onClick={handleContinue}
                 disabled={!selectedType}
             >

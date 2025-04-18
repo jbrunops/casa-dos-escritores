@@ -6,18 +6,19 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        purple: {
-          50: '#f5f3ff', 
-          100: '#ede9fe',
-          200: '#ddd6fe',
-          300: '#c4b5fd',
-          400: '#a78bfa',
-          500: '#8b5cf6',
-          600: '#7c3aed', // Cor principal
-          700: '#6d28d9',
-          800: '#5b21b6',
-          900: '#4c1d95',
-          950: '#2e1065',
+        primary: {
+          DEFAULT: '#484DB5',
+          50: '#f5f6fd',
+          100: '#e7e8fa',
+          200: '#c5c8f0',
+          300: '#a3a7e7',
+          400: '#7e85de',
+          500: '#484DB5',
+          600: '#3b3f92', // variação mais escura
+          700: '#2d316e', // variação ainda mais escura
+        },
+        border: {
+          DEFAULT: '#B1B1B1',
         },
       },
       fontFamily: {
@@ -26,11 +27,8 @@ module.exports = {
       container: {
         center: true,
         padding: {
-          DEFAULT: '1rem',
-          sm: '2rem',
-          lg: '4rem',
-          xl: '5rem',
-          '2xl': '6rem',
+          DEFAULT: '1rem', // Mobile
+          md: '0', // Sem padding lateral em telas md+
         },
       },
       boxShadow: {

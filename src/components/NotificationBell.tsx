@@ -76,16 +76,16 @@ export default function NotificationBell() {
   return (
     <div ref={dropdownRef} className="relative">
       <button onClick={() => setIsOpen((open) => !open)} className="relative">
-        <Bell className="w-6 h-6 text-[#484DB5]" />
+        <Bell className="w-6 h-6 text-primary" />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+          <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-primary rounded-full">
             {unreadCount}
           </span>
         )}
       </button>
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-          <div className="p-4 border-b border-gray-100 font-bold text-gray-700">Notificações</div>
+        <div className="absolute right-0 mt-2 w-80 bg-white border border-primary rounded-lg shadow-lg z-50">
+          <div className="p-4 border-b border-primary font-bold text-primary">Notificações</div>
           <div className="max-h-96 overflow-y-auto">
             {loading ? (
               <div className="p-4 text-center text-gray-500">Carregando...</div>
@@ -93,7 +93,7 @@ export default function NotificationBell() {
               <div className="p-4 text-center text-gray-500">Nenhuma notificação.</div>
             ) : (
               notifications.map((notification) => (
-                <div key={notification.id} className={`p-4 border-b border-gray-100 ${!notification.is_read ? 'bg-[#484DB5]/10' : ''}`}>
+                <div key={notification.id} className={`p-4 border-b border-primary ${!notification.is_read ? 'bg-primary/10' : ''}`}>
                   <div className="flex items-center gap-2">
                     {notification.profiles?.avatar_url ? (
                       <img src={notification.profiles.avatar_url} alt="avatar" className="w-8 h-8 rounded-full" />

@@ -54,7 +54,7 @@ export default async function StoryPage({ params }: StoryPageParams) {
   } catch {}
   // Render
   return (
-    <div className="story-page">
+    <div className="story-page max-w-[75rem] mx-auto w-full px-4 md:px-0">
       <h1 className="text-2xl font-bold mb-4">{story.title}</h1>
       <div className="mb-2 flex items-center gap-2 text-gray-500 text-sm">
         <span>{story.profiles?.username || "Autor desconhecido"}</span>

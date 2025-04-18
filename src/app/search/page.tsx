@@ -17,7 +17,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     const query = searchParams.q || "";
     if (!query || query.length < 3) {
         return (
-            <div className="mx-auto max-w-[75rem] px-4 md:px-0 py-8">
+            <div className="mx-auto max-w-[75rem] w-full px-4 md:px-0 py-8">
                 <h1 className="text-2xl font-bold text-gray-900 mb-6">Pesquisa</h1>
                 <div className="bg-white rounded-lg border border-[#E5E7EB] p-8 text-center mb-6">
                     <Search size={40} className="mx-auto text-gray-300 mb-4" />

@@ -28,7 +28,7 @@ export default function StoryContent({ content }: StoryContentProps) {
 
   return (
     <div
-      className="prose prose-lg max-w-none text-gray-800 prose-headings:font-bold prose-a:text-[#484DB5] prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-blockquote:border-l-[#484DB5] prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic"
+      className="prose prose-lg max-w-none text-gray-800 prose-headings:font-bold prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-blockquote:border-l-primary prose-blockquote:border-l-4 border-border prose-blockquote:pl-4 prose-blockquote:italic"
       dangerouslySetInnerHTML={{ __html: sanitizedContent || content }}
     />
   );

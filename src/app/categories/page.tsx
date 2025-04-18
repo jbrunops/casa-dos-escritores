@@ -16,7 +16,7 @@ interface Category {
 export default async function CategoriesPage() {
   const categoriesData = await fetchAllCategoriesWithCounts();
   return (
-    <div className="max-w-[75rem] mx-auto py-[1.875rem] sm:px-0 px-4">
+    <div className="max-w-[75rem] mx-auto w-full py-[1.875rem] px-4 md:px-0">
       <h1 className="text-3xl font-bold text-black mb-[1.875rem]">Todas as Categorias</h1>
       {categoriesData.length === 0 ? (
         <p className="text-gray-600">Não foi possível carregar as categorias no momento. Tente novamente mais tarde.</p>

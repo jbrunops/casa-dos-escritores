@@ -52,7 +52,7 @@ export default function CategoryDropdown({
         <ChevronDown size={16} />
       </MenuItem>
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 bg-white rounded-md shadow-lg p-3 z-10 border border-[#E5E7EB] min-w-[16rem]">
+        <div className="absolute top-full left-0 mt-2 bg-white rounded-md shadow-lg p-3 z-10 border border-[#C4C4C4] min-w-[16rem]">
           <div className={`grid grid-cols-${columns} gap-2`}>
             {categories.map((category) => (
               <Link
@@ -65,7 +65,7 @@ export default function CategoryDropdown({
             ))}
           </div>
           {footerLink && footerLabel && (
-            <div className="mt-3 pt-2 border-t border-[#E5E7EB]">
+            <div className="mt-3 pt-2 border-t border-[#C4C4C4]">
               <Link
                 href={footerLink}
                 className="block text-center text-xs text-[#484DB5] hover:underline"

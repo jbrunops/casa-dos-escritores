@@ -51,23 +51,18 @@ a:not(.no-hover):hover {
 /* Cores padrão */
 :root {
   --color-primary: #484DB5;
-  --color-border: #E5E7EB;
+  --color-border: #C4C4C4;
 }
 
 /* Ajuste de padding responsivo para seções */
 @media (max-width: 768px) {
-  .section-container {
+  .section-container,
+  .max-w-\[75rem\] {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
   section > div {
     /* padding-left: 1rem; */
     /* padding-right: 1rem; */
   }
-  
-  .max-w-\[75rem\] {
-    /* padding-left: 1rem; */
-    /* padding-right: 1rem; */
-  }
-} 
+}

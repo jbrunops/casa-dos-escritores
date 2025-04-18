@@ -110,7 +110,7 @@ export default function SeriesHighlights() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-8">
-        <div className="w-12 h-12 border-4 border-t-[#484DB5] border-r-[#E5E7EB] border-b-[#E5E7EB] border-l-[#E5E7EB] rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-4 border-t-[#484DB5] border-[#C4C4C4] rounded-full animate-spin"></div>
         <p className="mt-4 text-gray-600">Carregando séries populares...</p>
       </div>
     );
@@ -127,6 +127,65 @@ export default function SeriesHighlights() {
             <span className="block h-1 w-64 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
           </h2>
           <Link href="/series" className="flex items-center text-[#484DB5] hover:underline">
+            Ver todas
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {series.map((serie, index) => (
+            <Link
+              href={`/series/${serie.id}`}
+              key={serie.id}
+              className="flex flex-col rounded-lg border border-[#C4C4C4] overflow-hidden hover:shadow-md transition-shadow bg-white"
+            >
+              <div className="relative w-full pt-[150%]">
+                <div className={`absolute top-2 left-2 px-2 py-1 text-sm font-bold rounded z-10 ${index === 0 ? 'bg-blue-600' : 'bg-[#484DB5]'} text-white`}>
+                  #{index + 1}
+                </div>
+                {serie.cover_url ? (
+                  <img
+                    src={serie.cover_url}
+                    alt={serie.title}
+                    className="absolute top-0 left-0 w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-[#484DB5] text-white text-4xl font-bold">
+                    {serie.title.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <div className="p-3 flex-grow flex flex-col">
+                <h3 className="font-bold text-base line-clamp-2 mb-1" title={serie.title}>{serie.title}</h3>
+                <p className="text-xs text-gray-600 mb-2">de {serie.author_name}</p>
+                {serie.genre && (
+                  <div className="mb-2">
+                    <span className="text-xs text-[#484DB5] font-medium">› {serie.genre}</span>
+                  </div>
+                )}
+                <div className="mt-auto flex items-center justify-between text-xs text-gray-600 border-t border-[#C4C4C4] pt-3">
+                  <div className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    {serie.view_count.toLocaleString("pt-BR")}
+                  </div>
+                  <div className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    {serie.chapter_count}
+                  </div>
+                  <span className="text-xs text-[#484DB5] bg-purple-100 px-2 py-0.5 rounded">
+                    {serie.is_completed ? "Completa" : "escrevendo..."}
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
             <span>Ver Todas</span>
             <ChevronRight size={16} className="ml-1" />
           </Link>
@@ -136,7 +195,7 @@ export default function SeriesHighlights() {
             <Link
               href={`/series/${generateSlug(serie.title, serie.id)}`}
               key={serie.id}
-              className="flex flex-col rounded-lg border border-[#E5E7EB] overflow-hidden hover:shadow-md transition-shadow bg-white"
+              className="flex flex-col rounded-lg border border-border overflow-hidden hover:shadow-md transition-shadow bg-white"
             >
               <div className="relative w-full pt-[150%]">
                 {index === 0 ? (
@@ -144,7 +203,7 @@ export default function SeriesHighlights() {
                     #1
                   </div>
                 ) : (
-                  <div className="absolute top-2 left-2 bg-[#484DB5] text-white px-2 py-1 text-sm font-bold rounded z-10">
+                  <div className="absolute top-2 left-2 bg-primary text-white px-2 py-1 text-sm font-bold rounded z-10">
                     #{index + 1}
                   </div>
                 )}
@@ -155,7 +214,7 @@ export default function SeriesHighlights() {
                     className="absolute top-0 left-0 w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-[#484DB5] text-white text-4xl font-bold">
+                  <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-primary text-white text-4xl font-bold">
                     {serie.title.charAt(0).toUpperCase()}
                   </div>
                 )}

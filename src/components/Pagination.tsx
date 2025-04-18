@@ -36,12 +36,12 @@ export default function Pagination({ currentPage, totalPages, baseUrl }: Paginat
       {currentPage > 1 ? (
         <Link
           href={`${baseUrl}?page=${currentPage - 1}`}
-          className="h-10 px-4 flex items-center justify-center border border-[#E5E7EB] rounded-md text-gray-700 hover:bg-gray-50 transition-all duration-200"
+          className="h-10 px-4 flex items-center justify-center border border-[#C4C4C4] rounded-md text-gray-700 hover:bg-gray-50 transition-all duration-200"
         >
           Anterior
         </Link>
       ) : (
-        <span className="h-10 px-4 flex items-center justify-center border border-[#E5E7EB] rounded-md text-gray-400 bg-gray-50 opacity-60 cursor-not-allowed">
+        <span className="h-10 px-4 flex items-center justify-center border border-[#C4C4C4] rounded-md text-gray-400 bg-gray-50 opacity-60 cursor-not-allowed">
           Anterior
         </span>
       )}
@@ -51,7 +51,7 @@ export default function Pagination({ currentPage, totalPages, baseUrl }: Paginat
             <Link
               key={page}
               href={`${baseUrl}?page=${page}`}
-              className={`h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB] text-gray-700 ${page === currentPage ? "bg-[#484DB5] text-white font-semibold" : "hover:bg-gray-50"}`}
+              className={`h-10 w-10 flex items-center justify-center rounded-md border border-[#C4C4C4] text-gray-700 ${page === currentPage ? "bg-[#484DB5] text-white font-semibold" : "hover:bg-gray-50"}`}
             >
               {page}
             </Link>
@@ -65,12 +65,12 @@ export default function Pagination({ currentPage, totalPages, baseUrl }: Paginat
       {currentPage < totalPages ? (
         <Link
           href={`${baseUrl}?page=${currentPage + 1}`}
-          className="h-10 px-4 flex items-center justify-center border border-[#E5E7EB] rounded-md text-gray-700 hover:bg-gray-50 transition-all duration-200"
+          className="h-10 px-4 flex items-center justify-center border border-[#C4C4C4] rounded-md text-gray-700 hover:bg-gray-50 transition-all duration-200"
         >
           Próxima
         </Link>
       ) : (
-        <span className="h-10 px-4 flex items-center justify-center border border-[#E5E7EB] rounded-md text-gray-400 bg-gray-50 opacity-60 cursor-not-allowed">
+        <span className="h-10 px-4 flex items-center justify-center border border-[#C4C4C4] rounded-md text-gray-400 bg-gray-50 opacity-60 cursor-not-allowed">
           Próxima
         </span>
       )}

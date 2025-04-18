@@ -43,7 +43,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="max-w-[75rem] mx-auto px-4 md:px-0 three-columns-section">
+      <section className="max-w-[75rem] mx-auto w-full px-4 md:px-0 three-columns-section">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="column">
             <h2 className="text-2xl font-extrabold text-black mb-4 border-[#E5E7EB] pb-2 relative">

@@ -17,7 +17,7 @@ function WriterRankItem({ writer, rank }: { writer: Writer; rank: number }) {
   return (
     <div
       key={writer.author_id}
-      className="flex items-center p-4 md:py-3 md:px-3 rounded-lg border border-[#E5E7EB] hover:shadow-sm transition-shadow"
+      className="flex items-center py-4 px-4 md:px-0 rounded-lg border border-[#C4C4C4] hover:shadow-sm transition-shadow"
     >
       <span className="font-bold text-xl w-8 text-center mr-3 text-[#484DB5] shrink-0">{rank}</span>
       {writer.avatar_url ? (

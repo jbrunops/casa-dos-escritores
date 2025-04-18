@@ -33,12 +33,26 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 <meta name="twitter:title" content="Casa dos Escritores: Publique Livros, Encontre Leitores e Cresça" />
                 <meta name="twitter:description" content="Publique seu livro, conecte-se com outros autores e encontre leitores na Casa dos Escritores, a maior comunidade para escritores do Brasil." />
                 <meta name="twitter:image" content="/casadosescritores.png" />
+                {/* Canonical URL */}
+                <link rel="canonical" href="https://casadosescritores.com.br/" />
+                {/* Dados estruturados Schema.org */}
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: `{
+                  \"@context\": \"https://schema.org\",
+                  \"@type\": \"WebSite\",
+                  \"name\": \"Casa dos Escritores\",
+                  \"url\": \"https://casadosescritores.com.br/\",
+                  \"potentialAction\": {
+                    \"@type\": \"SearchAction\",
+                    \"target\": \"https://casadosescritores.com.br/search?q={search_term_string}\",
+                    \"query-input\": \"required name=search_term_string\"
+                  }
+                }` }} />
             </head>
             <body suppressHydrationWarning>
                 <Header />
-                <main className="content-wrapper">{children}</main>
-                <footer className="border-t border-[#E5E7EB] mt-[1.875rem] bg-[#484DB5]">
-                    <div className="max-w-[75rem] mx-auto px-4 sm:px-6 md:px-0 py-12">
+                <main className="max-w-[75rem] mx-auto w-full flex-1">{children}</main>
+                <footer className="border-t border-[#C4C4C4] mt-[1.875rem] bg-[#484DB5]">
+                    <div className="max-w-[75rem] mx-auto w-full py-12 px-4 md:px-0">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             {/* Coluna 1 - Logo e informações */}
                             <div className="flex flex-col space-y-4">

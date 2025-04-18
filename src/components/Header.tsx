@@ -222,7 +222,7 @@ export default function Header() {
     };
 
     return (
-        <header className="bg-white border-b border-[#E5E7EB] w-full py-3 mb-[1.875rem] relative z-30">
+        <header className="bg-white border-b border-[#C4C4C4] w-full py-3 mb-[1.875rem] relative z-30">
             <div className="max-w-[75rem] mx-auto flex items-center justify-between px-4 md:px-0">
                 <div className="flex items-center">
                     <div className="text-[#484DB5] font-bold text-xl mr-6">
@@ -255,7 +255,7 @@ export default function Header() {
                                 placeholder="Buscar histórias, séries, autores..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full h-10 pl-10 pr-4 rounded-md border border-[#E5E7EB] focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent transition-all duration-200"
+                                className="w-full h-10 pl-10 pr-4 rounded-md border border-[#C4C4C4] focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent transition-all duration-200"
                             />
                             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                                 <Search size={18} />
@@ -311,7 +311,7 @@ export default function Header() {
                                                 placeholder="Buscar..."
                                                 value={searchTerm}
                                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                                className="w-full h-10 pl-10 pr-4 rounded-md border border-[#E5E7EB] focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent transition-all duration-200"
+                                                className="w-full h-10 pl-10 pr-4 rounded-md border border-[#C4C4C4] focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent transition-all duration-200"
                                             />
                                             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                                                 <Search size={18} />

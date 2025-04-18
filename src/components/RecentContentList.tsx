@@ -40,7 +40,7 @@ export default function RecentContentList({ contentList }: RecentContentListProp
           <Link
             href={`/story/${generateSlug(content.title, content.id)}`}
             key={`recent-story-${content.id}`}
-            className="block p-4 md:py-4 md:px-4 rounded-lg border border-[#E5E7EB] hover:shadow-md transition-shadow"
+            className="block py-4 px-4 md:px-0 rounded-lg border border-[#C4C4C4] hover:shadow-md transition-shadow"
           >
             <h3 className="font-semibold text-lg">{content.title}</h3>
             <div className="flex justify-between text-sm text-gray-600 mt-1 mb-2">
@@ -59,7 +59,7 @@ export default function RecentContentList({ contentList }: RecentContentListProp
           <Link
             href={`/chapter/${generateSlug(content.title, content.id)}`}
             key={`recent-chapter-${content.id}`}
-            className="block relative p-4 md:py-4 md:px-4 rounded-lg border border-[#E5E7EB] bg-gray-50 hover:shadow-md transition-shadow"
+            className="block relative p-4 md:py-4 md:px-4 rounded-lg border border-[#C4C4C4] bg-gray-50 hover:shadow-md transition-shadow"
           >
             <div className="absolute top-0 right-0 px-2 py-1 bg-[#484DB5] text-white text-xs rounded-tr-lg">
               Capítulo {content.chapter_number || '?'}
@@ -77,7 +77,7 @@ export default function RecentContentList({ contentList }: RecentContentListProp
             <p className="text-gray-700 my-4">
               {createSummary(content.content)}
             </p>
-            <div className="flex justify-between text-sm text-gray-600 mt-4 pt-3 border-t border-[#E5E7EB]">
+            <div className="flex justify-between text-sm text-gray-600 mt-4 pt-3 border-t border-[#C4C4C4]">
               <span className="font-bold text-[#484DB5]">
                 {content.author_username}
               </span>

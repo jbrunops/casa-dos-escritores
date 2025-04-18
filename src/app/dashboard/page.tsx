@@ -169,7 +169,7 @@ export default function DashboardPage() {
     // ... (restante da lógica e renderização, mantendo a estrutura original, mas com tipagem)
 
     return (
-        <div className="dashboard-page">
+        <div className="dashboard-page max-w-[75rem] mx-auto w-full px-4 md:px-0">
             {/* Renderização dos componentes, tabs, listas, modais, etc. */}
             {/* Exemplo: */}
             <h1 className="text-2xl font-bold mb-4">Dashboard</h1>

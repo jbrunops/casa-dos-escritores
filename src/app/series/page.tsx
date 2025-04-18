@@ -111,7 +111,7 @@ export default async function SeriesPage({ searchParams }: SeriesPageProps) {
                             <h2 className="text-lg font-semibold mb-1">
                                 <Link href={`/series/${generateSlug(serie.title, serie.id)}`}>{serie.title}</Link>
                             </h2>
-                            <div className="text-sm text-gray-500 mb-1">
+                            <div className="max-w-[75rem] mx-auto w-full py-8 px-4 md:px-0">
                                 {serie.author_name} • {serie.chapter_count} capítulos
                             </div>
                             <div className="text-xs text-gray-400">

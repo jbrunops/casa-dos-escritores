@@ -60,14 +60,14 @@ export default function DropdownMenu({
       {triggerElement}
       {isOpen && (
         <div
-          className={`absolute top-full ${position === "right" ? "right-0" : "left-0"} mt-2 bg-white rounded-md shadow-lg p-3 z-10 border border-[#E5E7EB] min-w-[10rem]`}
+          className={`absolute top-full ${position === "right" ? "right-0" : "left-0"} mt-2 bg-white rounded-md shadow-lg p-3 z-10 border border-[#C4C4C4] min-w-[10rem]`}
         >
           <div className="flex flex-col gap-2">
             {items.map((item, idx) => (
               <button
                 key={idx}
                 onClick={item.onClick}
-                className="block px-2 py-1 rounded hover:bg-[#484DB5]/10 text-sm text-gray-700 text-left"
+                className="block px-2 py-1 rounded hover:bg-[#484DB5]/10 text-sm text-gray-700 text-left border border-[#C4C4C4]"
               >
                 {item.label}
               </button>
