@@ -6,9 +6,9 @@ function WriterRankItem({ writer, rank }) {
     return (
         <div
             key={writer.author_id} // Usar author_id como chave
-            className="flex items-center p-4 md:py-3 md:px-3 rounded-lg border border-[#E5E7EB] hover:shadow-sm transition-shadow"
+            className="flex items-center p-4 md:py-3 md:px-3 rounded-lg border border-border hover:shadow-sm transition-shadow"
         >
-            <span className="font-bold text-xl w-8 text-center mr-3 text-[#484DB5] shrink-0">
+            <span className="font-bold text-xl w-8 text-center mr-3 text-primary shrink-0">
                 {rank}
             </span>
 
@@ -21,7 +21,7 @@ function WriterRankItem({ writer, rank }) {
                     // TODO: Considerar usar <Image> do Next.js aqui na Etapa 4 para otimização
                 />
             ) : (
-                <div className="w-10 h-10 rounded-full bg-[#484DB5] text-white flex items-center justify-center mr-3 shrink-0">
+                <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center mr-3 shrink-0">
                     {writer.username?.charAt(0)?.toUpperCase() || '?'} {/* Corrigido: usar username */}
                 </div>
             )}
@@ -31,7 +31,7 @@ function WriterRankItem({ writer, rank }) {
                 <Link
                     href={`/profile/${writer.username}`}
                     // Corrigido: Reduzir tamanho da fonte para text-base
-                    className="font-semibold text-base hover:text-[#484DB5] transition-colors block truncate"
+                    className="font-semibold text-base hover:text-primary transition-colors block truncate"
                 >
                     {writer.username}
                 </Link>

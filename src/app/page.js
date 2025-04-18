@@ -34,7 +34,7 @@ export default async function HomePage() {
     return (
         <>
             {/* Seção de 3 colunas */}
-            <section className="max-w-[75rem] mx-auto px-4 md:px-0 three-columns-section">
+            <section className="max-w-[75rem] mx-auto three-columns-section">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Coluna 1: Histórias Recentes */}
                     <div className="column">
@@ -66,44 +66,44 @@ export default async function HomePage() {
             </section>
 
             {/* NOVA SEÇÃO: Séries Destacadas */}
-            <section className="max-w-[75rem] mx-auto px-4 md:px-0 series-highlights-section">
+            <section className="max-w-[75rem] mx-auto series-highlights-section">
                 <SeriesHighlights />
             </section>
 
-            <section className="max-w-[75rem] mx-auto px-4 md:px-0 py-12 features-section">
+            <section className="max-w-[75rem] mx-auto py-12 features-section">
                 <h2 className="text-3xl font-extrabold text-black mb-8 pb-2 relative">
                     Como funciona
                     <span className="block h-1 w-64 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 features-grid">
-                    <div className="bg-white p-6 rounded-lg shadow-md border border-[#E5E7EB] flex flex-col items-center text-center feature-card">
-                        <div className="bg-[#484DB5]/10 p-4 rounded-full mb-4 feature-icon">
+                    <div className="bg-white p-6 rounded-lg shadow-md border border-border flex flex-col items-center text-center feature-card">
+                        <div className="bg-primary-100 p-4 rounded-full mb-4 feature-icon">
                             <Edit size={32} color="#484DB5" />
                         </div>
-                        <h3 className="text-xl font-semibold mb-3 text-[#484DB5]">1. Crie uma conta</h3>
+                        <h3 className="text-xl font-semibold mb-3 text-primary">1. Crie uma conta</h3>
                         <p className="text-gray-700">
                             Registre-se gratuitamente para começar a
                             compartilhar suas histórias com outros leitores.
                         </p>
                     </div>
 
-                    <div className="bg-white p-6 rounded-lg shadow-md border border-[#E5E7EB] flex flex-col items-center text-center feature-card">
-                        <div className="bg-[#484DB5]/10 p-4 rounded-full mb-4 feature-icon">
+                    <div className="bg-white p-6 rounded-lg shadow-md border border-border flex flex-col items-center text-center feature-card">
+                        <div className="bg-primary-100 p-4 rounded-full mb-4 feature-icon">
                             <BookOpen size={32} color="#484DB5" />
                         </div>
-                        <h3 className="text-xl font-semibold mb-3 text-[#484DB5]">2. Escreva suas histórias</h3>
+                        <h3 className="text-xl font-semibold mb-3 text-primary">2. Escreva suas histórias</h3>
                         <p className="text-gray-700">
                             Use nosso editor intuitivo para criar suas obras com
                             formatação profissional.
                         </p>
                     </div>
 
-                    <div className="bg-white p-6 rounded-lg shadow-md border border-[#E5E7EB] flex flex-col items-center text-center feature-card">
-                        <div className="bg-[#484DB5]/10 p-4 rounded-full mb-4 feature-icon">
+                    <div className="bg-white p-6 rounded-lg shadow-md border border-border flex flex-col items-center text-center feature-card">
+                        <div className="bg-primary-100 p-4 rounded-full mb-4 feature-icon">
                             <Share2 size={32} color="#484DB5" />
                         </div>
-                        <h3 className="text-xl font-semibold mb-3 text-[#484DB5]">3. Compartilhe com o mundo</h3>
+                        <h3 className="text-xl font-semibold mb-3 text-primary">3. Compartilhe com o mundo</h3>
                         <p className="text-gray-700">
                             Publique suas histórias e receba feedback valioso da
                             comunidade de leitores.
