@@ -25,44 +25,30 @@ footer {
   flex-shrink: 0;
 }
 
-/* Configurações globais do projeto */
-.max-w-\[75rem\] {
-  max-width: 75rem;
-}
+/* Configurações globais do projeto - REMOVIDAS */
 
-/* Estilo para botões */
-button, .btn, [type="button"], [type="submit"] {
-  height: 2.5rem;
-}
+/* Estilo para botões - REMOVIDOS */
 
-/* Animações e efeitos de hover */
-button:hover, .btn:hover, [type="button"]:hover, [type="submit"]:hover, 
-a.hover-effect:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
+/* Animações e efeitos de hover - REMOVIDOS */
 
-a:not(.no-hover):hover {
-  opacity: 0.85;
-  transition: opacity 0.3s ease;
-}
+/* Cores padrão - REMOVIDAS */
 
-/* Cores padrão */
-:root {
-  --color-primary: #484DB5;
-  --color-border: #C4C4C4;
-}
+/* Ajuste de padding responsivo para seções - REMOVIDO */
 
 /* Ajuste de padding responsivo para seções */
 @media (max-width: 768px) {
-  .section-container,
-  .max-w-\[75rem\] {
+  .section-container {
     padding-left: 1rem;
     padding-right: 1rem;
   }
+  
   section > div {
     /* padding-left: 1rem; */
     /* padding-right: 1rem; */
   }
-}
+  
+  .max-w-\[75rem\] {
+    /* padding-left: 1rem; */
+    /* padding-right: 1rem; */
+  }
+} 

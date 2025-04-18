@@ -17,9 +17,7 @@ module.exports = {
           600: '#3b3f92', // variação mais escura
           700: '#2d316e', // variação ainda mais escura
         },
-        border: {
-          DEFAULT: '#B1B1B1',
-        },
+        border: '#D7D7D7',
       },
       fontFamily: {
         sans: ['Poppins', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
@@ -27,9 +25,12 @@ module.exports = {
       container: {
         center: true,
         padding: {
-          DEFAULT: '1rem', // Mobile
-          md: '0', // Sem padding lateral em telas md+
+          DEFAULT: '1rem', // Padding padrão (px-4) para mobile
+          md: '0', // Sem padding lateral em telas médias ou maiores
         },
+      },
+      maxWidth: {
+        '7xl': '75rem',
       },
       boxShadow: {
         'card': '0 2px 8px rgba(0, 0, 0, 0.1)',
