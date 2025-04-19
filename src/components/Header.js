@@ -236,12 +236,12 @@ export default function Header() {
     };
 
     return (
-        <header className="bg-white border-b border-[#E5E7EB] w-full py-3 mb-[1.875rem] relative z-30">
-            <div className="max-w-[75rem] mx-auto flex items-center justify-between px-4 md:px-0">
+        <header className="bg-white border-b border-border w-full py-3 mb-[1.875rem] relative z-30">
+            <div className="max-w-[75rem] mx-auto flex items-center justify-between">
                 {/* Logo e navegação principal agrupados */}
                 <div className="flex items-center">
                     {/* Logo */}
-                    <div className="text-[#484DB5] font-bold text-xl mr-6">
+                    <div className="text-primary font-bold text-xl mr-6">
                         <Link href="/">Casa Dos Escritores</Link>
                     </div>
 
@@ -278,7 +278,7 @@ export default function Header() {
                                 placeholder="Buscar histórias, séries, autores..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full h-10 pl-10 pr-4 rounded-md border border-[#E5E7EB] focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent transition-all duration-200"
+                                className="w-full h-10 pl-10 pr-4 rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                             />
                             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                                 <Search size={18} />
@@ -289,7 +289,7 @@ export default function Header() {
 
                 {/* Elementos para mobile */}
                 <button
-                    className="md:hidden text-[#484DB5]"
+                    className="md:hidden text-primary"
                     onClick={toggleMobileMenu}
                     aria-label="Menu"
                 >
@@ -338,7 +338,7 @@ export default function Header() {
                                                 placeholder="Buscar..."
                                                 value={searchTerm}
                                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                                className="w-full h-10 pl-10 pr-4 rounded-md border border-[#E5E7EB] focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-transparent transition-all duration-200"
+                                                className="w-full h-10 pl-10 pr-4 rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                             />
                                             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                                                 <Search size={18} />
@@ -397,7 +397,7 @@ export default function Header() {
                                             >
                                                 Notificações
                                                 {unreadCount > 0 && (
-                                                    <span className="ml-2 px-1.5 py-0.5 text-xs font-medium rounded-full bg-[#484DB5] text-white">
+                                                    <span className="ml-2 px-1.5 py-0.5 text-xs font-medium rounded-full bg-primary text-white">
                                                         {unreadCount}
                                                     </span>
                                                 )}
@@ -446,7 +446,7 @@ export default function Header() {
                             <DropdownMenu
                                 trigger={
                                     <button
-                                        className="flex items-center text-[#484DB5] font-semibold h-10 rounded px-2 ml-2"
+                                        className="flex items-center text-primary font-semibold h-10 rounded px-2 ml-2"
                                         onClick={() => setShowUserDropdown(!showUserDropdown)}
                                     >
                                         <User size={18} className="mr-1.5" />

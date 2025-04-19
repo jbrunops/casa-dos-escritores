@@ -26,8 +26,8 @@ export default function MenuItem({
 }) {
   // Cores baseadas na variante
   const variantStyles = {
-    default: "text-[#484DB5] hover:text-[#383bA5]",
-    primary: "text-white bg-[#484DB5] hover:bg-[#383bA5]",
+    default: "text-primary hover:text-primary-600",
+    primary: "text-white bg-primary hover:bg-primary-600",
     danger: "text-red-600 hover:bg-red-50",
   };
   

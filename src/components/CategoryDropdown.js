@@ -56,13 +56,13 @@ export default function CategoryDropdown({
       </MenuItem>
       
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 bg-white rounded-md shadow-lg p-3 z-10 border border-[#E5E7EB] min-w-[16rem]">
+        <div className="absolute top-full left-0 mt-2 bg-white rounded-md shadow-lg p-3 z-10 border border-border min-w-[16rem]">
           <div className={`grid grid-cols-${columns} gap-2`}>
             {categories.map((category) => (
               <Link
                 key={category}
                 href={`/categories/${category.toLowerCase().replace(/\s+/g, "-")}`}
-                className="text-gray-700 hover:bg-gray-100 hover:text-[#484DB5] transition-all duration-200 px-3 py-2 rounded"
+                className="text-gray-700 hover:bg-gray-100 hover:text-primary transition-all duration-200 px-3 py-2 rounded"
                 onClick={() => setIsOpen(false)}
               >
                 {category}
@@ -72,7 +72,7 @@ export default function CategoryDropdown({
             {footerLink && footerLabel && (
               <Link
                 href={footerLink}
-                className={`col-span-${columns} text-center text-[#484DB5] mt-2 font-medium rounded px-2 py-1`}
+                className={`col-span-${columns} text-center text-primary mt-2 font-medium rounded px-2 py-1`}
                 onClick={() => setIsOpen(false)}
               >
                 {footerLabel}
