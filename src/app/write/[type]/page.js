@@ -129,9 +129,9 @@ export default function WritePage() {
                     await notifyFollowers(user.id, type, data[0].id, title);
                 }
 
-                // Redirecionar para criar o primeiro capítulo
+                // Redirecionar para CRIAR O PRIMEIRO CAPÍTULO NA NOVA ROTA
                 setTimeout(() => {
-                    router.push(`/dashboard/new-chapter/${data[0].id}`);
+                    router.push(`/write/chapter/${data[0].id}`);
                 }, 1500);
 
                 return {
