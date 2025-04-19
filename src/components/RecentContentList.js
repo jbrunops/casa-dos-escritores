@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { createSummary, formatDate, generateSlug } from '@/lib/utils';
-import { Book } from 'lucide-react';
+import { createSummary } from '@/lib/utils';
+import CardTexto from './CardTexto';
 
 export default function RecentContentList({ contentList }) {
     if (!contentList || contentList.length === 0) {
@@ -9,60 +9,21 @@ export default function RecentContentList({ contentList }) {
 
     return (
         <div className="space-y-4">
-            {contentList.map((content) =>
-                content.type === 'story' ? (
-                    <Link
-                        href={`/story/${generateSlug(content.title, content.id)}`}
-                        key={`recent-story-${content.id}`}
-                        className="block p-4 md:py-4 md:px-4 rounded-lg border border-border hover:shadow-md transition-shadow"
-                    >
-                        <h3 className="font-semibold text-lg">{content.title}</h3>
-                        <div className="flex justify-between text-sm text-gray-600 mt-1 mb-2">
-                            <span className="font-bold text-primary">
-                                {content.author_username}
-                            </span>
-                            <span className="text-xs">
-                                {formatDate(content.created_at)}
-                            </span>
-                        </div>
-                        <p className="text-gray-700">
-                            {createSummary(content.content)}
-                        </p>
-                    </Link>
-                ) : ( // content.type === 'chapter'
-                    <Link
-                        href={`/chapter/${generateSlug(content.title, content.id)}`}
-                        key={`recent-chapter-${content.id}`}
-                        className="block relative p-4 md:py-4 md:px-4 rounded-lg border border-border bg-gray-50 hover:shadow-md transition-shadow"
-                    >
-                        <div className="absolute top-0 right-0 px-2 py-1 bg-primary text-white text-xs rounded-tr-lg">
-                            Capítulo {content.chapter_number || '?'}
-                        </div>
-                        <h3 className="font-semibold text-lg mt-2 mb-3">{content.title}</h3>
-                        <div className="flex items-center text-sm text-gray-600 mt-1 mb-2">
-                            <span className="mr-2">
-                                <span className="font-semibold">Série:</span>{" "}
-                                <span
-                                    className="inline-flex items-center bg-primary-100 text-primary px-2 py-0.5 rounded-md">
-                                    <Book size={14} className="mr-1" />
-                                    {content.series_title || 'N/A'}
-                                </span>
-                            </span>
-                        </div>
-                        <p className="text-gray-700 my-4">
-                            {createSummary(content.content)}
-                        </p>
-                        <div className="flex justify-between text-sm text-gray-600 mt-4 pt-3 border-t border-border">
-                            <span className="font-bold text-primary">
-                                {content.author_username}
-                            </span>
-                            <span className="text-xs">
-                                {formatDate(content.created_at)}
-                            </span>
-                        </div>
-                    </Link>
-                )
-            )}
+            {contentList.map((content) => (
+                <CardTexto
+                    key={`recent-${content.type}-${content.id}`}
+                    id={content.id}
+                    type={content.type}
+                    title={content.title}
+                    summary={content.summary || createSummary(content.content)}
+                    author={content.author_username}
+                    date={content.created_at}
+                    commentsCount={content.comment_count}
+                    seriesTitle={content.series_title}
+                    chapterNumber={content.chapter_number}
+                    seriesId={content.series_id}
+                />
+            ))}
         </div>
     );
 } 
