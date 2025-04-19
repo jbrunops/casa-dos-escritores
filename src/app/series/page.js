@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import Pagination from "@/components/Pagination";
 import { generateSlug } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const PAGE_SIZE = 12; // Número de séries por página
 
@@ -17,6 +18,10 @@ export default async function SeriesPage({ searchParams }) {
         console.log("Carregando página de séries");
         const supabase = await createServerSupabaseClient();
         const page = searchParams.page ? parseInt(searchParams.page) : 1;
+
+        // Obter a sessão do usuário
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
 
         // Calcular o offset para paginação
         const from = (page - 1) * PAGE_SIZE;
@@ -116,21 +121,41 @@ export default async function SeriesPage({ searchParams }) {
                     </p>
                 </div>
 
+                {/* Botão condicional */}
+                <div className="mb-6 text-center">
+                    {user ? (
+                        <Button asChild className="bg-primary hover:bg-primary-600 text-white">
+                            <Link href="/write">Criar novo texto</Link>
+                        </Button>
+                    ) : (
+                         <Button asChild variant="outline" className="border-border text-primary hover:bg-gray-100">
+                             <Link href="/login">Comece a escrever agora mesmo</Link>
+                         </Button>
+                    )}
+                </div>
+
                 {series?.length === 0 ? (
                     <div className="flex flex-col items-center justify-center space-y-4 py-8">
                         <p className="text-gray-600">Ainda não há séries publicadas.</p>
-                        <Link href="/dashboard/new" className="h-10 px-4 flex items-center justify-center bg-[#484DB5] text-white rounded-md hover:shadow-md transition-shadow duration-200">
-                            Crie a primeira série
-                        </Link>
+                        {/* Mantem o botão original caso não hajam séries, mas agora depende do login */} 
+                        {user ? (
+                            <Button asChild className="bg-primary hover:bg-primary-600 text-white">
+                                <Link href="/write">Crie a primeira série</Link>
+                            </Button>
+                        ) : (
+                            <Button asChild variant="outline" className="border-border text-primary hover:bg-gray-100">
+                                <Link href="/login">Comece a escrever agora mesmo</Link>
+                            </Button>
+                        )}
                     </div>
                 ) : (
                     <>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
                             {seriesWithChapterCount.map((serie) => (
                                 <Link
-                                    href={`/series/${generateSlug(serie.title, serie.id)}`}
+                                    href={`/obra/${generateSlug(serie.title, serie.id)}`}
                                     key={serie.id}
-                                    className="flex flex-col rounded-lg border border-[#E5E7EB] overflow-hidden hover:shadow-md transition-shadow bg-white"
+                                    className="flex flex-col rounded-lg border border-border overflow-hidden hover:shadow-md transition-shadow bg-white"
                                 >
                                     <div className="relative w-full pt-[150%]">
                                         {serie.cover_url ? (
@@ -140,7 +165,7 @@ export default async function SeriesPage({ searchParams }) {
                                                 className="absolute top-0 left-0 w-full h-full object-cover"
                                             />
                                         ) : (
-                                            <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-[#484DB5] text-white text-4xl font-bold">
+                                            <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-primary text-white text-4xl font-bold">
                                                 {serie.title.charAt(0).toUpperCase()}
                                             </div>
                                         )}
@@ -152,7 +177,7 @@ export default async function SeriesPage({ searchParams }) {
                                         </p>
                                         {serie.genre && (
                                             <div className="mb-2">
-                                                <span className="text-xs text-[#484DB5] font-medium">
+                                                <span className="text-xs text-primary font-medium">
                                                     › {serie.genre}
                                                 </span>
                                             </div>
@@ -171,7 +196,7 @@ export default async function SeriesPage({ searchParams }) {
                                                 </svg>
                                                 {serie.chapter_count}
                                             </div>
-                                            <span className="text-xs text-[#484DB5] bg-purple-100 px-2 py-0.5 rounded">
+                                            <span className={`text-xs px-2 py-0.5 rounded ${serie.is_completed ? 'bg-green-100 text-green-800' : 'text-primary bg-primary-100'}`}>
                                                 {serie.is_completed ? "Completa" : "escrevendo..."}
                                             </span>
                                         </div>
@@ -191,6 +216,20 @@ export default async function SeriesPage({ searchParams }) {
                         )}
                     </>
                 )}
+
+                {/* Botão para login em caso de erro */}
+                <div className="mb-6 text-center">
+                    <Button asChild variant="outline" className="border-border text-primary hover:bg-gray-100">
+                        <Link href="/login">Faça login para tentar novamente</Link>
+                    </Button>
+                </div>
+
+                <div className="error-message">
+                    <p>
+                        Não foi possível carregar as séries. Por favor, tente
+                        novamente.
+                    </p>
+                </div>
             </div>
         );
     } catch (error) {

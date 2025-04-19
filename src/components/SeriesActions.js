@@ -60,27 +60,39 @@ export default function SeriesActions({ series, isAuthor }) {
         }
     };
 
+    // Ação primária: Ler o primeiro capítulo ou a série
+    const primaryAction = series.first_chapter ? (
+        <Link
+            href={`/ler/${series.first_chapter}`}
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+        >
+            Ler Primeiro Capítulo
+        </Link>
+    ) : (
+        <Link
+             href={`/obra/${generateSlug(series.title, series.id)}`}
+             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+        >
+            Ver Obra
+        </Link>
+    );
+
     return (
         <div className="flex flex-wrap gap-2 mt-4">
-            {series.first_chapter ? (
-                <Link
-                    href={`/chapter/${series.first_chapter}`}
-                    className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-300 ease-in-out"
-                >
-                    <BookOpen size={18} className="sm:mr-2" />
-                    <span className="hidden sm:inline">Ver Série</span>
-                </Link>
-            ) : (
-                <span className="inline-flex items-center justify-center h-10 px-4 border border-[#E5E7EB] text-gray-400 rounded-md bg-gray-50 cursor-not-allowed">
-                    <BookOpen size={18} className="sm:mr-2" />
-                    <span className="hidden sm:inline">Sem Capítulos</span>
-                </span>
-            )}
+            {primaryAction}
 
             {isAuthor && (
                 <>
                     <Link
-                        href={`/dashboard/edit-series/${series.id}`}
+                        href={`/write/chapter/${series.id}`}
+                        className="inline-flex items-center justify-center h-10 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 transition-all duration-300 ease-in-out"
+                    >
+                        <BookOpen size={18} className="sm:mr-2" />
+                        <span className="hidden sm:inline">Adicionar Capítulo</span>
+                    </Link>
+
+                    <Link
+                        href={`/edit/series/${series.id}`}
                         className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-300 ease-in-out"
                     >
                         <Edit size={18} className="sm:mr-2" />

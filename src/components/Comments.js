@@ -5,332 +5,424 @@ import { createBrowserClient } from "@/lib/supabase-browser";
 import Link from "next/link";
 import { RefreshCw, MessageSquare, Reply, X } from "lucide-react";
 
+// Interface para o perfil (ajuda na clareza)
+// interface Profile {
+//     id: string;
+//     username: string | null;
+//     avatar_url: string | null;
+// }
+
+// Interface para o comentário combinado (ajuda na clareza)
+// interface CombinedComment {
+//     id: string;
+//     text: string;
+//     created_at: string;
+//     author_id: string;
+//     parent_id: string | null;
+//     author_profile: Profile | null; // Perfil aninhado
+//     replies: CombinedComment[];
+// }
+
 export default function Comments({
-    storyId,
     contentId,
     contentType,
-    sessionId,
     userId,
-    authorId,
-    isSeriesComment = false,
+    // authorId, // Prop authorId não é mais usada diretamente aqui
 }) {
+    console.log("[Comments Component] Props recebidas:", { contentId, contentType, userId });
+
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
     const [replyTo, setReplyTo] = useState(null);
     const [submitting, setSubmitting] = useState(false);
-    const [username, setUsername] = useState("");
+    const [userProfile, setUserProfile] = useState(null); // Armazena username e avatar do usuário logado
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const [loading, setLoading] = useState(true); // Estado de carregamento
     const supabase = createBrowserClient();
     const commentInputRef = useRef(null);
-    const [userSession, setUserSession] = useState(null);
+    // const [userSessionId, setUserSessionId] = useState(null); // Removido, usaremos userId diretamente ou getUser
 
-    // Determinar o ID e tipo de conteúdo para comentários
-    const id = contentId || storyId;
-    const type = contentType || (isSeriesComment ? "series" : "story");
-    // Usar userId se fornecido, senão usar sessionId
-    const currentUserId = userId || sessionId;
-    
-    // Se não temos userId do servidor, tentar buscar com supabase browser client
+    const id = contentId;
+    const type = contentType;
+    const currentUserId = userId;
+
+    // Busca perfil do usuário logado (apenas uma vez)
     useEffect(() => {
-        async function getUserSession() {
-            if (!currentUserId) {
+        async function fetchUserProfile() {
+            if (currentUserId) {
                 try {
-                    const { data: { session } } = await supabase.auth.getSession();
-                    if (session?.user) {
-                        setUserSession(session.user.id);
-                        fetchUsername(session.user.id);
-                    }
+                    const { data, error } = await supabase
+                        .from("profiles")
+                        .select("username, avatar_url")
+                        .eq("id", currentUserId)
+                        .single();
+                    if (error) throw error;
+                    setUserProfile(data);
                 } catch (err) {
-                    console.error("Erro ao obter sessão:", err);
+                    console.error("Erro ao buscar perfil do usuário logado:", err);
                 }
-            } else {
-                fetchUsername(currentUserId);
             }
         }
-        
-        getUserSession();
+        fetchUserProfile();
     }, [currentUserId, supabase]);
-    
-    useEffect(() => {
-        // Carregar comentários iniciais
-        loadComments();
-    }, [id]);
 
-    // Se estamos respondendo a um comentário, focar no input
+    // Carrega comentários quando ID ou Tipo mudam
+    useEffect(() => {
+        if (id && type) {
+            loadComments();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id, type]); // Dependência apenas em id e type
+
     useEffect(() => {
         if (replyTo && commentInputRef.current) {
             commentInputRef.current.focus();
         }
     }, [replyTo]);
 
-    // Função para carregar comentários
     const loadComments = async () => {
+        setLoading(true);
+        setError(null);
+        console.log("[Comments loadComments] Iniciando busca para:", { contentId, contentType });
+
         try {
-            if (!id) {
-                console.error(`ID do conteúdo é inválido:`, id);
+            if (!id || !type) {
+                console.error(`[Comments] ID (${id}) ou Tipo (${type}) do conteúdo é inválido.`);
+                setError("Não foi possível carregar comentários: ID ou Tipo inválido.");
+                setComments([]);
+                setLoading(false);
                 return;
             }
 
-            console.log("Carregando comentários para:", {
-                contentId: id,
-                contentType: type,
-            });
-
-            let query = supabase
+            // 1. Buscar dados base dos comentários
+            let commentsQuery = supabase
                 .from("comments")
                 .select(
                     `
-                id, 
+                id,
                 text,
                 created_at,
                 author_id,
-                parent_id,
-                profiles(username, avatar_url)
+                parent_id
                 `
-                );
+                )
+                .order("created_at", { ascending: true });
             
-            // Aplicar filtro com base no tipo de conteúdo
             if (type === "chapter") {
-                query = query.eq("chapter_id", id);
+                commentsQuery = commentsQuery.eq("chapter_id", id);
             } else if (type === "series") {
-                query = query.eq("series_id", id);
+                commentsQuery = commentsQuery.eq("series_id", id);
+            } else if (type === "story") {
+                commentsQuery = commentsQuery.eq("story_id", id);
             } else {
-                query = query.eq("story_id", id);
-            }
-            
-            const { data, error } = await query.order("created_at", { ascending: true });
-
-            if (error) {
-                console.error("Erro ao buscar comentários:", error);
+                console.error(`[Comments] loadComments: Tipo de conteúdo desconhecido: ${type}`);
+                setError(`Tipo de conteúdo desconhecido: ${type}`);
+                setLoading(false);
                 return;
             }
+            
+            const { data: baseComments, error: commentsError } = await commentsQuery;
 
-            console.log("Comentários carregados:", data?.length || 0);
-            setComments(data || []);
+            if (commentsError) {
+                console.error("[Comments] Erro na query ao buscar comentários base:", { 
+                    message: commentsError.message, 
+                    details: commentsError.details, 
+                    code: commentsError.code, 
+                    hint: commentsError.hint,
+                    errorObj: commentsError
+                 });
+                setError("Erro ao carregar dados dos comentários. Tente novamente.");
+                setComments([]);
+                setLoading(false);
+                return;
+            }
+            
+            if (!baseComments || baseComments.length === 0) {
+                console.log("[Comments loadComments] Nenhum comentário base encontrado.");
+                setComments([]);
+                setLoading(false);
+                return;
+            }
+            
+            console.log("[Comments loadComments] Comentários base carregados:", baseComments.length);
+
+            // 2. Extrair IDs de autores únicos
+            const authorIds = [...new Set(baseComments.map(comment => comment.author_id).filter(Boolean))];
+            
+            let profilesMap = {};
+
+            // 3. Buscar perfis dos autores se houver IDs
+            if (authorIds.length > 0) {
+                console.log("[Comments loadComments] Buscando perfis para autores:", authorIds);
+                const { data: profilesData, error: profilesError } = await supabase
+                    .from("profiles")
+                    .select("id, username, avatar_url")
+                    .in("id", authorIds);
+
+                if (profilesError) {
+                    console.error("[Comments] Erro ao buscar perfis dos autores:", {
+                         message: profilesError.message,
+                         details: profilesError.details,
+                         code: profilesError.code,
+                         hint: profilesError.hint,
+                         errorObj: profilesError
+                    });
+                    // Não definir erro fatal aqui, podemos mostrar comentários sem perfil
+                    setError("Erro ao carregar informações de alguns autores."); 
+                } else if (profilesData) {
+                    console.log("[Comments loadComments] Perfis carregados:", profilesData.length);
+                    profilesMap = profilesData.reduce((map, profile) => {
+                        map[profile.id] = profile;
+                        return map;
+                    }, {});
+                }
+            }
+
+            // 4. Combinar comentários com perfis
+            const combinedComments = baseComments.map(comment => ({
+                ...comment,
+                author_profile: profilesMap[comment.author_id] || null // Adiciona perfil ao comentário
+            }));
+
+            console.log("[Comments loadComments] Comentários combinados com perfis:", combinedComments);
+            setComments(combinedComments);
+
         } catch (err) {
-            console.error("Exceção ao carregar comentários:", err);
+            console.error("[Comments] Exceção inesperada ao carregar comentários:", err instanceof Error ? err.message : err, err); 
+            setError("Ocorreu um erro inesperado ao carregar comentários.");
             setComments([]);
+        } finally {
+            setLoading(false);
         }
     };
 
-    async function fetchUsername(uid) {
-        if (!uid) return;
-        
-        try {
-            const { data } = await supabase
-                .from("profiles")
-                .select("username")
-                .eq("id", uid)
-                .single();
+    // fetchUsername não é mais necessário aqui, perfil do usuário logado é buscado separadamente
+    // async function fetchUsername(uid) { ... }
 
-            if (data) {
-                setUsername(data.username);
-            }
-        } catch (err) {
-            console.error("Erro ao buscar nome de usuário:", err);
-        }
-    }
-
-    // Usar a API para adicionar comentários
     async function handleSubmitComment(e) {
         e.preventDefault();
+
+        // Usa o ID do usuário logado diretamente (se disponível)
+        if (!currentUserId) {
+            // Tenta pegar do Supabase auth se não veio via prop (caso de usuário deslogado inicialmente)
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                setError("Você precisa estar logado para comentar");
+                return;
+            }
+            // Se pegou o usuário, usa o ID dele
+            // (Idealmente, a prop userId deveria ser sempre confiável se o usuário estiver logado)
+            // Mas isso adiciona uma camada extra de segurança.
+            if (!currentUserId) {
+                 console.warn("[Comments handleSubmit] Prop userId estava faltando, usando supabase.auth.getUser().id");
+            }
+            // Define o ID ativo para a submissão
+             const activeUserId = currentUserId || user.id;
+             
+             // Validação adicional
+             if (!activeUserId) {
+                  setError("Não foi possível determinar o ID do usuário para comentar.");
+                  return;
+             }
+             
+             // ... (restante da lógica de submissão usando activeUserId)
+             
+        } else {
+             // Se currentUserId veio via prop, usa ele diretamente
+             const activeUserId = currentUserId;
+             // ... (lógica de submissão duplicada - refatorar depois) 
+        }
         
-        // Verificar se está logado
-        const activeUserId = currentUserId || userSession;
-
-        if (!activeUserId) {
-            setError("Você precisa estar logado para comentar");
-            return;
-        }
-
-        if (!newComment.trim()) {
-            setError("O comentário não pode estar vazio");
-            return;
-        }
-
-        setSubmitting(true);
-        setError(null);
-
-        try {
-            // Verificar se ID é válido
-            if (!id) {
-                console.error("ID inválido:", id);
-                throw new Error(`ID do ${type} inválido`);
+        // --- Lógica de Submissão Refatorada (para evitar duplicação) ---
+        const submitLogic = async (activeUserId) => {
+             if (!newComment.trim()) {
+                setError("O comentário não pode estar vazio");
+                return;
             }
-
-            // Preparar dados para a API
-            const commentData = {
-                text: newComment,
-                authorId: activeUserId,
-                parentId: replyTo ? replyTo.id : null,
-            };
-
-            // Adicionar o ID adequado com base no tipo de comentário
-            if (type === "chapter") {
-                commentData.chapterId = id;
-            } else if (type === "series") {
-                commentData.seriesId = id;
-            } else {
-                commentData.storyId = id;
+    
+            setSubmitting(true);
+            setError(null);
+    
+            try {
+                if (!id || !type) {
+                    console.error("[Comments] handleSubmit: ID ou Tipo inválido", { id, type });
+                    throw new Error(`ID (${id}) ou Tipo (${type}) inválido`);
+                }
+    
+                const commentData = {
+                    text: newComment,
+                    author_id: activeUserId, // API espera author_id (com underscore)
+                    parent_id: replyTo ? replyTo.id : null, // API espera parent_id
+                    ...(type === 'story' && { story_id: id }),
+                    ...(type === 'chapter' && { chapter_id: id }),
+                    ...(type === 'series' && { series_id: id }),
+                };
+    
+                // Verificar se API espera storyId ou story_id, etc. Ajustar aqui se necessário.
+                // Baseado na leitura anterior da API, parece esperar com underscore.
+                 if (!commentData.story_id && !commentData.chapter_id && !commentData.series_id) {
+                    console.error("[Comments] Nenhum ID de conteúdo (_id) foi definido para o tipo:", type, "ID:", id);
+                    throw new Error(`Tipo de conteúdo inválido ou não suportado: ${type}`);
+                 }
+    
+                console.log("[Comments] Enviando comentário para API:", commentData);
+    
+                const response = await fetch("/api/comments", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(commentData),
+                });
+    
+                const result = await response.json();
+                console.log("[Comments] Resposta da API de comentários:", result);
+    
+                if (!response.ok) {
+                    const errorMessage =
+                        result.error || "Erro ao adicionar comentário";
+                    const errorDetails = result.details
+                        ? JSON.stringify(result.details)
+                        : "";
+                    throw new Error(`${errorMessage} ${errorDetails}`);
+                }
+    
+                setNewComment("");
+                setReplyTo(null);
+                setSuccess(true);
+    
+                await loadComments(); // Recarrega comentários após sucesso
+    
+                setTimeout(() => {
+                    setSuccess(false);
+                }, 3000);
+            } catch (err) {
+                console.error("Erro detalhado ao submeter:", err);
+                setError(`Erro ao enviar: ${err.message}`);
+            } finally {
+                setSubmitting(false);
             }
-
-            console.log("Enviando para API:", commentData);
-
-            // Fazer requisição para a API
-            const response = await fetch("/api/comments", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(commentData),
-            });
-
-            const result = await response.json();
-            console.log("Resposta da API:", result);
-
-            if (!response.ok) {
-                const errorMessage =
-                    result.error || "Erro ao adicionar comentário";
-                const errorDetails = result.details
-                    ? JSON.stringify(result.details)
-                    : "";
-                throw new Error(`${errorMessage} ${errorDetails}`);
-            }
-
-            // Sucesso!
-            setNewComment("");
-            setReplyTo(null);
-            setSuccess(true);
-
-            // Recarregar comentários
-            await loadComments();
-
-            setTimeout(() => {
-                setSuccess(false);
-            }, 3000);
-        } catch (err) {
-            console.error("Erro detalhado:", err);
-            setError(`Erro: ${err.message}`);
-        } finally {
-            setSubmitting(false);
+        };
+        
+        // Determina o ID do usuário e chama a lógica de submissão
+        if (currentUserId) {
+             submitLogic(currentUserId);
+        } else {
+             const { data: { user } } = await supabase.auth.getUser();
+             if (user) {
+                 submitLogic(user.id);
+             } else {
+                  setError("Você precisa estar logado para comentar");
+             }
         }
+       // --- Fim da Lógica Refatorada ---
     }
 
-    // Função para iniciar uma resposta a um comentário
     const handleReply = (comment) => {
+        // Usa author_profile que agora está nos dados combinados
         setReplyTo(comment);
-        setNewComment(`@${comment.profiles?.username || "Usuário"} `);
+        setNewComment(`@${comment.author_profile?.username || "Usuário"} `);
     };
 
-    // Cancelar resposta
     const cancelReply = () => {
         setReplyTo(null);
         setNewComment("");
     };
 
-    // Renderizar comentários hierarquicamente
-    const renderComments = () => {
-        // Agrupar comentários por hierarquia
-        const commentMap = {};
-        const rootComments = [];
-
-        // Mapear todos os comentários por ID
-        comments.forEach((comment) => {
-            const commentWithReplies = { ...comment, replies: [] };
-            commentMap[comment.id] = commentWithReplies;
-
-            if (!comment.parent_id) {
-                rootComments.push(commentWithReplies);
-            }
-        });
-
-        // Adicionar respostas aos pais
-        comments.forEach((comment) => {
-            if (comment.parent_id && commentMap[comment.parent_id]) {
-                commentMap[comment.parent_id].replies.push(
-                    commentMap[comment.id]
-                );
-            }
-        });
-
-        // Renderizar recursivamente
-        const renderComment = (comment, level = 0) => (
+    // Função recursiva para renderizar comentários e suas respostas
+    const renderCommentsRecursive = (commentList, level = 0) => {
+        return commentList.map((comment) => (
             <div
                 key={comment.id}
-                className={`border-b border-[#E5E7EB] py-6 ${
-                    level > 0 ? "pl-6 md:pl-12" : ""
-                }`}
+                className={`py-4 ${level > 0 ? "pl-6 md:pl-10 border-l border-border ml-4 md:ml-6" : "border-b border-border"}`}
             >
-                <div className="mb-4">
-                    <div className="flex justify-between mb-2">
+                <div className="mb-3">
+                    <div className="flex justify-between items-center mb-1">
                         <div className="flex items-center gap-2">
-                            {comment.profiles?.avatar_url ? (
+                            {/* Usa author_profile */}
+                            {comment.author_profile?.avatar_url ? (
                                 <img
-                                    src={comment.profiles.avatar_url}
-                                    alt={
-                                        comment.profiles?.username || "Usuário"
-                                    }
+                                    src={comment.author_profile.avatar_url}
+                                    alt={comment.author_profile?.username || "Usuário"}
                                     className="w-8 h-8 rounded-full object-cover"
                                 />
                             ) : (
-                                <div className="w-8 h-8 rounded-full bg-[#484DB5] text-white flex items-center justify-center text-sm">
-                                    {(comment.profiles?.username || "A")
+                                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium">
+                                    {(comment.author_profile?.username || "A")
                                         .charAt(0)
                                         .toUpperCase()}
                                 </div>
                             )}
-                            <span className="font-medium">
-                                {comment.profiles?.username || "Usuário"}
+                            <span className="font-medium text-gray-800">
+                                {comment.author_profile?.username || "Usuário Anônimo"} 
                             </span>
                         </div>
-                        <span className="text-sm text-gray-500">
-                            {new Date(comment.created_at).toLocaleDateString(
-                                "pt-BR"
-                            )}
+                        <span className="text-xs text-gray-500">
+                            {new Date(comment.created_at).toLocaleDateString("pt-BR", { day: '2-digit', month: 'short', year: 'numeric' })}
                         </span>
                     </div>
-                    <p className="text-gray-800 mt-2">{comment.text}</p>
+                    <p className="text-gray-700 pl-10">{comment.text}</p> {/* Leve indentação do texto */}
                     {currentUserId && (
-                        <div className="mt-3">
+                        <div className="mt-2 pl-10"> {/* Leve indentação do botão */}
                             <button
                                 onClick={() => handleReply(comment)}
-                                className="flex items-center gap-1 text-sm text-gray-500 hover:text-[#484DB5] transition-colors duration-200"
+                                className="flex items-center gap-1 text-xs text-gray-500 hover:text-primary transition-colors duration-200"
                             >
-                                <Reply size={14} />
+                                <Reply size={12} />
                                 <span>Responder</span>
                             </button>
                         </div>
                     )}
                 </div>
 
-                {/* Renderizar respostas recursivamente */}
+                {/* Renderiza respostas recursivamente */}
                 {comment.replies && comment.replies.length > 0 && (
-                    <div className="border-l-2 border-[#E5E7EB] pl-4 ml-4">
-                        {comment.replies.map((reply) =>
-                            renderComment(reply, level + 1)
-                        )}
-                    </div>
+                     renderCommentsRecursive(comment.replies, level + 1)
                 )}
             </div>
-        );
-
-        return rootComments.map((comment) => renderComment(comment));
+        ));
     };
+    
+    // Processa a lista plana de comentários em uma estrutura aninhada
+    const getNestedComments = () => {
+        const commentMap = {};
+        const rootComments = [];
+
+        comments.forEach((comment) => {
+            // Adiciona a propriedade replies a cada comentário
+            commentMap[comment.id] = { ...comment, replies: [] }; 
+        });
+
+        comments.forEach((comment) => {
+            if (comment.parent_id && commentMap[comment.parent_id]) {
+                 // Adiciona a resposta ao array replies do pai
+                commentMap[comment.parent_id].replies.push(commentMap[comment.id]);
+            } else if (!comment.parent_id) {
+                // Adiciona comentários raiz à lista
+                rootComments.push(commentMap[comment.id]);
+            }
+        });
+        
+        return rootComments;
+    };
+
+    const nestedComments = getNestedComments();
 
     return (
         <div>
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
                 <MessageSquare size={24} />
-                <span>Comentários ({comments.length})</span>
+                {/* Usa comments.length para contagem total, não apenas raiz */}
+                <span>Comentários ({comments.length})</span> 
             </h2>
 
             <div className="mb-8">
                 {replyTo && (
-                    <div className="flex justify-between items-center bg-blue-50 p-3 rounded-md mb-4 border border-[#E5E7EB]">
+                    <div className="flex justify-between items-center bg-blue-50 p-3 rounded-md mb-4 border border-border">
                         <span className="text-sm">
                             Respondendo para{" "}
-                            <span className="font-medium">{replyTo.profiles?.username || "Usuário"}</span>
+                            <span className="font-medium">{replyTo.author_profile?.username || "Usuário"}</span>
                         </span>
                         <button
                             type="button"
@@ -355,38 +447,28 @@ export default function Comments({
                     </div>
                 )}
 
-                {!currentUserId ? (
-                    <div className="border border-[#E5E7EB] rounded-md p-6 text-center">
-                        <p className="mb-4 text-gray-700">
-                            Para deixar um comentário é preciso estar logado
-                        </p>
-                        <Link 
-                            href="/login" 
-                            className="inline-block h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-colors duration-200 flex items-center justify-center"
-                        >
-                            Fazer login
-                        </Link>
-                    </div>
-                ) : (
+                {/* Formulário de Comentário (Apenas para usuários logados) */}
+                {currentUserId ? (
                     <form onSubmit={handleSubmitComment} className="mb-6">
                         <textarea
                             ref={commentInputRef}
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
-                            placeholder="Escreva seu comentário..."
+                            placeholder={replyTo ? `Respondendo a ${replyTo.author_profile?.username || "Usuário"}...` : "Escreva seu comentário..."}
                             disabled={submitting}
-                            className="w-full p-3 border border-[#E5E7EB] rounded-md min-h-[120px] focus:ring-2 focus:ring-[#484DB5] focus:border-transparent outline-none resize-y transition-all duration-200"
+                            className="w-full p-3 border border-border rounded-md min-h-[100px] focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-y transition-all duration-200 bg-white"
                             required
                         />
                         
                         <div className="flex justify-between items-center mt-3">
                             <span className="text-sm text-gray-500">
-                                Comentando como <span className="font-medium">{username || "Usuário"}</span>
+                                Comentando como{" "}
+                                <span className="font-medium">{userProfile?.username || "Usuário"}</span>
                             </span>
                             <button
                                 type="submit"
                                 disabled={submitting || !newComment.trim()}
-                                className="h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 flex items-center"
+                                className="h-10 px-5 bg-primary text-white rounded-md hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 flex items-center font-medium"
                             >
                                 {submitting ? (
                                     <>
@@ -394,31 +476,44 @@ export default function Comments({
                                         <span>Enviando...</span>
                                     </>
                                 ) : (
-                                    "Comentar"
+                                    replyTo ? "Responder" : "Comentar"
                                 )}
                             </button>
                         </div>
                     </form>
-                )}
+                 ) : (
+                     <div className="border border-border rounded-md p-6 text-center bg-gray-50">
+                         <p className="mb-4 text-gray-700">
+                             Para deixar um comentário, por favor{" "}
+                             <Link href="/login" className="text-primary hover:underline font-medium">faça login</Link>.
+                         </p>
+                     </div>
+                 )}
             </div>
 
-            {comments.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 border-t border-b border-[#E5E7EB]">
+            {/* Lista de Comentários */}            
+            {loading ? (
+                <div className="text-center py-8 text-gray-500"><p>Carregando comentários...</p></div>
+            ) : nestedComments.length === 0 ? (
+                <div className="text-center py-8 text-gray-500 border-t border-border">
                     <p>Nenhum comentário ainda. Seja o primeiro a comentar!</p>
                 </div>
             ) : (
-                <div className="divide-y divide-[#E5E7EB]">
-                    {renderComments()}
+                <div className="border-t border-border">
+                    {renderCommentsRecursive(nestedComments)}
                 </div>
             )}
 
-            <button 
-                onClick={loadComments} 
-                className="mt-6 flex items-center gap-2 text-[#484DB5] hover:underline transition-all duration-200"
-            >
-                <RefreshCw size={16} />
-                <span>Atualizar comentários</span>
-            </button>
+            {!loading && (
+                <button 
+                    onClick={loadComments} 
+                    disabled={loading}
+                    className="mt-6 flex items-center gap-2 text-primary hover:underline transition-all duration-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+                >
+                    <RefreshCw size={14} className={loading ? "animate-spin" : ""}/>
+                    <span>Atualizar comentários</span>
+                </button>
+            )}
         </div>
     );
 }

@@ -52,8 +52,8 @@ export async function GET(request) {
             throw updateError;
         }
 
-        // Redirecionar de volta para a página da série
-        return NextResponse.redirect(new URL(`/series/${id}`, request.url));
+        // Redireciona para a página da obra após completar
+        return NextResponse.redirect(new URL(`/obra/${id}`, request.url));
     } catch (error) {
         console.error("Erro ao completar série:", error);
         return new Response(`Erro ao completar série: ${error.message}`, {

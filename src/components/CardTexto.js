@@ -2,13 +2,22 @@ import Link from 'next/link';
 import { MessageSquare, BookText } from 'lucide-react';
 import { formatDate, generateSlug } from '@/lib/utils';
 
+// Função auxiliar para capitalizar a primeira letra
+const capitalize = (str) => {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
 // Função auxiliar para determinar o texto e estilo do badge
-const getBadgeInfo = (type, chapterNumber, seriesTitle) => {
+const getBadgeInfo = (type, chapterNumber, seriesTitle, seriesType) => {
+    const baseStyle = 'bg-primary text-white';
+
     if (type === 'story') {
-        return { text: 'Conto Único', style: 'bg-indigo-600 text-white' };
+        return { text: 'Conto Único', style: baseStyle };
     }
     if (type === 'chapter' && seriesTitle && chapterNumber) {
-        return { text: `Capítulo ${chapterNumber}`, style: 'bg-indigo-600 text-white' };
+        const prefix = seriesType ? `${capitalize(seriesType)} - ` : '';
+        return { text: `${prefix}Cap. ${chapterNumber}`, style: baseStyle };
     }
     // Adicionar outros tipos (livro, novela) se necessário
     return { text: '', style: '' }; // Padrão ou para séries completas (sem badge no card?)
@@ -16,19 +25,27 @@ const getBadgeInfo = (type, chapterNumber, seriesTitle) => {
 
 // Função auxiliar para determinar o link
 const getLinkHref = (type, title, id, seriesId, seriesTitle) => {
-    if (type === 'story') {
-        return `/story/${generateSlug(title, id)}`;
+    let linkUrl = "#";
+    // const slug = generateSlug(title, id);
+
+    switch (type) {
+        case "story":
+            // Histórias únicas (sem série) vão para /ler/id
+            linkUrl = `/ler/${id}`;
+            break;
+        case "series":
+            // Páginas de detalhes da série vão para /obra/slug
+            linkUrl = `/obra/${generateSlug(title, id)}`; // Mantém o slug aqui para /obra/
+            break;
+        case "chapter":
+            // Capítulos vão para /ler/slug
+            linkUrl = `/ler/${generateSlug(title, id)}`; // Atualizado para /ler/
+            break;
+        default:
+            console.warn(`Tipo de card desconhecido: ${type}`);
+            linkUrl = "#";
     }
-    if (type === 'chapter') {
-        // Idealmente, o link do capítulo deveria incluir o slug da série também
-        // Ex: /series/[series-slug]/chapter/[chapter-slug]
-        // Por enquanto, vamos usar o link direto do capítulo:
-        return `/chapter/${generateSlug(title, id)}`;
-    }
-     if (type === 'series') {
-        return `/series/${generateSlug(title, id)}`;
-    }
-    return '#'; // Fallback
+    return linkUrl;
 };
 
 
@@ -43,12 +60,13 @@ export default function CardTexto({
     seriesTitle, // Apenas para chapter
     chapterNumber, // Apenas para chapter
     seriesId, // Apenas para chapter/series
+    seriesType,
     coverUrl, // Apenas para series (no SeriesHighlights) - NÃO USADO NESTE CARD PADRÃO
     genre, // Apenas para series (no SeriesHighlights) - NÃO USADO NESTE CARD PADRÃO
     viewCount, // Apenas para series (no SeriesHighlights) - NÃO USADO NESTE CARD PADRÃO
     status, // Apenas para series (no SeriesHighlights) - NÃO USADO NESTE CARD PADRÃO
 }) {
-    const badge = getBadgeInfo(type, chapterNumber, seriesTitle);
+    const badge = getBadgeInfo(type, chapterNumber, seriesTitle, seriesType);
     const href = getLinkHref(type, title, id, seriesId, seriesTitle);
 
     return (

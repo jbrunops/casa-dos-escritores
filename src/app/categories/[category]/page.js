@@ -410,11 +410,9 @@ export default async function CategoryPage({ params, searchParams }) {
                     <div className="space-y-4">
                         {paginatedResults.map((item) => (
                             <Link
-                                href={item.type === 'story' 
-                                    ? `/story/${generateSlug(item.title, item.id)}`
-                                    : item.type === 'series'
-                                    ? `/series/${generateSlug(item.title, item.id)}`
-                                    : `/chapter/${item.id}`
+                                href={item.type === 'series'
+                                    ? `/obra/${generateSlug(item.title, item.id)}`
+                                    : `/ler/${item.id}`
                                 }
                                 key={`${item.type}-${item.id}`}
                                 className="block p-4 bg-white border border-[#E5E7EB] rounded-md shadow-sm hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-1 relative overflow-hidden group"

@@ -427,9 +427,9 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="flex items-center mt-4 sm:mt-0">
-                    <Link href="/dashboard/new" className="h-10 px-4 flex items-center bg-[#484DB5] text-white rounded-md hover:bg-opacity-90">
+                    <Link href="/write" className="h-10 px-4 flex items-center bg-primary text-white rounded-md hover:bg-primary/90 transition-colors">
                         <PlusCircle size={20} className="mr-2" />
-                        <span>Nova História</span>
+                        <span>Escrever Novo Texto</span>
                     </Link>
                 </div>
             </div>
@@ -576,7 +576,7 @@ export default function DashboardPage() {
                                     </Link>
 
                                     <Link
-                                        href={`/dashboard/edit/${story.id}`}
+                                        href={`/edit/story/${story.id}`}
                                         className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB]"
                                         title="Editar"
                                     >
@@ -626,10 +626,12 @@ export default function DashboardPage() {
                         </div>
                     </div>
                     <div className="mt-6 text-center">
-                        <Link href="/dashboard/new-series" className="h-10 px-4 inline-flex items-center bg-[#484DB5] text-white rounded-md hover:bg-opacity-90">
+                        {/* Removido Link para /dashboard/new-series */}
+                        {/* <Link href="/dashboard/new-series" className="h-10 px-4 inline-flex items-center bg-[#484DB5] text-white rounded-md hover:bg-opacity-90">
                             <Plus size={20} className="mr-2" />
                             <span>Criar nova série</span>
-                        </Link>
+                        </Link> */}
+                        {/* O botão único já está no topo */}
                     </div>
                 </div>
             </div>

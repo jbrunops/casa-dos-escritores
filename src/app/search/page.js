@@ -210,7 +210,7 @@ export default async function SearchPage({ searchParams }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {series.map((serie) => (
                         <Link
-                          href={`/series/${generateSlug(serie.title, serie.id)}`}
+                          href={`/obra/${generateSlug(serie.title, serie.id)}`}
                           key={serie.id}
                           className="flex items-start p-4 bg-white rounded-lg border border-[#E5E7EB] hover:shadow-md transition-all duration-200"
                         >
@@ -226,7 +226,9 @@ export default async function SearchPage({ searchParams }) {
                             </div>
                           )}
                           <div>
-                            <h3 className="font-medium text-gray-900">{serie.title}</h3>
+                            <Link href={`/obra/${generateSlug(serie.title, serie.id)}`} className="hover:text-primary">
+                              <h3 className="text-lg font-semibold mb-1 line-clamp-2">{serie.title}</h3>
+                            </Link>
                             {serie.description && (
                               <p className="text-sm text-gray-500 line-clamp-2">
                                 {serie.description}
@@ -246,11 +248,13 @@ export default async function SearchPage({ searchParams }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {chapters.map((chapter) => (
                         <Link
-                          href={`/chapter/${generateSlug(chapter.title, chapter.id)}`}
+                          href={`/ler/${generateSlug(chapter.title, chapter.id)}`}
                           key={chapter.id}
                           className="flex flex-col p-4 bg-white rounded-lg border border-[#E5E7EB] hover:shadow-md transition-all duration-200"
                         >
-                          <h3 className="font-medium text-gray-900">{chapter.title}</h3>
+                          <Link href={`/ler/${generateSlug(chapter.title, chapter.id)}`} className="hover:text-primary">
+                            <h4 className="text-md font-medium mb-1 line-clamp-1">Cap. {chapter.chapter_number}: {chapter.title}</h4>
+                          </Link>
                           <p className="text-sm text-gray-500 line-clamp-2">
                             {createSummary(chapter.content)}
                           </p>

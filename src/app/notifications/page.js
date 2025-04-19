@@ -159,36 +159,42 @@ export default function NotificationsPage() {
             case "reply":
                 // Para histórias
                 if (notification.additional_data?.story_id) {
-                    return `/story/${generateSlug(
-                        notification.additional_data?.story_title || "",
-                        notification.additional_data?.story_id
-                    )}`;
+                    return `/ler/${notification.additional_data.story_id}`;
                 }
                 // Para séries
                 if (notification.additional_data?.series_id) {
-                    return `/series/${notification.additional_data.series_id}`;
+                    return `/obra/${notification.additional_data.series_id}`;
                 }
                 // Para capítulos
                 if (notification.additional_data?.chapter_id) {
-                    return `/chapter/${notification.additional_data.chapter_id}`;
+                    return `/ler/${notification.additional_data.chapter_id}`;
                 }
                 // Fallback para o ID relacionado se disponível
                 return notification.related_id 
-                    ? `/story/${notification.related_id}` 
+                    ? `/ler/${notification.related_id}` 
                     : "/dashboard";
             case "follow":
-                if (notification.additional_data?.username) {
-                    return `/profile/${notification.additional_data.username}`;
+                if (notification.additional_data?.follower_username) {
+                    return `/profile/${notification.additional_data.follower_username}`;
                 }
                 return "/profile";
             case "like":
                 if (notification.additional_data?.story_id) {
-                    return `/story/${generateSlug(
-                        notification.additional_data?.story_title || "",
-                        notification.additional_data?.story_id
-                    )}`;
+                    return `/ler/${notification.additional_data.story_id}`;
                 }
                 return "/dashboard";
+            case "new_chapter":
+            case "chapter_comment":
+            case "chapter_mention":
+                return notification.additional_data?.chapter_id ? `/ler/${notification.additional_data.chapter_id}` : '#';
+            case "new_series":
+            case "series_comment":
+            case "series_mention":
+                return notification.additional_data?.series_id ? `/obra/${notification.additional_data.series_id}` : '#';
+            case "new_story":
+            case "story_comment":
+            case "story_mention":
+                return notification.additional_data?.story_id ? `/ler/${notification.additional_data.story_id}` : '#';
             default:
                 return "/dashboard";
         }

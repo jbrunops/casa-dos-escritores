@@ -117,53 +117,49 @@ export default function WriteChapterPage() {
         const { title, content, isDraft } = formData;
         
         try {
-            // Determinar o número do próximo capítulo
             const { count, error: countError } = await supabase
                 .from('chapters')
                 .select('*' , { count: 'exact', head: true })
                 .eq('series_id', seriesId);
 
-            if (countError) throw new Error("Erro ao contar capítulos existentes: " + countError.message);
+            if (countError) {
+                throw new Error("Erro ao contar capítulos existentes: " + countError.message);
+            }
 
             const chapterNumber = (count ?? 0) + 1;
 
-            // Inserir o novo capítulo
+            const chapterInsertData = {
+                title,
+                content,
+                series_id: seriesId,
+                author_id: user.id,
+                chapter_number: chapterNumber
+            };
+
             const { data, error } = await supabase
                 .from("chapters")
-                .insert({
-                    title,
-                    content,
-                    series_id: seriesId,
-                    author_id: user.id,
-                    is_published: !isDraft,
-                    chapter_number: chapterNumber
-                })
+                .insert(chapterInsertData)
                 .select();
 
-            if (error) throw error;
+            if (error) {
+                throw error;
+            }
 
-            // Notificar seguidores sobre novo capítulo (se publicado)
             if (!isDraft && data[0]) {
                 await notifyFollowersNewChapter(
                     user.id, 
-                    data[0].id, // ID do capítulo criado
-                    title, // Título do capítulo
-                    seriesId, // ID da série (já temos)
-                    seriesInfo.title // Título da série (buscamos no useEffect)
+                    data[0].id,
+                    title,
+                    seriesId,
+                    seriesInfo.title
                 );
             }
 
-            // Redirecionar após pausa
-            setTimeout(() => {
-                 if (isDraft) {
-                    router.push(`/dashboard`); // Ou para a página da série no dashboard
-                } else {
-                    // Idealmente, redirecionar para a página do capítulo recém-criado
-                    // Ex: /series/[slug-serie]/chapters/[slug-capitulo]
-                    // Por ora, redirecionar para a página da série:
-                    router.push(`/series/${generateSlug(seriesInfo.title, seriesId)}`);
-                }
-            }, 1500);
+            if (data && data.length > 0) {
+                router.push(`/ler/${generateSlug(title, data[0].id)}`);
+            } else {
+                router.push(`/obra/${generateSlug(seriesInfo.title, seriesId)}`);
+            }
 
             return {
                 success: true,
@@ -171,10 +167,10 @@ export default function WriteChapterPage() {
             };
 
         } catch (err) {
-            console.error("Erro ao salvar capítulo:", err);
+            console.error("[WriteChapterPage] Erro CAPTURADO no handleChapterSubmit:", err);
             return {
                 success: false,
-                message: err.message || "Ocorreu um erro ao salvar o capítulo"
+                message: err?.message || "Ocorreu um erro ao salvar o capítulo. Verifique o console para detalhes."
             };
         }
     };
@@ -200,11 +196,15 @@ export default function WriteChapterPage() {
         <ContentEditor
             type="chapter" // Indica ao editor que é um capítulo
             headerTitle={`Adicionar Capítulo ${seriesInfo ? ': ' + seriesInfo.title : ''}`}
-            backPath={`/series/${generateSlug(seriesInfo.title, seriesId)}`} // Volta para a página da série
-            backLabel="Voltar para a Série"
+            backPath={`/obra/${generateSlug(seriesInfo.title, seriesId)}`} // Atualizado para /obra/
+            backLabel="Voltar para a Obra"
             onSubmit={handleChapterSubmit}
-            // Passar seriesId ou outras infos se o ContentEditor precisar
-            seriesId={seriesId} 
+            chapterData={null} // Novo capítulo
+            seriesId={seriesId}
+            seriesInfo={seriesInfo} // Passa info da série para o form (para link Voltar)
+            onSuccess={(chapterId, chapterTitle) => {
+                 router.push(`/ler/${generateSlug(chapterTitle, chapterId)}`);
+            }}
         />
     );
 } 

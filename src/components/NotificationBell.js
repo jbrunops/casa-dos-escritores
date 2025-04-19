@@ -272,13 +272,15 @@ export default function NotificationBell() {
                 }
                 return "/dashboard";
             case "new_chapter":
-                if (notification.additional_data?.chapter_id) {
-                    return `/chapter/${notification.additional_data.chapter_id}`;
-                }
-                if (notification.additional_data?.series_id) {
-                    return `/series/${notification.additional_data.series_id}`;
-                }
-                return "/dashboard";
+            case "chapter_comment":
+            case "chapter_mention":
+                return `/ler/${notification.additional_data.chapter_id}`;
+            case "follow":
+                return `/profile/${notification.additional_data.follower_username}`;
+            case "new_series":
+            case "series_comment":
+            case "series_mention":
+                return `/obra/${notification.additional_data.series_id}`;
             default:
                 return "/dashboard";
         }

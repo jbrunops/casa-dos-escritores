@@ -30,7 +30,8 @@ export default function ContentEditor({
     backPath = "/dashboard",
     backLabel = "Voltar ao Dashboard",
     headerTitle = "Criar Novo Conteúdo",
-    requireCategory = true
+    requireCategory = true,
+    initialData = null
 }) {
     // Estados comuns
     const [currentTitle, setCurrentTitle] = useState(title);
@@ -53,6 +54,7 @@ export default function ContentEditor({
     const [tagInput, setTagInput] = useState("");
     const [coverFile, setCoverFile] = useState(null);
     const [coverPreview, setCoverPreview] = useState("");
+    const [currentSeriesType, setCurrentSeriesType] = useState('');
     
     // Estados específicos para capítulos
     const [chapterNumber, setChapterNumber] = useState(1);
@@ -61,6 +63,26 @@ export default function ContentEditor({
 
     const router = useRouter();
     const supabase = createBrowserClient();
+
+    // >>> ADICIONAR useEffect para popular estados com initialData <<<
+    useEffect(() => {
+        if (initialData) {
+            console.log("[ContentEditor] Recebido initialData:", initialData);
+            setCurrentTitle(initialData.title || '');
+            setCurrentContent(initialData.content || '');
+            setCurrentDescription(initialData.description || '');
+            setCurrentCategory(initialData.category || initialData.genre || ''); // Usa category ou genre
+            setTags(initialData.tags || []);
+            setCoverPreview(initialData.cover_url || '');
+            setCurrentSeriesType(initialData.series_type || '');
+            // Definir chapterNumber se for edição de capítulo (embora campo tenha sido removido da UI)
+            if (type === 'chapter') {
+                setChapterNumber(initialData.chapter_number || 1);
+            }
+            // Resetar formTouched ao carregar dados iniciais para evitar aviso de saída prematuro
+            setFormTouched(false); 
+        }
+    }, [initialData, type]); // Depende de initialData e type
 
     // Lista de categorias disponíveis
     const categories = [
@@ -206,152 +228,37 @@ export default function ContentEditor({
         try {
             // Se um callback de envio personalizado foi fornecido, use-o
             if (onSubmit) {
-                await onSubmit({
+                // Passando um objeto com os dados relevantes para a função pai
+                const result = await onSubmit({
                     title: currentTitle,
                     content: currentContent,
                     category: currentCategory,
                     description: currentDescription,
                     tags,
                     coverFile,
-                    chapterNumber,
+                    seriesType: currentSeriesType,
                     isDraft,
-                    seriesId
+                    seriesId,
+                    // Passa o ID do conteúdo sendo editado, se disponível em initialData
+                    id: initialData?.id,
+                    // Passa o estado de completude se for edição de série
+                    isCompleted: initialData?.is_completed 
                 });
-                return;
-            }
-
-            // Implementação padrão se nenhum callback for fornecido
-            const {
-                data: { user },
-            } = await supabase.auth.getUser();
-
-            if (!user) throw new Error("Você precisa estar logado");
-
-            // Lógica baseada no tipo de conteúdo
-            if (type === "story") {
-                const { data, error } = await supabase
-                    .from("stories")
-                    .insert({
-                        title: currentTitle,
-                        content: currentContent,
-                        category: currentCategory || "Sem categoria",
-                        author_id: user.id,
-                        is_published: !isDraft,
-                    })
-                    .select();
-
-                if (error) throw error;
-
-                setSuccess(
-                    isDraft
-                        ? "História salva como rascunho com sucesso!"
-                        : "História publicada com sucesso!"
-                );
-
-                // Redirecionar após uma breve pausa
-                setTimeout(() => {
-                    if (isDraft) {
-                        router.push(`/dashboard`);
-                    } else {
-                        router.push(`/story/${data[0].id}`);
-                    }
-                }, 1500);
-            }
-            else if (type === "series") {
-                // Upload da capa, se fornecida
-                let coverUrl = null;
-                if (coverFile) {
-                    try {
-                        const formData = new FormData();
-                        formData.append('file', coverFile);
-                        formData.append('userId', user.id);
-                        
-                        const response = await fetch('/api/upload', {
-                            method: 'POST',
-                            body: formData
-                        });
-                        
-                        if (!response.ok) {
-                            const errorData = await response.json();
-                            throw new Error(errorData.error || 'Erro no upload da imagem');
-                        }
-                        
-                        const data = await response.json();
-                        coverUrl = data.url;
-                        
-                        if (!coverUrl) {
-                            throw new Error("Não foi possível obter URL da imagem");
-                        }
-                    } catch (uploadErr) {
-                        console.error("Erro no upload da capa:", uploadErr);
-                        setError(`Erro no upload da imagem: ${uploadErr.message}`);
-                        setSaving(false);
-                        setPublishing(false);
-                        return;
-                    }
+                 // Tratar resultado do onSubmit personalizado (opcional, depende da implementação pai)
+                if (result && result.success) {
+                    setSuccess(result.message);
+                } else if (result && !result.success) {
+                    setError(result.message || 'Ocorreu um erro no processo.');
                 }
-
-                // Criar série
-                const { data, error } = await supabase
-                    .from("series")
-                    .insert({
-                        title: currentTitle,
-                        description: currentDescription,
-                        genre: currentCategory,
-                        tags,
-                        author_id: user.id,
-                        cover_url: coverUrl,
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString(),
-                    })
-                    .select();
-
-                if (error) throw error;
-
-                setSuccess("Série criada com sucesso!");
-
-                // Redirecionar após breve pausa
-                setTimeout(() => {
-                    router.push(`/dashboard/new-chapter/${data[0].id}`);
-                }, 1500);
-            }
-            else if (type === "chapter") {
-                // Inserir novo capítulo
-                const { data, error } = await supabase
-                    .from("chapters")
-                    .insert({
-                        title: currentTitle,
-                        content: currentContent,
-                        chapter_number: chapterNumber,
-                        series_id: seriesId,
-                        author_id: user.id,
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString(),
-                    })
-                    .select();
-
-                if (error) throw error;
-
-                // Atualizar timestamp da série
-                const { error: updateError } = await supabase
-                    .from("series")
-                    .update({ updated_at: new Date().toISOString() })
-                    .eq("id", seriesId);
-
-                if (updateError) {
-                    console.error("Erro ao atualizar timestamp da série:", updateError);
-                }
-
-                setSuccess("Capítulo criado com sucesso!");
-
-                // Redirecionar após uma breve pausa
-                setTimeout(() => {
-                    router.push(`/series/${seriesId}`);
-                }, 1500);
+                // Não retornar aqui ainda, o finally precisa executar
+            } else {
+                 // --- REMOVER CÓDIGO MORTO (Lógica de handleSubmit padrão) --- 
+                 console.warn("[ContentEditor] onSubmit não foi fornecido. Nenhuma ação padrão será executada.");
+                 // A lógica padrão que interagia com Supabase foi REMOVIDA daqui.
             }
         } catch (err) {
-            setError(err.message || `Ocorreu um erro ao salvar ${type === "story" ? "a história" : type === "series" ? "a série" : "o capítulo"}`);
-            console.error("Erro:", err);
+            setError(err.message || `Ocorreu um erro ao processar a submissão`);
+            console.error("Erro no handleSubmit do ContentEditor:", err);
         } finally {
             setPublishing(false);
             setSaving(false);
@@ -429,28 +336,32 @@ export default function ContentEditor({
                             </select>
                         </div>
                     )}
-
-                    {type === "chapter" && seriesId && (
-                        <div className="space-y-2">
-                            <label htmlFor="chapterNumber" className="block text-sm font-medium text-gray-700">
-                                Número do Capítulo*
-                            </label>
-                            <input
-                                id="chapterNumber"
-                                type="number"
-                                min="1"
-                                value={chapterNumber}
-                                onChange={(e) => setChapterNumber(parseInt(e.target.value))}
-                                className="w-full h-10 px-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200"
-                                required
-                            />
-                        </div>
-                    )}
                 </div>
 
                 {/* Campos específicos para séries */}
                 {type === "series" && (
                     <>
+                        <div className="space-y-2">
+                            <label htmlFor="seriesType" className="block text-sm font-medium text-gray-700">
+                                Tipo de Obra*
+                            </label>
+                            <select
+                                id="seriesType"
+                                value={currentSeriesType}
+                                onChange={(e) => setCurrentSeriesType(e.target.value)}
+                                className="w-full h-10 px-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200"
+                                required
+                            >
+                                <option value="">Selecione o tipo</option>
+                                <option value="livro">Livro</option>
+                                <option value="novela">Novela</option>
+                                <option value="serie">Série</option> { /* Ou 'Série de TV', etc */}
+                            </select>
+                            <p className="text-xs text-gray-500 mt-1">
+                                Como você classifica esta obra em capítulos?
+                            </p>
+                        </div>
+
                         <div className="space-y-2">
                             <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                                 Descrição da Série

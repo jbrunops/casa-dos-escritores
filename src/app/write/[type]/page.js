@@ -75,7 +75,12 @@ export default function WritePage() {
 
             } else if (type === 'series') {
                 // --- Lógica para criar SÉRIE --- 
-                const { title, description, category, tags, coverFile } = formData;
+                const { title, description, category, tags, coverFile, seriesType } = formData;
+
+                // Validar se o seriesType foi selecionado
+                if (!seriesType) {
+                    throw new Error("Por favor, selecione o tipo da obra (Livro, Novela ou Série).");
+                }
 
                 // Upload da capa, se fornecida
                 let coverUrl = null;
@@ -115,6 +120,7 @@ export default function WritePage() {
                         description,
                         genre: category, // Usando o campo category como gênero para séries
                         tags,
+                        work_type: seriesType, // Salvar o tipo selecionado na nova coluna
                         author_id: user.id,
                         cover_url: coverUrl,
                         created_at: new Date().toISOString(),

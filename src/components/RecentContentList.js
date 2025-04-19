@@ -22,6 +22,7 @@ export default function RecentContentList({ contentList }) {
                     seriesTitle={content.series_title}
                     chapterNumber={content.chapter_number}
                     seriesId={content.series_id}
+                    seriesType={content.series_type}
                 />
             ))}
         </div>

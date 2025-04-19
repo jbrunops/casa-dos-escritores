@@ -19,9 +19,11 @@ export default function RootLayout({ children }) {
             </head>
             <body suppressHydrationWarning>
                 <Header />
-                <main className="container mx-auto content-wrapper">{children}</main>
+                <main className="container mx-auto content-wrapper">
+                    {children}
+                </main>
                 <footer className="border-t border-border mt-[1.875rem] bg-primary">
-                    <div className="container mx-auto py-12">
+                    <div className="container mx-auto py-12 max-w-7xl">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             {/* Coluna 1 - Logo e informações */}
                             <div className="flex flex-col space-y-4">
