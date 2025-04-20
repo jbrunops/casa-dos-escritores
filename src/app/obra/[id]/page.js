@@ -2,8 +2,6 @@
 
 // import React, { useState } from 'react'; // REMOVIDO
 import Link from 'next/link';
-import { createServerSupabaseClient } from '@/lib/supabase-server';
-import { notFound } from 'next/navigation'; // Mantido notFound
 // import { useRouter } from 'next/navigation'; // REMOVIDO
 import { extractIdFromSlug, generateSlug, formatDate } from '@/lib/utils';
 import { BookOpen, User, Calendar, Edit, Trash2, Type } from 'lucide-react'; 
@@ -11,19 +9,36 @@ import { BookOpen, User, Calendar, Edit, Trash2, Type } from 'lucide-react';
 import ObraDetailsClient from '@/components/ObraDetailsClient'; // <<< Importa o novo componente cliente
 // import { deleteObra, deleteChapter } from '@/app/actions/obraActions'; // REMOVIDO daqui, será passado
 
+// NOVOS IMPORTS para criar cliente Supabase diretamente
+import { cookies } from 'next/headers';
+import { createServerClient } from '@supabase/ssr';
+
 // Função auxiliar para capitalizar (pode ficar aqui ou em utils)
 const capitalize = (str) => {
     if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
-// Metadata para a página da obra (Mantida como estava)
+// Metadata para a página da obra
 export async function generateMetadata({ params }) {
     let id;
     try {
-        const slug = await Promise.resolve(params.id);
+        const resolvedParams = await params;
+        const slug = resolvedParams.id;
         id = extractIdFromSlug(slug) || slug;
-        const supabase = await createServerSupabaseClient();
+
+        // <<< CRIAR CLIENTE SUPABASE DIRETAMENTE AQUI (PARA METADATA) >>>
+        const cookieStore = cookies();
+        const supabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+            {
+                cookies: {
+                    get(name) { return cookieStore.get(name)?.value; },
+                    // set e remove não são estritamente necessários para leitura de metadata
+                },
+            }
+        );
 
         const { data: obra, error } = await supabase
             .from('series') // Assumindo que "obra" é uma "series"
@@ -45,18 +60,30 @@ export async function generateMetadata({ params }) {
     }
 }
 
-// Componente da Página da Obra (VOLTA A SER ASYNC SERVER COMPONENT)
-export default async function ObraPage({ params }) { 
+// Componente da Página da Obra
+export default async function ObraPage({ params }) {
     let id;
     try {
-        const slug = await Promise.resolve(params.id);
+        const resolvedParams = await params;
+        const slug = resolvedParams.id;
         id = extractIdFromSlug(slug) || slug;
+
+        // <<< CRIAR CLIENTE SUPABASE DIRETAMENTE AQUI (PARA PÁGINA) >>>
+        const cookieStore = cookies();
+        const supabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+            {
+                cookies: {
+                    get(name) { return cookieStore.get(name)?.value; },
+                    // set e remove não são necessários para leitura de dados da página
+                },
+            }
+        );
 
         console.log("----- DIAGNÓSTICO DE OBRA (Server) -----");
         console.log("Slug recebido da URL:", slug);
         console.log("ID extraído para consulta:", id);
-
-        const supabase = await createServerSupabaseClient();
 
         // Verificar usuário logado
         const { data: { user } } = await supabase.auth.getUser();

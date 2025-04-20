@@ -1,6 +1,8 @@
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
+import tsParser from "@typescript-eslint/parser";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -9,16 +11,39 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-// Combine as configurações estendidas com as regras personalizadas
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals"),
-  {
-    rules: {
-      "react/no-unescaped-entities": "off",
-      "react-hooks/exhaustive-deps": "warn",
-      "@next/next/no-img-element": "warn",
+const baseConfig = {
+  rules: {
+    "react/no-unescaped-entities": "off",
+    "react-hooks/exhaustive-deps": "warn",
+    "@next/next/no-img-element": "warn",
+  },
+};
+
+const tsConfig = {
+  files: ["**/*.ts", "**/*.tsx"],
+  languageOptions: {
+    parser: tsParser,
+    parserOptions: {
+      ecmaFeatures: { jsx: true },
+      ecmaVersion: "latest",
+      sourceType: "module",
+      project: "./tsconfig.json",
     },
   },
+  plugins: {
+    "@typescript-eslint": tsPlugin,
+  },
+  rules: {
+    ...tsPlugin.configs.recommended.rules,
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "off",
+  },
+};
+
+const eslintConfig = [
+  ...compat.extends("next/core-web-vitals"),
+  baseConfig,
+  tsConfig,
 ];
 
 export default eslintConfig;

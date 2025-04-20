@@ -1,9 +1,13 @@
 // src/app/series/page.js
 import Link from "next/link";
-import { createServerSupabaseClient } from "@/lib/supabase-server";
+// import { createServerSupabaseClient } from "@/lib/supabase-server"; // REMOVIDO
 import Pagination from "@/components/Pagination";
 import { generateSlug } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+
+// NOVOS IMPORTS para criar cliente Supabase diretamente
+import { cookies } from 'next/headers';
+import { createServerClient } from '@supabase/ssr';
 
 const PAGE_SIZE = 12; // Número de séries por página
 
@@ -16,7 +20,20 @@ export const metadata = {
 export default async function SeriesPage({ searchParams }) {
     try {
         console.log("Carregando página de séries");
-        const supabase = await createServerSupabaseClient();
+        
+        // <<< CRIAR CLIENTE SUPABASE DIRETAMENTE AQUI >>>
+        const cookieStore = cookies();
+        const supabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+            {
+                cookies: {
+                    get(name) { return cookieStore.get(name)?.value; },
+                    // set e remove não são necessários para leitura
+                },
+            }
+        );
+        
         const page = searchParams.page ? parseInt(searchParams.page) : 1;
 
         // Obter a sessão do usuário
