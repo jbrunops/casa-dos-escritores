@@ -6,12 +6,40 @@ import ContentEditor from "@/components/ContentEditor";
 import { generateSlug } from "@/lib/utils";
 import { useEffect, useState } from 'react';
 
+interface User {
+    id: string;
+    [key: string]: any;
+}
+
+interface StoryFormData {
+    title: string;
+    content: string;
+    category?: string;
+    isDraft: boolean;
+}
+
+interface SeriesFormData {
+    title: string;
+    description: string;
+    category: string;
+    tags: string[];
+    coverFile?: File;
+    seriesType: string;
+}
+
+type FormDataType = StoryFormData | SeriesFormData;
+
+type SubmitResult = {
+    success: boolean;
+    message: string;
+};
+
 export default function WritePage() {
     const router = useRouter();
-    const params = useParams();
+    const params = useParams() as { type: string };
     const supabase = createBrowserClient();
-    const [user, setUser] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     // Determina o tipo (story ou series) a partir da URL
     const type = params.type;
@@ -31,7 +59,7 @@ export default function WritePage() {
         fetchUser();
     }, [supabase, router]);
 
-    const handleUnifiedSubmit = async (formData) => {
+    const handleUnifiedSubmit = async (formData: FormDataType): Promise<SubmitResult> => {
         if (!user) {
             return { success: false, message: "Usuário não autenticado." };
         }
@@ -39,7 +67,7 @@ export default function WritePage() {
         try {
             if (type === 'story') {
                 // --- Lógica para criar CONTO ÚNICO --- 
-                const { title, content, category, isDraft } = formData;
+                const { title, content, category, isDraft } = formData as StoryFormData;
 
                 const { data, error } = await supabase
                     .from("stories")
@@ -75,7 +103,7 @@ export default function WritePage() {
 
             } else if (type === 'series') {
                 // --- Lógica para criar SÉRIE --- 
-                const { title, description, category, tags, coverFile, seriesType } = formData;
+                const { title, description, category, tags, coverFile, seriesType } = formData as SeriesFormData;
 
                 // Validar se o seriesType foi selecionado
                 if (!seriesType) {
@@ -83,7 +111,7 @@ export default function WritePage() {
                 }
 
                 // Upload da capa, se fornecida
-                let coverUrl = null;
+                let coverUrl: string | null = null;
                 if (coverFile) {
                     try {
                         const fileFormData = new FormData();
@@ -106,7 +134,7 @@ export default function WritePage() {
                         if (!coverUrl) {
                             throw new Error("Não foi possível obter URL da imagem após upload.");
                         }
-                    } catch (uploadErr) {
+                    } catch (uploadErr: any) {
                         console.error("Erro no upload da capa:", uploadErr);
                         throw new Error(`Erro no upload da imagem: ${uploadErr.message}`);
                     }
@@ -148,7 +176,7 @@ export default function WritePage() {
                  throw new Error("Tipo de conteúdo inválido.");
             }
 
-        } catch (err) {
+        } catch (err: any) {
             console.error("Erro ao salvar conteúdo:", err);
             return {
                 success: false,
@@ -158,7 +186,12 @@ export default function WritePage() {
     };
 
     // --- Função Unificada para Notificar Seguidores --- 
-    const notifyFollowers = async (authorId, contentType, contentId, contentTitle) => {
+    const notifyFollowers = async (
+        authorId: string,
+        contentType: string,
+        contentId: string,
+        contentTitle: string
+    ): Promise<void> => {
         try {
             // Obter seguidores
             const { data: followers, error: followersError } = await supabase
@@ -179,7 +212,7 @@ export default function WritePage() {
 
                 // Preparar notificações
                 const notificationType = contentType === 'story' ? 'new_story' : 'new_series'; // Ajuste conforme necessário
-                const notifications = followers.map(follower => ({
+                const notifications = followers.map((follower: { follower_id: string }) => ({
                     user_id: follower.follower_id,
                     type: notificationType,
                     sender_id: authorId,

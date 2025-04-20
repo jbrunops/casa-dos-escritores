@@ -1,34 +1,49 @@
-// src/app/series/page.js
+// src/app/series/page.tsx
 import Link from "next/link";
 // import { createServerSupabaseClient } from "@/lib/supabase-server"; // REMOVIDO
 import Pagination from "@/components/Pagination";
 import { generateSlug } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-
-// NOVOS IMPORTS para criar cliente Supabase diretamente
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
+import { Metadata } from 'next';
 
 const PAGE_SIZE = 12; // Número de séries por página
 
-export const metadata = {
+export const metadata: Metadata = {
     title: "Séries Literárias",
     description:
         "Explore séries de histórias em capítulos na Casa dos Escritores",
 };
 
-export default async function SeriesPage({ searchParams }) {
+interface Series {
+    id: string;
+    title: string;
+    genre?: string;
+    cover_url?: string;
+    is_completed?: boolean;
+    view_count?: number;
+    author_id: string;
+    author_name?: string;
+    chapter_count?: number;
+}
+
+interface SeriesPageProps {
+    searchParams: { [key: string]: string | undefined };
+}
+
+export default async function SeriesPage({ searchParams }: SeriesPageProps) {
     try {
-        console.log("Carregando página de séries");
+        // console.log("Carregando página de séries");
         
         // <<< CRIAR CLIENTE SUPABASE DIRETAMENTE AQUI >>>
         const cookieStore = cookies();
         const supabase = createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
             {
                 cookies: {
-                    get(name) { return cookieStore.get(name)?.value; },
+                    get(name: string) { return cookieStore.get(name)?.value; },
                     // set e remove não são necessários para leitura
                 },
             }
@@ -67,15 +82,15 @@ export default async function SeriesPage({ searchParams }) {
             .range(from, to);
 
         if (error) {
-            console.error("Erro ao buscar séries:", error);
+            // console.error("Erro ao buscar séries:", error);
             throw error;
         }
 
-        console.log("Séries encontradas:", series?.length || 0);
+        // console.log("Séries encontradas:", series?.length || 0);
 
         // Buscar autores para cada série
-        const seriesWithAuthors = await Promise.all(
-            (series || []).map(async (serie) => {
+        const seriesWithAuthors: Series[] = await Promise.all(
+            (series || []).map(async (serie: Series) => {
                 try {
                     const { data: author } = await supabase
                         .from("profiles")
@@ -88,11 +103,11 @@ export default async function SeriesPage({ searchParams }) {
                         author_name: author?.username || "Autor desconhecido",
                     };
                 } catch (err) {
-                    console.warn(
-                        "Erro ao buscar autor para série:",
-                        serie.id,
-                        err
-                    );
+                    // console.warn(
+                    //     "Erro ao buscar autor para série:",
+                    //     serie.id,
+                    //     err
+                    // );
                     return {
                         ...serie,
                         author_name: "Autor desconhecido",
@@ -102,8 +117,8 @@ export default async function SeriesPage({ searchParams }) {
         );
 
         // Buscar contagem de capítulos para cada série
-        const seriesWithChapterCount = await Promise.all(
-            seriesWithAuthors.map(async (serie) => {
+        const seriesWithChapterCount: Series[] = await Promise.all(
+            seriesWithAuthors.map(async (serie: Series) => {
                 const { count: chapterCount, error: countError } =
                     await supabase
                         .from("chapters") // Mudado de stories para chapters
@@ -111,7 +126,7 @@ export default async function SeriesPage({ searchParams }) {
                         .eq("series_id", serie.id);
 
                 if (countError) {
-                    console.warn("Erro ao contar capítulos:", countError);
+                    // console.warn("Erro ao contar capítulos:", countError);
                     return {
                         ...serie,
                         chapter_count: 0,
@@ -250,7 +265,7 @@ export default async function SeriesPage({ searchParams }) {
             </div>
         );
     } catch (error) {
-        console.error("Erro na página de séries:", error);
+        // console.error("Erro na página de séries:", error);
         return (
             <div className="max-w-[75rem] mx-auto px-4 sm:px-0">
                 <div className="mb-8 text-center">

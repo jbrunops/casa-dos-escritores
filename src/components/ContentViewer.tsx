@@ -8,28 +8,30 @@ import * as React from 'react';
 // Tipos específicos para melhor clareza
 type ContentType = 'story' | 'chapter';
 
-interface AuthorProfile {
+// --- Exported Interfaces ---
+export interface AuthorProfile {
     id: string;
     username: string | null;
     avatar_url: string | null;
 }
 
-interface SeriesInfo {
+export interface SeriesInfo {
     id: string | number;
     title: string;
 }
 
-interface ChapterRef {
+interface ChapterRef { // Não precisa exportar, usado internamente por NavigationInfo
     id: string | number;
     title: string;
     chapter_number: number;
 }
 
-interface NavigationInfo {
+export interface NavigationInfo {
     prevChapter: ChapterRef | null;
     nextChapter: ChapterRef | null;
 }
 
+// --- Component Props Interface ---
 interface ContentViewerProps {
     title: string;
     content: string | null;

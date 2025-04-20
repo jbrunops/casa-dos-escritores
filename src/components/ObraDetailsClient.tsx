@@ -9,37 +9,42 @@ import { formatDate, generateSlug, capitalize } from '@/lib/utils';
 import { deleteObraAction, deleteChapterAction } from '@/app/actions/obraActions';
 import toast from 'react-hot-toast';
 
-// Tipos para os dados
-interface Obra {
+// Tipos para os dados - exportados para uso externo
+export interface ObraData { // Renomeado e exportado
     id: string;
-    title: string;
+    title: string | null; // Ajustado para null
     description?: string | null;
     cover_url?: string | null;
     work_type?: string | null;
     tags?: string[] | null;
     created_at?: string | Date | null;
-    // Adicionar outros campos se necessário (genre, status, etc.)
+    genre?: string | null; // Adicionado genre se necessário
+    is_completed?: boolean;
+    author_id: string; // Adicionado author_id
+    // Adicionar outros campos que ObraPage.tsx busca
 }
 
-interface Chapter {
+export interface ChapterData { // Renomeado e exportado
     id: string;
-    title: string;
+    title: string | null; // Ajustado para null
     chapter_number: number;
-    // Adicionar outros campos se necessário
+    // Adicionar outros campos que ObraPage.tsx busca
 }
 
-interface Profile {
+export interface AuthorProfileData { // Renomeado e exportado
     id: string;
     username: string | null;
-    // Adicionar outros campos se necessário
+    avatar_url?: string | null; // Adicionado avatar_url se necessário
+    // Adicionar outros campos que ObraPage.tsx busca
 }
 
 // Props do componente
 interface ObraDetailsClientProps {
-    obraData: Obra | null;
-    chaptersData: Chapter[] | null;
-    authorProfileData: Profile | null;
+    obraData: ObraData; // Usar tipo exportado
+    chaptersData: ChapterData[]; // Usar tipo exportado
+    authorProfileData: AuthorProfileData; // Usar tipo exportado
     isAuthor: boolean;
+    // userId?: string | null; // Remover se não for usado
 }
 
 interface ItemToDelete {

@@ -1,16 +1,57 @@
-// src/app/search/page.js
+// src/app/search/page.tsx
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { generateSlug } from "@/lib/utils";
 import { ArrowLeft, Search } from "lucide-react";
+import { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
     title: "Resultados de pesquisa",
     description: "Pesquise histórias em nossa plataforma",
 };
 
-export default async function SearchPage({ searchParams }) {
+interface SearchPageProps {
+    searchParams: { [key: string]: string | undefined };
+}
+
+interface Story {
+    id: string;
+    title: string;
+    content: string;
+    created_at: string;
+    category?: string;
+    profiles: { username: string };
+    highlightedTitle?: string;
+    summary?: string;
+}
+
+interface Serie {
+    id: string;
+    title: string;
+    description?: string;
+    cover_url?: string;
+    author_id: string;
+    created_at: string;
+}
+
+interface Chapter {
+    id: string;
+    title: string;
+    content: string;
+    series_id: string;
+    created_at: string;
+    chapter_number?: number;
+}
+
+interface Profile {
+    id: string;
+    username: string;
+    bio?: string;
+    avatar_url?: string;
+}
+
+export default async function SearchPage({ searchParams }: SearchPageProps) {
     const query = searchParams.q || "";
 
     // Se não há consulta, redirecionar para home
@@ -135,7 +176,7 @@ export default async function SearchPage({ searchParams }) {
         }
 
         // Função para criar resumo do conteúdo HTML
-        const createSummary = (htmlContent, maxLength = 150) => {
+        const createSummary = (htmlContent: string, maxLength = 150): string => {
             // Remover todas as tags HTML
             const textContent = htmlContent?.replace(/<[^>]*>/g, "") || "";
 
@@ -151,7 +192,7 @@ export default async function SearchPage({ searchParams }) {
         };
 
         // Destacar o termo da pesquisa no texto
-        const highlightText = (text, query) => {
+        const highlightText = (text: string, query: string): string => {
             // Escapar caracteres especiais na consulta
             const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -171,7 +212,7 @@ export default async function SearchPage({ searchParams }) {
         };
 
         // Formatar a data para o formato compacto
-        const formatDate = (dateString) => {
+        const formatDate = (dateString: string): string => {
             const date = new Date(dateString);
             return date.toLocaleDateString("pt-BR", {
                 day: "2-digit",
@@ -181,7 +222,7 @@ export default async function SearchPage({ searchParams }) {
         };
 
         // Processar os resultados para destaque
-        const processedStories = stories.map((story) => ({
+        const processedStories: Story[] = (stories as Story[]).map((story) => ({
             ...story,
             highlightedTitle: highlightText(story.title, query),
             summary: highlightText(createSummary(story.content), query),
