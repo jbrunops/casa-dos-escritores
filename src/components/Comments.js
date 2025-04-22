@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import Link from "next/link";
 import { RefreshCw, MessageSquare, Reply, X } from "lucide-react";
+import Image from "next/image";
 
 export default function Comments({
     storyId,
@@ -78,7 +79,7 @@ export default function Comments({
             });
 
             let query = supabase
-                .from("comments")
+                .from("comments_with_author")
                 .select(
                     `
                 id, 
@@ -86,7 +87,8 @@ export default function Comments({
                 created_at,
                 author_id,
                 parent_id,
-                profiles(username, avatar_url)
+                author_username,
+                author_avatar_url
                 `
                 );
             
@@ -102,14 +104,16 @@ export default function Comments({
             const { data, error } = await query.order("created_at", { ascending: true });
 
             if (error) {
-                console.error("Erro ao buscar comentários:", error);
+                console.error("[Client] Erro detalhado ao buscar comentários:", error?.message || error, JSON.stringify(error, null, 2));
+                console.error("[Client] Stack do erro ao buscar comentários:", error?.stack);
                 return;
             }
 
             console.log("Comentários carregados:", data?.length || 0);
             setComments(data || []);
         } catch (err) {
-            console.error("Exceção ao carregar comentários:", err);
+            console.error("[Client] Exceção detalhada ao carregar comentários:", err?.message || err, JSON.stringify(err, null, 2));
+            console.error("[Client] Stack da exceção ao carregar comentários:", err?.stack);
             setComments([]);
         }
     };
@@ -220,7 +224,7 @@ export default function Comments({
     // Função para iniciar uma resposta a um comentário
     const handleReply = (comment) => {
         setReplyTo(comment);
-        setNewComment(`@${comment.profiles?.username || "Usuário"} `);
+        setNewComment(`@${comment.author_username || "Usuário"} `);
     };
 
     // Cancelar resposta
@@ -256,52 +260,44 @@ export default function Comments({
 
         // Renderizar recursivamente
         const renderComment = (comment, level = 0) => (
-            <div
-                key={comment.id}
-                className={`border-b border-[#E5E7EB] py-6 ${
-                    level > 0 ? "pl-6 md:pl-12" : ""
-                }`}
-            >
-                <div className="mb-4">
-                    <div className="flex justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                            {comment.profiles?.avatar_url ? (
-                                <img
-                                    src={comment.profiles.avatar_url}
-                                    alt={
-                                        comment.profiles?.username || "Usuário"
-                                    }
-                                    className="w-8 h-8 rounded-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-8 h-8 rounded-full bg-[#484DB5] text-white flex items-center justify-center text-sm">
-                                    {(comment.profiles?.username || "A")
-                                        .charAt(0)
-                                        .toUpperCase()}
-                                </div>
-                            )}
-                            <span className="font-medium">
-                                {comment.profiles?.username || "Usuário"}
+            <div key={comment.id} className={`ml-${level * 4} mt-4`}>
+                <div className="flex items-start space-x-3">
+                    {/* Avatar */} 
+                    <Link href={`/profile/${comment.author_id}`}>
+                        <Image
+                            src={comment.author_avatar_url || "/avatar-placeholder.png"}
+                            alt={comment.author_username || "Avatar"}
+                            width={32}
+                            height={32}
+                            className="rounded-full"
+                        />
+                    </Link>
+                    <div className="flex-1">
+                        <div className="flex items-center mb-1">
+                            <Link href={`/profile/${comment.author_id}"`}>
+                                <span className="font-semibold text-sm mr-2">
+                                    {comment.author_username || "Usuário Anônimo"}
+                                </span>
+                             </Link>
+                            <span className="text-xs text-gray-500">
+                                {new Date(
+                                    comment.created_at
+                                ).toLocaleDateString("pt-BR")}
                             </span>
                         </div>
-                        <span className="text-sm text-gray-500">
-                            {new Date(comment.created_at).toLocaleDateString(
-                                "pt-BR"
-                            )}
-                        </span>
+                        <p className="text-gray-800 mt-2">{comment.text}</p>
+                        {currentUserId && (
+                            <div className="mt-3">
+                                <button
+                                    onClick={() => handleReply(comment)}
+                                    className="flex items-center gap-1 text-sm text-gray-500 hover:text-[#484DB5] transition-colors duration-200"
+                                >
+                                    <Reply size={14} />
+                                    <span>Responder</span>
+                                </button>
+                            </div>
+                        )}
                     </div>
-                    <p className="text-gray-800 mt-2">{comment.text}</p>
-                    {currentUserId && (
-                        <div className="mt-3">
-                            <button
-                                onClick={() => handleReply(comment)}
-                                className="flex items-center gap-1 text-sm text-gray-500 hover:text-[#484DB5] transition-colors duration-200"
-                            >
-                                <Reply size={14} />
-                                <span>Responder</span>
-                            </button>
-                        </div>
-                    )}
                 </div>
 
                 {/* Renderizar respostas recursivamente */}
@@ -330,7 +326,7 @@ export default function Comments({
                     <div className="flex justify-between items-center bg-blue-50 p-3 rounded-md mb-4 border border-[#E5E7EB]">
                         <span className="text-sm">
                             Respondendo para{" "}
-                            <span className="font-medium">{replyTo.profiles?.username || "Usuário"}</span>
+                            <span className="font-medium">{replyTo.author_username || "Usuário"}</span>
                         </span>
                         <button
                             type="button"

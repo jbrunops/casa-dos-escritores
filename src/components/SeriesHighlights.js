@@ -23,7 +23,7 @@ export default async function SeriesHighlights() {
         console.log("[Server] Buscando séries populares para Highlights");
         // Buscar as 5 séries mais visualizadas, incluindo dados do autor
         const { data: initialSeries, error: seriesError } = await supabase
-            .from("series")
+            .from("series_with_author")
             .select(
                 `
                 id,
@@ -33,7 +33,7 @@ export default async function SeriesHighlights() {
                 view_count,
                 is_completed,
                 author_id,
-                profiles ( username ) 
+                author_name
               `
             )
             .order("view_count", { ascending: false })
@@ -77,9 +77,6 @@ export default async function SeriesHighlights() {
         // Combinar dados
         seriesWithDetails = initialSeries.map(serie => ({
             ...serie,
-            // Extrair nome do autor do objeto profiles
-            author_name: serie.profiles?.username || "Autor desconhecido", 
-            // Usar contagem do mapa
             chapter_count: countsMap[serie.id] || 0,
         }));
 

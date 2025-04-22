@@ -194,7 +194,9 @@ export default function NewChapterPage() {
                 if (notificationError) throw notificationError;
             }
         } catch (error) {
-            console.error('Erro ao notificar seguidores:', error);
+            // Log detalhado
+            console.error('[Client] Erro detalhado ao notificar seguidores:', error?.message || error, JSON.stringify(error, null, 2));
+            console.error('[Client] Stack do erro ao notificar:', error?.stack);
             // Não propagar o erro, para não interromper o fluxo principal
         }
     };

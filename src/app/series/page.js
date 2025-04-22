@@ -28,7 +28,7 @@ export default async function SeriesPage({ searchParams }) {
             count,
             error,
         } = await supabase
-            .from("series")
+            .from("series_with_author")
             .select(
                 `
                 id,
@@ -38,7 +38,7 @@ export default async function SeriesPage({ searchParams }) {
                 is_completed,
                 view_count,
                 author_id,
-                profiles ( username ) 
+                author_name
               `,
                 { count: "exact" }
             )
@@ -46,8 +46,10 @@ export default async function SeriesPage({ searchParams }) {
             .range(from, to);
 
         if (error) {
-            console.error("Erro ao buscar séries:", error);
-            throw error;
+            // Log detalhado do erro do Supabase
+            console.error("[Server] Erro detalhado ao buscar séries do Supabase:", JSON.stringify(error, null, 2));
+            console.error("[Server] Stack do erro Supabase:", error.stack);
+            throw error; // Re-lançar o erro original
         }
 
         console.log("Séries encontradas:", series?.length || 0);
@@ -74,7 +76,6 @@ export default async function SeriesPage({ searchParams }) {
             // Combinar dados
             seriesWithDetails = series.map(serie => ({
                 ...serie,
-                author_name: serie.profiles?.username || "Autor desconhecido", 
                 chapter_count: countsMap[serie.id] || 0,
             }));
         } else {
@@ -175,7 +176,9 @@ export default async function SeriesPage({ searchParams }) {
             </div>
         );
     } catch (error) {
-        console.error("Erro na página de séries:", error);
+        // Log detalhado no catch principal
+        console.error("[Server] Erro GERAL na página de séries:", error?.message || error);
+        console.error("[Server] Stack do erro GERAL:", error?.stack);
         return (
             <div className="max-w-[75rem] mx-auto px-4 sm:px-0">
                 <div className="mb-8 text-center">

@@ -74,33 +74,6 @@ export default function SignupPage() {
 
             if (signUpError) throw signUpError;
 
-            // Tentar criar perfil automaticamente
-            try {
-                if (data.user) {
-                    const { error: profileError } = await supabase
-                        .from("profiles")
-                        .insert({
-                            id: data.user.id,
-                            username,
-                            email,
-                            role: "user",
-                            created_at: new Date().toISOString(),
-                        });
-
-                    if (profileError) {
-                        console.warn("Aviso ao criar perfil:", profileError);
-                        setWarning(
-                            "Seu perfil será criado automaticamente no primeiro login"
-                        );
-                    }
-                }
-            } catch (profileErr) {
-                console.warn("Exceção ao criar perfil:", profileErr);
-                setWarning(
-                    "Seu perfil será criado automaticamente no primeiro login"
-                );
-            }
-
             // Se chegou aqui, o usuário foi criado (mesmo que com aviso)
             setSuccess(true);
 
