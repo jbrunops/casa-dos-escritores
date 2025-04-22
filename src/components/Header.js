@@ -247,25 +247,23 @@ export default function Header() {
 
                     {/* Navegação principal - apenas desktop */}
                     <nav className="hidden md:flex items-center space-x-6">
-                        {/* Menu de Categorias */}
-                        <CategoryDropdown 
-                            icon={<Compass size={20} />}
-                            isOpen={showCategoryDropdown}
-                            setIsOpen={setShowCategoryDropdown}
-                            categories={categories}
-                            columns={2}
-                            footerLink="/categories"
-                            footerLabel="Ver Todas"
-                        />
+                        {/* ADICIONADO: Link para Categorias */}
+                        <Link 
+                            href="/categories"
+                            className="flex items-center text-[#374151] hover:text-[#484DB5] transition-colors duration-200 font-medium"
+                        >
+                            <Compass size={20} className="mr-1.5" /> {/* Ícone adicionado */}
+                            Explorar
+                        </Link>
 
                         {/* Item de menu Séries */}
-                        <MenuItem 
+                        <Link 
                             href="/series"
-                            icon={<BookOpen size={20} />}
-                            isActive={pathname.startsWith("/series")}
+                            className="flex items-center text-[#374151] hover:text-[#484DB5] transition-colors duration-200 font-medium"
                         >
+                             <BookOpen size={20} className="mr-1.5" /> {/* Mantendo o ícone e estilo */}
                             Séries
-                        </MenuItem>
+                        </Link>
                     </nav>
                 </div>
 
