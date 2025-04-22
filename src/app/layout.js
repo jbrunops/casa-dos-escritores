@@ -1,0 +1,114 @@
+import "./globals.css";
+import { Poppins } from 'next/font/google';
+import Header from "@/components/Header";
+import Link from "next/link";
+
+// ADICIONADO: Configuração da fonte Poppins
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
+
+export const metadata = {
+    title: "Casa Dos Escritores: Plataforma Online para Autores Publicarem e se Conectarem",
+    description: "Publique, conecte-se e cresça na Casa Dos Escritores. A plataforma online ideal para autores independentes encontrarem leitores e ferramentas.",
+};
+
+// Definindo o objeto schema fora do return
+const schemaData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": "Casa Dos Escritores",
+      // CORRIGIDO: URL base no Schema Markup para .com
+      "url": "https://casadosescritores.com/", 
+      "description": "Publique, conecte-se e cresça na Casa Dos Escritores. A plataforma online ideal para autores independentes encontrarem leitores e ferramentas."
+    },
+    {
+      "@type": "Organization",
+      "name": "Casa Dos Escritores",
+      // CORRIGIDO: URL base no Schema Markup para .com
+      "url": "https://casadosescritores.com/", 
+      "sameAs": [
+        "https://www.instagram.com/casadosescritoresbr"
+      ],
+      // CORRIGIDO: Caminho relativo para logo no Schema Markup
+      "logo": "/Logo Casa Dos Contos.png" 
+    }
+  ]
+};
+
+export default function RootLayout({ children }) {
+    return (
+        <html lang="pt-BR" className={poppins.className}>
+            <head>
+                {/* REMOVIDO: Tag <link> para Google Fonts */}
+                {/* 
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+                    rel="stylesheet"
+                />
+                */}
+                <meta name="google-adsense-account" content="ca-pub-2169694779628621"></meta>
+                {/* Schema Markup */}
+                <script 
+                  type="application/ld+json" 
+                  dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} 
+                />
+            </head>
+            <body suppressHydrationWarning>
+                <Header />
+                <main className="content-wrapper">{children}</main>
+                <footer className="border-t border-[#E5E7EB] mt-[1.875rem] bg-[#484DB5]">
+                    <div className="max-w-[75rem] mx-auto px-4 sm:px-6 md:px-0 py-12">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {/* Coluna 1 - Logo e informações */}
+                            <div className="flex flex-col space-y-4">
+                                <div className="flex items-center">
+                                    <h2 className="text-xl font-bold text-white">Casa dos Escritores</h2>
+                                </div>
+                                <p className="text-white max-w-sm">O lugar ideal para compartilhar suas histórias, conectar-se com outros escritores e inspirar leitores.</p>
+                                <p className="text-white">&copy; {new Date().getFullYear()} Casa Dos Escritores</p>
+                            </div>
+                            
+                            {/* Coluna 2 - Links úteis */}
+                            <div className="flex flex-col space-y-4">
+                                <h3 className="text-lg font-semibold text-white">Links úteis</h3>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Link href="/categories" className="text-white hover:text-opacity-80 transition-colors duration-200">Categorias</Link>
+                                    <Link href="/series" className="text-white hover:text-opacity-80 transition-colors duration-200">Séries</Link>
+                                    {/* Mantido espaço para outros links */}
+                                </div>
+                            </div>
+                            
+                            {/* Coluna 3 - Formulário de sugestão */}
+                            <div className="flex flex-col space-y-4">
+                                <h3 className="text-lg font-semibold text-white">Envie sua sugestão</h3>
+                                <p className="text-white">Ajude-nos a melhorar a plataforma com suas ideias.</p>
+                                <form className="space-y-3">
+                                    <input 
+                                        type="email" 
+                                        placeholder="Seu e-mail"
+                                        className="w-full h-10 px-3 bg-white text-gray-600 placeholder-gray-400 focus:outline-none rounded-md"
+                                    />
+                                    <textarea 
+                                        placeholder="Sua sugestão"
+                                        className="w-full p-3 bg-white text-gray-600 placeholder-gray-400 focus:outline-none min-h-[5rem] rounded-md"
+                                    ></textarea>
+                                    <button 
+                                        type="submit"
+                                        className="h-10 px-4 bg-white text-[#484DB5] rounded-md hover:bg-opacity-90 transition-all duration-300 ease-in-out"
+                                    >
+                                        Enviar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </body>
+        </html>
+    );
+}

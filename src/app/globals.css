@@ -23,4 +23,38 @@ main {
 
 footer {
   flex-shrink: 0;
+}
+
+/* Configurações globais do projeto */
+.max-w-\[75rem\] {
+  max-width: 75rem;
+}
+
+a:not(.no-hover):hover {
+  opacity: 0.85;
+  transition: opacity 0.3s ease;
+}
+
+/* Cores padrão */
+:root {
+  --color-primary: #484DB5;
+  --color-border: #E5E7EB;
+}
+
+/* Ajuste de padding responsivo para seções */
+@media (max-width: 768px) {
+  .section-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  section > div {
+    /* padding-left: 1rem; */
+    /* padding-right: 1rem; */
+  }
+  
+  .max-w-\[75rem\] {
+    /* padding-left: 1rem; */
+    /* padding-right: 1rem; */
+  }
 } 
