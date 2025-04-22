@@ -73,7 +73,7 @@ export default function ContentFooter({
   };
 
   return (
-    <div className="my-8 border-t border-b border-gray-200 py-8">
+    <div className="my-8 border-t border-b border-gray-200 py-8 font-poppins">
       {/* Seção do autor */}
       <div className="mb-8">
         <Link

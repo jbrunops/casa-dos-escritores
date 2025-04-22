@@ -9,7 +9,7 @@ export default function RelatedContent({ items = [], type = "story" }) {
   }
 
   return (
-    <div className="my-12">
+    <div className="my-12 font-poppins">
       <h2 className="text-xl font-bold mb-6 text-gray-900 border-b border-gray-200 pb-2">
         {type === "chapter" ? "Mais capítulos desta série" : "Mais histórias que você pode gostar"}
       </h2>

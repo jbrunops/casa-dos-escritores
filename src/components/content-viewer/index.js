@@ -60,7 +60,7 @@ export default function ContentViewer({
   };
 
   return (
-    <div className="relative">
+    <div className="relative font-poppins">
       {/* Barra de progresso de leitura fixa no topo */}
       <div className="fixed top-0 left-0 w-full h-1 bg-gray-200 z-50">
         <div
@@ -75,7 +75,7 @@ export default function ContentViewer({
           title={title}
           subtitle={subtitle}
           author={author}
-          authorId={author?.id}
+          seriesId={seriesId}
           publishDate={createdAt}
           contentType={contentType}
           category={category}
@@ -85,7 +85,7 @@ export default function ContentViewer({
           chapterNumber={chapterNumber}
         />
 
-        {/* Navegação de capítulos (apenas para contentType === "chapter") */}
+        {/* Navegação superior (apenas para contentType === "chapter") */}
         {contentType === "chapter" && (
           <ContentNavigation
             prevChapter={prevChapter}
@@ -93,11 +93,12 @@ export default function ContentViewer({
             seriesId={seriesId}
             seriesTitle={seriesTitle}
             currentChapterNumber={chapterNumber}
+            showBorders={true} // Mostrar bordas apenas na navegação superior
           />
         )}
 
         {/* Conteúdo */}
-        <div className="prose prose-lg max-w-none text-gray-800 mb-8 font-serif">
+        <div className="prose prose-lg max-w-none text-gray-800 mb-8 font-poppins">
           <StoryContent content={content} />
         </div>
 
@@ -109,6 +110,7 @@ export default function ContentViewer({
             seriesId={seriesId}
             seriesTitle={seriesTitle}
             currentChapterNumber={chapterNumber}
+            showBorders={false} // Não mostrar bordas na navegação inferior
           />
         )}
 

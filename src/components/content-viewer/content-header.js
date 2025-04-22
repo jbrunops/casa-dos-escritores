@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Eye, BookOpen, Bookmark } from "lucide-react";
-import { formatDate, calculateReadingTime } from "@/lib/utils";
+import { formatDate, calculateReadingTime, generateSlug } from "@/lib/utils";
 
 export default function ContentHeader({
   title,
   subtitle,
   author,
-  authorId,
+  seriesId,
   publishDate,
   contentType,
   category,
@@ -43,7 +43,7 @@ export default function ContentHeader({
   };
 
   return (
-    <div className="mb-8">
+    <div className="mb-8 font-poppins">
       {/* Título */}
       <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 leading-tight">
         {contentType === "chapter" && chapterNumber && (
@@ -63,7 +63,7 @@ export default function ContentHeader({
         <div className="mb-4 text-base">
           <span className="text-gray-600">Da série </span>
           <Link 
-            href={`/series/${seriesTitle.toLowerCase().replace(/\s+/g, "-")}`}
+            href={seriesId ? `/series/${generateSlug(seriesTitle, seriesId)}` : '#'}
             className="text-[#484DB5] hover:underline transition-colors duration-200"
           >
             {seriesTitle}

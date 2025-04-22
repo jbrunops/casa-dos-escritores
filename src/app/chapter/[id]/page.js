@@ -6,8 +6,9 @@ import Script from "next/script";
 import { extractIdFromSlug, generateSlug } from "@/lib/utils";
 
 export async function generateMetadata({ params }) {
-    // Buscar informações do capítulo para o título da página
-    const slug = params.id;
+    // Corrigido: Await params
+    const resolvedParams = await Promise.resolve(params);
+    const slug = resolvedParams.id;
     const id = extractIdFromSlug(slug) || slug;
     
     try {
@@ -34,7 +35,9 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ChapterPage({ params }) {
-    const slug = params.id;
+    // Corrigido: Await params
+    const resolvedParams = await Promise.resolve(params);
+    const slug = resolvedParams.id;
     const id = extractIdFromSlug(slug) || slug;
     
     console.log("----- DIAGNÓSTICO DE CAPÍTULO -----");
@@ -44,9 +47,9 @@ export default async function ChapterPage({ params }) {
 
     const supabase = await createServerSupabaseClient();
     
-    // Obter a sessão do usuário
-    const { data: { session } } = await supabase.auth.getSession();
-    const userId = session?.user?.id;
+    // Corrigido: Usar getUser() para obter usuário autenticado
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id; // Obter userId do usuário autenticado
 
     // Buscar dados do capítulo atual
     const { data: chapter, error } = await supabase
@@ -76,10 +79,10 @@ export default async function ChapterPage({ params }) {
     // Obter dados da série separadamente
     const { data: series } = await supabase
         .from("series")
-        .select("title, id, cover_url")
+        .select("title, id, cover_url, genre")
         .eq("id", chapter.series_id)
         .single();
-        
+
     // Obter dados do autor separadamente
     const { data: author } = await supabase
         .from("profiles")
@@ -147,8 +150,9 @@ export default async function ChapterPage({ params }) {
                 userId={userId}
                 contentType="chapter"
                 chapterNumber={chapter.chapter_number}
-                seriesId={series.id}
-                seriesTitle={series.title}
+                seriesId={series?.id}
+                seriesTitle={series?.title || "Série desconhecida"}
+                category={series?.genre}
                 prevChapter={prevChapter}
                 nextChapter={nextChapter}
             />

@@ -11,6 +11,7 @@ export default function ContentNavigation({
   seriesTitle,
   currentChapterNumber,
   isCompact = false,
+  showBorders = false,
 }) {
   // Se não tivermos informações da série, não renderizar navegação
   if (!seriesId && !seriesTitle) {
@@ -18,12 +19,13 @@ export default function ContentNavigation({
   }
 
   // Gerar link para a série principal
-  const seriesLink = seriesId
+  // Garantir que seriesId exista antes de gerar o link
+  const seriesLink = seriesId && seriesTitle 
     ? `/series/${generateSlug(seriesTitle, seriesId)}`
-    : `/series/${encodeURIComponent(seriesTitle.toLowerCase().replace(/\s+/g, "-"))}`;
+    : "#"; // Fallback para link inválido ou página de erro, se preferir
 
   return (
-    <div className={`w-full ${isCompact ? 'py-2' : 'py-4'} border-t border-b border-gray-200 my-6`}>
+    <div className={`w-full ${isCompact ? 'py-2' : 'py-4'} ${showBorders ? 'border-t border-b border-gray-200' : ''} my-6`}>
       <div className="flex flex-wrap justify-between items-center gap-3">
         {/* Link para capítulo anterior */}
         <div className="flex-1 min-w-[120px]">
