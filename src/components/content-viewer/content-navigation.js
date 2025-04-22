@@ -11,7 +11,8 @@ export default function ContentNavigation({
   seriesTitle,
   currentChapterNumber,
   isCompact = false,
-  showBorders = false,
+  showTopBorder = false,
+  showBottomBorder = false,
 }) {
   // Se não tivermos informações da série, não renderizar navegação
   if (!seriesId && !seriesTitle) {
@@ -19,16 +20,22 @@ export default function ContentNavigation({
   }
 
   // Gerar link para a série principal
-  // Garantir que seriesId exista antes de gerar o link
   const seriesLink = seriesId && seriesTitle 
     ? `/series/${generateSlug(seriesTitle, seriesId)}`
-    : "#"; // Fallback para link inválido ou página de erro, se preferir
+    : "#";
+
+  // Construir classes de borda condicionalmente
+  const borderClasses = [
+    showTopBorder ? "border-t" : "",
+    showBottomBorder ? "border-b" : "",
+    (showTopBorder || showBottomBorder) ? "border-gray-200" : "",
+  ].filter(Boolean).join(" ");
 
   return (
-    <div className={`w-full ${isCompact ? 'py-2' : 'py-4'} ${showBorders ? 'border-t border-b border-gray-200' : ''} my-6`}>
-      <div className="flex flex-wrap justify-between items-center gap-3">
+    <div className={`w-full ${isCompact ? 'py-2' : 'py-4'} ${borderClasses} my-6`}>
+      <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
         {/* Link para capítulo anterior */}
-        <div className="flex-1 min-w-[120px]">
+        <div className="flex-1 min-w-[120px] flex justify-start">
           {prevChapter ? (
             <Link
               href={`/chapter/${generateSlug(prevChapter.title, prevChapter.id)}`}
@@ -54,22 +61,24 @@ export default function ContentNavigation({
           )}
         </div>
 
-        {/* Link para índice de capítulos */}
-        <Link
-          href={seriesLink}
-          className={`
-            inline-flex items-center ${isCompact ? 'text-sm px-3 h-8' : 'text-base px-4 h-10'} 
-            border border-gray-200 rounded-md text-gray-700 hover:bg-gray-50 
-            hover:text-[#484DB5] hover:border-[#484DB5] transition-all duration-300 hover:-translate-y-1
-          `}
-          title="Ver todos os capítulos"
-        >
-          <ListOrdered size={isCompact ? 14 : 16} className="mr-1" />
-          <span>Índice</span>
-        </Link>
+        {/* Link para índice de capítulos (agora no centro) */}
+        <div className="flex-shrink-0">
+          <Link
+            href={seriesLink}
+            className={`
+              inline-flex items-center ${isCompact ? 'text-sm px-3 h-8' : 'text-base px-4 h-10'} 
+              border border-gray-200 rounded-md text-gray-700 hover:bg-gray-50 
+              hover:text-[#484DB5] hover:border-[#484DB5] transition-all duration-300 hover:-translate-y-1
+            `}
+            title="Ver todos os capítulos"
+          >
+            <ListOrdered size={isCompact ? 14 : 16} className="mr-1" />
+            <span>Índice</span>
+          </Link>
+        </div>
 
         {/* Link para próximo capítulo */}
-        <div className="flex-1 min-w-[120px] text-right">
+        <div className="flex-1 min-w-[120px] flex justify-end">
           {nextChapter ? (
             <Link
               href={`/chapter/${generateSlug(nextChapter.title, nextChapter.id)}`}

@@ -93,7 +93,8 @@ export default function ContentViewer({
             seriesId={seriesId}
             seriesTitle={seriesTitle}
             currentChapterNumber={chapterNumber}
-            showBorders={true} // Mostrar bordas apenas na navegação superior
+            showBottomBorder={true}
+            showTopBorder={false}
           />
         )}
 
@@ -110,7 +111,8 @@ export default function ContentViewer({
             seriesId={seriesId}
             seriesTitle={seriesTitle}
             currentChapterNumber={chapterNumber}
-            showBorders={false} // Não mostrar bordas na navegação inferior
+            showTopBorder={true}
+            showBottomBorder={false}
           />
         )}
 
