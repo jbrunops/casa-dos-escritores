@@ -13,6 +13,28 @@ const poppins = Poppins({
 export const metadata = {
     title: "Casa Dos Escritores: Plataforma Online para Autores Publicarem e se Conectarem",
     description: "Publique, conecte-se e cresça na Casa Dos Escritores. A plataforma online ideal para autores independentes encontrarem leitores e ferramentas.",
+    openGraph: {
+        title: "Casa Dos Escritores: Plataforma Online para Autores", 
+        description: "A plataforma online ideal para autores independentes encontrarem leitores e ferramentas.", 
+        url: 'https://casadosescritores.com.br',
+        siteName: 'Casa dos Escritores',
+        images: [
+          {
+            url: 'https://casadosescritores.com.br/og-default-image.jpg', 
+            width: 1200,
+            height: 630,
+            alt: 'Casa dos Escritores - Plataforma para Autores',
+          },
+        ],
+        locale: 'pt_BR',
+        type: 'website',
+    },
+    twitter: {
+        card: 'summary_large_image', 
+        title: 'Casa Dos Escritores: Plataforma Online para Autores',
+        description: 'A plataforma online ideal para autores independentes encontrarem leitores e ferramentas.',
+        images: ['https://casadosescritores.com.br/og-default-image.jpg'], 
+    },
 };
 
 // Definindo o objeto schema fora do return
@@ -22,19 +44,16 @@ const schemaData = {
     {
       "@type": "WebSite",
       "name": "Casa Dos Escritores",
-      // CORRIGIDO: URL base no Schema Markup para .com
       "url": "https://casadosescritores.com/", 
       "description": "Publique, conecte-se e cresça na Casa Dos Escritores. A plataforma online ideal para autores independentes encontrarem leitores e ferramentas."
     },
     {
       "@type": "Organization",
       "name": "Casa Dos Escritores",
-      // CORRIGIDO: URL base no Schema Markup para .com
       "url": "https://casadosescritores.com/", 
       "sameAs": [
         "https://www.instagram.com/casadosescritoresbr"
       ],
-      // CORRIGIDO: Caminho relativo para logo no Schema Markup
       "logo": "/Logo Casa Dos Contos.png" 
     }
   ]
