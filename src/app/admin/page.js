@@ -106,7 +106,7 @@ export default function AdminDashboard() {
                     id,
                     text,
                     created_at,
-                    profiles(username),
+                    author_id:profiles!inner(username),
                     stories(title)
                 `
                 )
@@ -180,6 +180,14 @@ export default function AdminDashboard() {
         setStatusMessage({ type: "", message: "" });
 
         try {
+            // Novo passo: Excluir notificações enviadas pelo usuário
+            const { error: notificationsError } = await supabase
+                .from("notifications")
+                .delete()
+                .eq("sender_id", userId);
+
+            if (notificationsError) throw notificationsError;
+
             // Etapa 1: Excluir histórias do usuário
             const { error: storiesError } = await supabase
                 .from("stories")
