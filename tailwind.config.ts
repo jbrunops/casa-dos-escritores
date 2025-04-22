@@ -9,5 +9,5 @@ const config: Config = {
   },
   plugins: [],
 };
-www
+
 export default config;
