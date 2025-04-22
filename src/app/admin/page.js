@@ -106,7 +106,6 @@ export default function AdminDashboard() {
                     id,
                     text,
                     created_at,
-                    author_id:profiles!inner(username),
                     stories(title)
                 `
                 )
