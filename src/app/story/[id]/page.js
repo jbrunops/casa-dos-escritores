@@ -1,10 +1,7 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import Comments from "@/components/Comments";
-import StoryContent from "@/components/StoryContent";
-import { extractIdFromSlug, formatDate, calculateReadingTime } from "@/lib/utils";
-import { Eye } from "lucide-react";
+import ContentViewer from "@/components/content-viewer";
+import { extractIdFromSlug } from "@/lib/utils";
 
 export async function generateMetadata({ params }) {
     try {
@@ -24,7 +21,7 @@ export async function generateMetadata({ params }) {
 
         return {
             title: story.title,
-            description: `Leia "${story.title}" na Plataforma para Escritores`,
+            description: `Leia "${story.title}" na Casa dos Escritores`,
         };
     } catch (error) {
         console.error("Erro ao gerar metadata:", error);
@@ -57,7 +54,7 @@ export default async function StoryPage({ params }) {
                 view_count,
                 is_published, 
                 author_id, 
-                profiles(username, avatar_url)
+                profiles(id, username, avatar_url, bio)
             `
             )
             .eq("id", id)
@@ -100,125 +97,39 @@ export default async function StoryPage({ params }) {
             // Continue mesmo se falhar ao atualizar contagem
         }
 
-        // Formatar a data de publicação
-        const formattedDate = formatDate(story.created_at);
-
-        // Calcular tempo estimado de leitura
-        const readingTime = calculateReadingTime(story.content);
+        // Buscar histórias relacionadas (mesma categoria)
+        const { data: relatedStories } = await supabase
+            .from("stories")
+            .select(
+                `
+                id, 
+                title, 
+                content, 
+                created_at, 
+                view_count,
+                profiles(username, avatar_url)
+                `
+            )
+            .eq("category", story.category)
+            .eq("is_published", true)
+            .neq("id", id)
+            .order("view_count", { ascending: false })
+            .limit(3);
 
         return (
-            <div className="max-w-[75rem] mx-auto py-8 px-4 sm:px-0">
-                <div className="border border-[#E5E7EB] p-6 mb-6">
-                    <h1 className="text-4xl font-bold mb-6">{story.title}</h1>
-
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                        <div className="flex items-center gap-3">
-                            {story.profiles?.avatar_url ? (
-                                <img
-                                    src={story.profiles.avatar_url}
-                                    alt={story.profiles.username || "Autor"}
-                                    className="w-12 h-12 rounded-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-12 h-12 rounded-full bg-[#484DB5] text-white flex items-center justify-center font-medium">
-                                    {(story.profiles?.username || "A")
-                                        .charAt(0)
-                                        .toUpperCase()}
-                                </div>
-                            )}
-                            <div>
-                                <Link
-                                    href={`/profile/${encodeURIComponent(
-                                        story.profiles?.username || ""
-                                    )}`}
-                                    className="font-medium text-gray-900 hover:underline transition-all duration-300"
-                                >
-                                    {story.profiles?.username ||
-                                        "Autor desconhecido"}
-                                </Link>
-                                <div className="flex flex-col sm:flex-row sm:items-center">
-                                    <div className="flex text-sm text-gray-500 gap-2 items-center">
-                                        <span>
-                                            {formattedDate}
-                                        </span>
-                                        <span>·</span>
-                                        <span>
-                                            {readingTime} min para ler
-                                        </span>
-                                    </div>
-                                    
-                                    <div className="flex text-sm text-gray-500 gap-2 items-center mt-1 sm:mt-0 sm:ml-2">
-                                        <span className="hidden sm:inline">·</span>
-                                        {story.category && (
-                                            <>
-                                                <Link
-                                                    href={`/categories/${story.category
-                                                        .toLowerCase()
-                                                        .replace(/\s+/g, "-")}`}
-                                                    className="px-2 py-0.5 rounded-full bg-gray-100 border border-[#E5E7EB] hover:bg-gray-200 transition-colors duration-300"
-                                                >
-                                                    {story.category}
-                                                </Link>
-                                                <span>·</span>
-                                            </>
-                                        )}
-                                        <span className="flex items-center gap-1" title="Visualizações">
-                                            <Eye size={14} className="text-[#484DB5]" /> {story.view_count.toLocaleString("pt-BR")}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mb-8">
-                        <StoryContent content={story.content} />
-                    </div>
-                </div>
-
-                {/* Informações do autor ao final do artigo */}
-                <div className="mb-6 p-6 border border-[#E5E7EB]">
-                    <Link
-                        href={`/profile/${encodeURIComponent(
-                            story.profiles?.username || ""
-                        )}`}
-                    >
-                        <div className="flex items-center gap-4 hover:bg-gray-50 p-4 rounded-lg transition-all duration-300 hover:-translate-y-1">
-                            {story.profiles?.avatar_url ? (
-                                <img
-                                    src={story.profiles.avatar_url}
-                                    alt={story.profiles.username || "Autor"}
-                                    className="w-16 h-16 rounded-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-16 h-16 rounded-full bg-[#484DB5] text-white flex items-center justify-center text-xl font-medium">
-                                    {(story.profiles?.username || "A")
-                                        .charAt(0)
-                                        .toUpperCase()}
-                                </div>
-                            )}
-                            <div>
-                                <h3 className="text-lg font-medium">
-                                    Escrito por{" "}
-                                    {story.profiles?.username ||
-                                        "Autor desconhecido"}
-                                </h3>
-                                <p className="text-gray-600">
-                                    Veja mais histórias deste autor visitando
-                                    seu perfil.
-                                </p>
-                            </div>
-                        </div>
-                    </Link>
-                </div>
-
-                <div className="border border-[#E5E7EB] p-6">
-                    <Comments
-                        storyId={story.id}
-                        userId={session?.user?.id}
-                        authorId={story.author_id}
-                    />
-                </div>
+            <div className="max-w-[75rem] mx-auto">
+                <ContentViewer
+                    id={story.id}
+                    title={story.title}
+                    content={story.content}
+                    createdAt={story.created_at}
+                    author={story.profiles}
+                    viewCount={story.view_count}
+                    relatedItems={relatedStories}
+                    userId={session?.user?.id}
+                    contentType="story"
+                    category={story.category}
+                />
             </div>
         );
     } catch (error) {
