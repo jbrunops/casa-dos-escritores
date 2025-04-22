@@ -448,20 +448,23 @@ export default function ContentEditor({
                         </div>
                     )}
 
-                    {type === "chapter" && seriesId && (
+                    {/* Campo Número do Capítulo - Mostrar APENAS se for CAPÍTULO e estiver EDITANDO */}
+                    {type === "chapter" && isEditingModeRef.current && (
                         <div className="space-y-2">
                             <label htmlFor="chapterNumber" className="block text-sm font-medium text-gray-700">
-                                Número do Capítulo*
+                                Número do Capítulo* 
                             </label>
                             <input
                                 id="chapterNumber"
                                 type="number"
                                 min="1"
-                                value={chapterNumber}
-                                onChange={(e) => setChapterNumber(parseInt(e.target.value))}
-                                className="w-full h-10 px-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200"
+                                value={chapterNumber} // Usar estado local, se houver
+                                // onChange={(e) => setChapterNumber(parseInt(e.target.value))} // Talvez desabilitar a edição?
+                                className="w-full h-10 px-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200 bg-gray-50" // Adicionado bg-gray-50 para indicar não editável
                                 required
+                                readOnly // Tornar read-only para evitar edição manual confusa
                             />
+                             <p className="text-xs text-gray-500">O número do capítulo é gerenciado automaticamente.</p> {/* Mensagem informativa */} 
                         </div>
                     )}
                 </div>
