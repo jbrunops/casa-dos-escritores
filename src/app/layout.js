@@ -44,17 +44,17 @@ const schemaData = {
     {
       "@type": "WebSite",
       "name": "Casa Dos Escritores",
-      "url": "https://casadosescritores.com/", 
+      "url": "https://casadosescritores.com.br/", 
       "description": "Publique, conecte-se e cresça na Casa Dos Escritores. A plataforma online ideal para autores independentes encontrarem leitores e ferramentas."
     },
     {
       "@type": "Organization",
       "name": "Casa Dos Escritores",
-      "url": "https://casadosescritores.com/", 
+      "url": "https://casadosescritores.com.br/", 
       "sameAs": [
         "https://www.instagram.com/casadosescritoresbr"
       ],
-      "logo": "/Logo Casa Dos Contos.png" 
+      "logo": "https://casadosescritores.com.br/casadosescritores.png" 
     }
   ]
 };
