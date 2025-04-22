@@ -42,7 +42,7 @@ export default async function HomePage() {
                     {/* Coluna 1: Histórias Recentes */}
                     <div className="column">
                         <h2 className="text-2xl font-extrabold text-black mb-4 border-[#E5E7EB] pb-2 relative">
-                            Histórias e Capítulos Recentes
+                            Recentes
                             <span className="block h-1 w-32 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
                         </h2>
                         <RecentContentList contentList={recentContent} />

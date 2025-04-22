@@ -1,3 +1,4 @@
+import Script from 'next/script';
 import "./globals.css";
 import { Poppins } from 'next/font/google';
 import Header from "@/components/Header";
@@ -71,6 +72,13 @@ export default function RootLayout({ children }) {
                 />
                 */}
                 <meta name="google-adsense-account" content="ca-pub-2169694779628621"></meta>
+                {/* AdSense Script */}
+                <Script
+                  async
+                  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2169694779628621"
+                  crossOrigin="anonymous"
+                  strategy="lazyOnload" // Opcional: controla quando carregar (lazyOnload é bom para desempenho)
+                />
                 {/* Schema Markup */}
                 <script 
                   type="application/ld+json" 
