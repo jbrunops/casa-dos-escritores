@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import TipTapEditor from "@/components/TipTapEditor";
@@ -15,7 +15,8 @@ import {
     Clock,
     BookOpen,
     Book,
-    Image
+    Image,
+    UploadCloud
 } from "lucide-react";
 
 export default function ContentEditor({
@@ -75,6 +76,9 @@ export default function ContentEditor({
         "Anime",
         "Outros",
     ];
+
+    // Determinar se estamos em modo de edição baseado na prop 'title' inicial
+    const isEditingModeRef = useRef(!!title);
 
     // Detectar mudanças no formulário
     useEffect(() => {
@@ -358,6 +362,20 @@ export default function ContentEditor({
         }
     };
 
+    // Determina o texto do botão principal baseado no modo e tipo
+    const getSubmitButtonText = () => {
+        if (isEditingModeRef.current) {
+            return type === 'chapter' ? 'Atualizar Capítulo' : 'Atualizar História';
+        } else {
+            return type === 'chapter' ? 'Publicar Capítulo' : 'Publicar História';
+        }
+    };
+    
+    // Determina o ícone do botão principal
+    const getSubmitButtonIcon = () => {
+        return isEditingModeRef.current ? <Save size={16} className="mr-2" /> : <Send size={16} className="mr-2" />;
+    };
+
     // Renderização do formulário baseada no tipo
     return (
         <div className="max-w-[75rem] mx-auto px-4 sm:px-6 md:px-0 py-8">
@@ -609,15 +627,11 @@ export default function ContentEditor({
                         {publishing ? (
                             <div className="w-5 h-5 border-2 border-t-white border-r-[#484DB5] border-b-[#484DB5] border-l-[#484DB5] rounded-full animate-spin mr-2"></div>
                         ) : (
-                            <Send size={18} className="mr-2" />
+                            <span className="flex items-center">
+                                {getSubmitButtonIcon()}
+                                {getSubmitButtonText()}
+                            </span>
                         )}
-                        <span>
-                            {type === "story" 
-                                ? "Publicar História" 
-                                : type === "series" 
-                                    ? "Criar Série" 
-                                    : "Criar Capítulo"}
-                        </span>
                     </button>
                 </div>
             </form>

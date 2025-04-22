@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import Link from "next/link";
-import { ArrowLeft, Save, AlertTriangle, CheckCircle2, Image, X } from "lucide-react";
+import { ArrowLeft, Save, AlertTriangle, CheckCircle2, Image, X, Eye, Edit3 } from "lucide-react";
 
 export default function EditSeriesPage() {
     const router = useRouter();

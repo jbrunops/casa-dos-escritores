@@ -80,9 +80,9 @@ export default function EditChapterPage() {
             } = await supabase.auth.getUser();
 
             if (!user) throw new Error("Você precisa estar logado");
-
+            
             // Atualizar capítulo
-            const { data, error } = await supabase
+            const { data: updateData, error: updateError } = await supabase
                 .from("chapters")
                 .update({
                     title,
@@ -91,20 +91,19 @@ export default function EditChapterPage() {
                 })
                 .eq("id", chapterId)
                 .select();
-
-            if (error) {
-                console.error("Erro ao atualizar capítulo:", error);
-                throw error;
+                
+            if (updateError) {
+                throw updateError;
             }
-
+            
             // Atualizar timestamp da série
-            const { error: updateError } = await supabase
+            const { error: seriesUpdateError } = await supabase
                 .from("series")
                 .update({ updated_at: new Date().toISOString() })
                 .eq("id", seriesId);
-
-            if (updateError) {
-                console.error("Erro ao atualizar timestamp da série:", updateError);
+                
+            if (seriesUpdateError) {
+                console.error("Erro ao atualizar timestamp da série:", seriesUpdateError);
             }
 
             // Redirecionar após uma breve pausa
@@ -117,7 +116,7 @@ export default function EditChapterPage() {
                 message: "Capítulo atualizado com sucesso!"
             };
         } catch (err) {
-            console.error("Erro ao atualizar capítulo:", err);
+            console.error("Erro ao salvar capítulo:", err); 
             return {
                 success: false,
                 message: err.message || "Ocorreu um erro ao salvar o capítulo"
