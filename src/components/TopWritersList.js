@@ -20,7 +20,7 @@ function WriterRankItem({ writer, rank }) {
                     alt={writer.username} // Corrigido: usar username
                     width={40}
                     height={40}
-                    className="rounded-full mr-3 object-cover shrink-0"
+                    className="rounded-full mr-3 object-cover shrink-0 h-10"
                 />
             ) : (
                 <div className="w-10 h-10 rounded-full bg-[#484DB5] text-white flex items-center justify-center mr-3 shrink-0">
