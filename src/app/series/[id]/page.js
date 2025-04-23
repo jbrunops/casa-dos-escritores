@@ -216,32 +216,32 @@ export default function SeriesPage() {
 
     if (loading) {
         return (
-            <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
+            <section className="content-wrapper py-8">
                 <div className="flex flex-col items-center justify-center py-12">
-                    <div className="w-12 h-12 border-4 border-t-[#484DB5] border-r-[#E5E7EB] border-b-[#E5E7EB] border-l-[#E5E7EB] rounded-full animate-spin"></div>
+                    <div className="w-12 h-12 border-4 border-t-primary border-r-border border-b-border border-l-border rounded-full animate-spin"></div>
                     <p className="mt-4 text-gray-700">Carregando série...</p>
                 </div>
-            </div>
+            </section>
         );
     }
 
     if (error || !series) {
         return (
-            <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
+            <section className="content-wrapper py-8">
                 <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md">
                     {error || "Série não encontrada."}
                 </div>
                 <div className="text-center mt-4">
-                    <Link href="/series" className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200">
+                    <Link href="/series" className="inline-flex items-center justify-center h-10 px-4 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-200">
                         Voltar para todas as séries
                     </Link>
                 </div>
-            </div>
+            </section>
         );
     }
 
     return (
-        <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
+        <section className="content-wrapper py-8">
             {/* Mensagens de Feedback */} 
             {successMessage && (
                 <div className="flex items-center p-4 mb-4 bg-green-50 text-green-700 rounded-md border border-green-200">
@@ -255,8 +255,8 @@ export default function SeriesPage() {
                     <span>{errorMessage}</span>
                 </div>
             )}
-            {/* Header com informações da série */}
-            <div className="flex flex-col md:flex-row p-6 gap-6 border border-[#E5E7EB] mb-6">
+            {/* Header com informações da série - Padding Removido */}
+            <div className="flex flex-col md:flex-row gap-6 mb-6">
                 <div className="w-full md:w-1/3 lg:w-1/4">
                     {series.cover_url ? (
                         <img
@@ -284,7 +284,7 @@ export default function SeriesPage() {
                                     href={`/profile/${encodeURIComponent(
                                         author?.username || "usuário"
                                     )}`}
-                                    className="text-[#484DB5] hover:text-[#5c61ca] transition-colors duration-200"
+                                    className="text-primary hover:text-primary-dark transition-colors duration-200"
                                 >
                                     {author?.username || "Usuário"}
                                 </Link>
@@ -303,7 +303,7 @@ export default function SeriesPage() {
                         
                         {series.genre && (
                             <div className="flex items-center gap-1">
-                                <span className="px-2 py-0.5 bg-[#484DB5] text-white text-xs rounded-full">
+                                <span className="px-2 py-0.5 bg-primary text-white text-xs rounded-full">
                                     {series.genre}
                                 </span>
                             </div>
@@ -321,7 +321,7 @@ export default function SeriesPage() {
                     <div className="flex flex-wrap gap-2 mb-6">
                         {series.tags && series.tags.length > 0 &&
                             series.tags.map((tag) => (
-                                <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border border-[#E5E7EB]">
+                                <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border border-border">
                                     {tag}
                                 </span>
                             ))
@@ -333,18 +333,18 @@ export default function SeriesPage() {
                 </div>
             </div>
 
-            {/* Seção de capítulos */}
-            <div className="p-6 border border-[#E5E7EB] mb-6">
+            {/* Seção de capítulos - Padding Mantido */}
+            <div className="p-6 border border-border mb-6">
                 <div className="flex flex-row justify-between items-center mb-4">
                     <h2 className="text-xl font-bold text-gray-900">
                         Capítulos ({chapters.length})
                     </h2>
                     
-                    {/* Botão "Adicionar Capítulo" - apenas ícone no mobile */}
+                    {/* Botão "Adicionar Capítulo" */}
                     {isAuthor && (
                         <Link
                             href={`/dashboard/new-chapter/${series.id}`}
-                            className="inline-flex items-center justify-center h-10 px-4 sm:px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-300 ease-in-out"
+                            className="inline-flex items-center justify-center h-10 px-4 sm:px-4 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-300 ease-in-out"
                         >
                             <Plus size={16} className="sm:mr-2" />
                             <span className="hidden sm:inline">Adicionar Capítulo</span>
@@ -358,7 +358,7 @@ export default function SeriesPage() {
                         {isAuthor && (
                             <Link
                                 href={`/dashboard/new-chapter/${series.id}`}
-                                className="inline-flex items-center justify-center h-10 px-4 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200"
+                                className="inline-flex items-center justify-center h-10 px-4 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-200"
                             >
                                 <Edit size={16} className="mr-2" />
                                 <span>Escrever Primeiro Capítulo</span>
@@ -366,7 +366,7 @@ export default function SeriesPage() {
                         )}
                     </div>
                 ) : (
-                    <div className="divide-y divide-[#E5E7EB]">
+                    <div className="divide-y divide-border">
                         {chapters.map((chapter, index) => (
                             <div
                                 key={chapter.id}
@@ -374,7 +374,7 @@ export default function SeriesPage() {
                             >
                                 <Link
                                     href={`/chapter/${generateSlug(chapter.title, chapter.id)}`}
-                                    className="flex-1 text-gray-900 hover:text-[#484DB5] transition-colors duration-300"
+                                    className="flex-1 text-gray-900 hover:text-primary transition-colors duration-300"
                                 >
                                     <span className="text-sm font-medium text-gray-500 block">
                                         Capítulo {chapter.chapter_number}
@@ -392,7 +392,7 @@ export default function SeriesPage() {
                                 <div className="flex gap-2">
                                     <Link
                                         href={`/chapter/${generateSlug(chapter.title, chapter.id)}`}
-                                        className="flex items-center justify-center h-10 w-10 text-gray-600 hover:text-[#484DB5] rounded-md border border-[#E5E7EB] hover:border-[#484DB5] transition-all duration-300 hover:-translate-y-1"
+                                        className="flex items-center justify-center h-10 w-10 text-gray-600 hover:text-primary rounded-md border border-border hover:border-primary transition-all duration-300 hover:-translate-y-1"
                                         title="Ver Capítulo"
                                     >
                                         <Eye size={16} />
@@ -402,7 +402,7 @@ export default function SeriesPage() {
                                         <>
                                             <Link
                                                 href={`/dashboard/edit-chapter/${chapter.id}`}
-                                                className="flex items-center justify-center h-10 w-10 text-gray-600 hover:text-[#484DB5] rounded-md border border-[#E5E7EB] hover:border-[#484DB5] transition-all duration-300 hover:-translate-y-1"
+                                                className="flex items-center justify-center h-10 w-10 text-gray-600 hover:text-primary rounded-md border border-border hover:border-primary transition-all duration-300 hover:-translate-y-1"
                                                 title="Editar Capítulo"
                                             >
                                                 <Edit size={16} />
@@ -411,7 +411,7 @@ export default function SeriesPage() {
                                                 onClick={() =>
                                                     openDeleteModal(chapter.id, chapter.title)
                                                 }
-                                                className="flex items-center justify-center h-10 w-10 text-gray-600 hover:text-red-600 rounded-md border border-[#E5E7EB] hover:border-red-300 transition-all duration-300 hover:-translate-y-1"
+                                                className="flex items-center justify-center h-10 w-10 text-gray-600 hover:text-red-600 rounded-md border border-border hover:border-red-300 transition-all duration-300 hover:-translate-y-1"
                                                 title="Excluir Capítulo"
                                                 disabled={deleting}
                                             >
@@ -437,6 +437,6 @@ export default function SeriesPage() {
                     isLoading={deleting}
                 />
             )}
-        </div>
+        </section>
     );
 }

@@ -6,19 +6,22 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        purple: {
-          50: '#f5f3ff', 
-          100: '#ede9fe',
-          200: '#ddd6fe',
-          300: '#c4b5fd',
-          400: '#a78bfa',
-          500: '#8b5cf6',
-          600: '#7c3aed', // Cor principal
-          700: '#6d28d9',
-          800: '#5b21b6',
-          900: '#4c1d95',
-          950: '#2e1065',
+        primary: {
+          DEFAULT: '#484DB5',
+          light: '#5C61C3',
+          dark: '#3A3E9B',
+          50: '#F1F1F9',
+          100: '#E2E3F3',
+          200: '#C5C7E7',
+          300: '#A8ABDB', 
+          400: '#8B8FCF',
+          500: '#6E73C3',
+          600: '#484DB5', // Cor principal
+          700: '#3A3E9B',
+          800: '#2C3081',
+          900: '#1E2167',
         },
+        border: '#D7D7D7',
       },
       fontFamily: {
         sans: ['Poppins', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
@@ -41,9 +44,9 @@ module.exports = {
           css: {
             color: theme('colors.gray.800'),
             a: {
-              color: theme('colors.purple.600'),
+              color: theme('colors.primary.600'),
               '&:hover': {
-                color: theme('colors.purple.800'),
+                color: theme('colors.primary.800'),
               },
             },
             'h1, h2, h3, h4, h5, h6': {
@@ -51,7 +54,7 @@ module.exports = {
               fontWeight: theme('fontWeight.bold'),
             },
             blockquote: {
-              borderLeftColor: theme('colors.gray.300'),
+              borderLeftColor: theme('colors.border'),
               fontStyle: 'italic',
             },
           },

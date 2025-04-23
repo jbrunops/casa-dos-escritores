@@ -66,7 +66,7 @@ export default function DropdownMenu({
             ${position === "right" ? "right-0" : "left-0"} 
             bg-white rounded-md shadow-lg 
             p-3 z-10 
-            border border-[#E5E7EB]
+            border border-border
             min-w-[12rem]
           `}
         >
@@ -74,7 +74,7 @@ export default function DropdownMenu({
             {items.map((item, idx) => (
               <React.Fragment key={idx}>
                 {item.divider ? (
-                  <div className="border-t border-[#E5E7EB] my-1"></div>
+                  <div className="border-t border-border my-1"></div>
                 ) : (
                   <MenuItem
                     href={item.href}

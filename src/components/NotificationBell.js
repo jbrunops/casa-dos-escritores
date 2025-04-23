@@ -210,19 +210,19 @@ export default function NotificationBell() {
     const getNotificationIcon = (type) => {
         switch (type) {
             case "comment":
-                return <MessageSquare size={20} className="text-[#484DB5]" />;
+                return <MessageSquare size={20} className="text-primary" />;
             case "reply":
-                return <Reply size={20} className="text-[#484DB5]" />;
+                return <Reply size={20} className="text-primary" />;
             case "like":
-                return <Heart size={20} className="text-[#484DB5]" />;
+                return <Heart size={20} className="text-primary" />;
             case "follow":
-                return <User size={20} className="text-[#484DB5]" />;
+                return <User size={20} className="text-primary" />;
             case "new_story":
-                return <BookText size={20} className="text-[#484DB5]" />;
+                return <BookText size={20} className="text-primary" />;
             case "new_chapter":
-                return <BookOpen size={20} className="text-[#484DB5]" />;
+                return <BookOpen size={20} className="text-primary" />;
             default:
-                return <Bell size={20} className="text-[#484DB5]" />;
+                return <Bell size={20} className="text-primary" />;
         }
     };
 
@@ -368,7 +368,7 @@ export default function NotificationBell() {
                     className="relative flex items-center justify-center h-10 w-10 rounded-full hover:bg-gray-100 transition-colors duration-200"
                     aria-label="Notificações"
                 >
-                    <Bell size={isMobile ? 24 : 20} className="text-[#484DB5]" />
+                    <Bell size={isMobile ? 24 : 20} className="text-primary" />
                 </button>
             </div>
         );
@@ -382,7 +382,7 @@ export default function NotificationBell() {
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Notificações"
             >
-                <Bell size={isMobile ? 24 : 20} className="text-[#484DB5]" />
+                <Bell size={isMobile ? 24 : 20} className="text-primary" />
                 {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 flex items-center justify-center h-5 w-5 rounded-full bg-red-500 text-white text-xs font-medium">
                         {unreadCount > 9 ? "9+" : unreadCount}
@@ -391,13 +391,13 @@ export default function NotificationBell() {
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white rounded-lg shadow-lg border border-[#E5E7EB] overflow-hidden z-50">
-                    <div className="flex items-center justify-between p-4 border-b border-[#E5E7EB]">
+                <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white rounded-lg shadow-lg border border-border overflow-hidden z-50">
+                    <div className="flex items-center justify-between p-4 border-b border-border">
                         <h3 className="font-semibold text-gray-900">Notificações</h3>
                         {unreadCount > 0 && (
                             <button
                                 onClick={markAllAsRead}
-                                className="text-xs font-medium text-[#484DB5] hover:text-opacity-80 transition-colors duration-200 flex items-center"
+                                className="text-xs font-medium text-primary hover:text-opacity-80 transition-colors duration-200 flex items-center"
                             >
                                 <Check size={14} className="mr-1" />
                                 Marcar todas como lidas
@@ -442,7 +442,7 @@ export default function NotificationBell() {
                                                 </div>
                                                 {!notification.is_read && (
                                                     <div className="ml-2 mt-1 flex-shrink-0">
-                                                        <div className="h-2 w-2 rounded-full bg-[#484DB5]"></div>
+                                                        <div className="h-2 w-2 rounded-full bg-primary"></div>
                                                     </div>
                                                 )}
                                             </div>
@@ -463,10 +463,10 @@ export default function NotificationBell() {
                         )}
                     </div>
 
-                    <div className="border-t border-[#E5E7EB] p-3">
+                    <div className="border-t border-border p-3">
                         <Link 
                             href="/notifications"
-                            className="block w-full h-10 flex items-center justify-center text-sm font-medium text-[#484DB5] hover:bg-gray-50 rounded-md transition-colors duration-200"
+                            className="block w-full h-10 flex items-center justify-center text-sm font-medium text-primary hover:bg-gray-50 rounded-md transition-colors duration-200"
                         >
                             Ver todas as notificações
                             <ArrowRight size={16} className="ml-2" />

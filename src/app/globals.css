@@ -26,8 +26,16 @@ footer {
 }
 
 /* Configurações globais do projeto */
-.max-w-\[75rem\] {
+.content-wrapper {
   max-width: 75rem;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+/* Exceção para páginas tipo Medium */
+.medium-style-page {
+  max-width: none;
 }
 
 a:not(.no-hover):hover {
@@ -38,23 +46,13 @@ a:not(.no-hover):hover {
 /* Cores padrão */
 :root {
   --color-primary: #484DB5;
-  --color-border: #E5E7EB;
+  --color-border: #D7D7D7;
 }
 
 /* Ajuste de padding responsivo para seções */
 @media (max-width: 768px) {
-  .section-container {
+  .content-wrapper {
     padding-left: 1rem;
     padding-right: 1rem;
-  }
-  
-  section > div {
-    /* padding-left: 1rem; */
-    /* padding-right: 1rem; */
-  }
-  
-  .max-w-\[75rem\] {
-    /* padding-left: 1rem; */
-    /* padding-right: 1rem; */
   }
 } 

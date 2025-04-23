@@ -87,9 +87,9 @@ export default function RootLayout({ children }) {
             </head>
             <body suppressHydrationWarning>
                 <Header />
-                <main className="content-wrapper">{children}</main>
-                <footer className="border-t border-[#E5E7EB] mt-[1.875rem] bg-[#484DB5]">
-                    <div className="max-w-[75rem] mx-auto px-4 sm:px-6 md:px-0 py-12">
+                <main>{children}</main>
+                <footer className="border-t border-border mt-[1.875rem] bg-primary">
+                    <div className="content-wrapper py-12">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             {/* Coluna 1 - Logo e informações */}
                             <div className="flex flex-col space-y-4">
@@ -126,7 +126,7 @@ export default function RootLayout({ children }) {
                                     ></textarea>
                                     <button 
                                         type="submit"
-                                        className="h-10 px-4 bg-white text-[#484DB5] rounded-md hover:bg-opacity-90 transition-all duration-300 ease-in-out"
+                                        className="h-10 px-4 bg-white text-primary rounded-md hover:bg-opacity-90 transition-all duration-300 ease-in-out"
                                     >
                                         Enviar
                                     </button>
