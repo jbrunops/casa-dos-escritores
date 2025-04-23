@@ -547,7 +547,7 @@ export default function Comments({
                             <button
                                 type="submit"
                                 disabled={submitting || !newComment.trim()}
-                                className="h-9 px-4 bg-primary-500 text-white rounded-md hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 flex items-center text-sm font-medium"
+                                className="h-9 px-4 bg-[#484DB5] text-white rounded-md hover:bg-[#4045A8] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 flex items-center text-sm font-medium"
                             >
                                 {submitting ? (
                                     <>

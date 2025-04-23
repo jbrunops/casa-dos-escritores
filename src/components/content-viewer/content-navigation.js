@@ -48,7 +48,7 @@ export default function ContentNavigation({
               <ArrowLeft size={isCompact ? 16 : 18} className="mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
               <div className="flex flex-col">
                 <span className="text-xs text-gray-500">Anterior</span>
-                <span className="truncate max-w-[180px]">
+                <span className="truncate max-w-[180px] hidden md:inline">
                   Cap. {prevChapter.chapter_number}: {isCompact ? '' : prevChapter.title}
                 </span>
               </div>
@@ -90,7 +90,7 @@ export default function ContentNavigation({
             >
               <div className="flex flex-col items-end">
                 <span className="text-xs text-gray-500">Próximo</span>
-                <span className="truncate max-w-[180px]">
+                <span className="truncate max-w-[180px] hidden md:inline">
                   Cap. {nextChapter.chapter_number}: {isCompact ? '' : nextChapter.title}
                 </span>
               </div>
