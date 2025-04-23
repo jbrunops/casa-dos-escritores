@@ -28,8 +28,9 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [deleteModal, setDeleteModal] = useState({
         open: false,
-        storyId: null,
+        id: null,
         title: "",
+        type: "story",
     });
     const [deleting, setDeleting] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
@@ -42,6 +43,7 @@ export default function DashboardPage() {
     const [activeTab, setActiveTab] = useState("all");
     const [loadingStories, setLoadingStories] = useState(true);
     const [loadingStats, setLoadingStats] = useState(true);
+    const [error, setError] = useState(null);
 
     const router = useRouter();
     const supabase = createBrowserClient();
@@ -305,88 +307,118 @@ export default function DashboardPage() {
     };
 
     const openDeleteModal = (id, title, type = "story") => {
-        setDeleteModal({
-            open: true,
-            id,
-            title,
-            type, // tipo pode ser "story" ou "series"
-        });
+        console.log("[DEBUG] openDeleteModal INICIADA com:", { id, title, type });
+        try {
+            setDeleteModal({
+                open: true,
+                id,
+                title,
+                type,
+            });
+            console.log("[DEBUG] openDeleteModal: setDeleteModal EXECUTADO.");
+        } catch (e) {
+            console.error("[DEBUG] Erro ao tentar definir estado em openDeleteModal:", e);
+        }
     };
 
     const closeDeleteModal = () => {
         setDeleteModal({
             open: false,
-            storyId: null,
+            id: null,
             title: "",
+            type: "story",
         });
     };
 
-    // Renomeie para handleDelete
     const handleDelete = async () => {
-        if (!deleteModal.id) return;
-
-        setDeleting(true);
+        console.log("[DEBUG] handleDelete iniciado. Estado deleteModal:", deleteModal);
+        if (!deleteModal.id || !deleteModal.type) {
+            console.error("[DEBUG] ID ou Tipo inválido no deleteModal:", deleteModal);
+            return;
+        }
 
         try {
-            if (deleteModal.type === "series") {
-                // Primeiro, excluir todos os capítulos associados
-                await supabase
+            setDeleting(true);
+            const { id, type } = deleteModal;
+
+            if (type === "story") {
+                console.log(`[DEBUG] Tentando excluir STORY com ID: ${id}`);
+                // Deletar história
+                const { error } = await supabase
                     .from("stories")
                     .delete()
-                    .eq("series_id", deleteModal.id);
+                    .eq("id", id);
 
-                // Então excluir a série
+                if (error) {
+                    console.error("[DEBUG] Erro ao excluir STORY:", error);
+                    throw error;
+                }
+                console.log(`[DEBUG] STORY com ID ${id} excluída com sucesso do DB.`);
+
+            } else if (type === "series") {
+                console.log(`[DEBUG] Tentando excluir SERIES com ID: ${id}`);
+                // Verificar se a série tem capítulos
+                const { count, error: countError } = await supabase
+                    .from("chapters")
+                    .select("id", { count: "exact" })
+                    .eq("series_id", id);
+
+                if (countError) {
+                    console.error("[DEBUG] Erro ao contar capítulos da série:", countError);
+                    throw countError;
+                }
+
+                if (count > 0) {
+                    console.log(`[DEBUG] Excluindo ${count} capítulos da série ${id}...`);
+                    const { error: chaptersError } = await supabase
+                        .from("chapters")
+                        .delete()
+                        .eq("series_id", id);
+
+                    if (chaptersError) {
+                        console.error("[DEBUG] Erro ao excluir capítulos da série:", chaptersError);
+                        throw chaptersError;
+                    }
+                    console.log(`[DEBUG] Capítulos da série ${id} excluídos.`);
+                }
+
+                // Deletar a série
+                console.log(`[DEBUG] Excluindo a série ${id}...`);
                 const { error } = await supabase
                     .from("series")
                     .delete()
-                    .eq("id", deleteModal.id);
+                    .eq("id", id);
 
-                if (error) throw error;
-
-                // Atualizar a lista de séries
-                setSeries(
-                    series.filter((serie) => serie.id !== deleteModal.id)
-                );
-            } else {
-                // Código existente para excluir histórias
-                const { error } = await supabase
-                    .from("stories")
-                    .delete()
-                    .eq("id", deleteModal.id);
-
-                if (error) throw error;
-
-                // Atualizar a lista de histórias
-                setStories(
-                    stories.filter((story) => story.id !== deleteModal.id)
-                );
+                if (error) {
+                    console.error("[DEBUG] Erro ao excluir SERIES:", error);
+                    throw error;
+                }
+                 console.log(`[DEBUG] SERIES com ID ${id} excluída com sucesso do DB.`);
             }
 
             setSuccessMessage(
-                `${deleteModal.type === "series" ? "Série" : "História"} "${
-                    deleteModal.title
-                }" foi excluída com sucesso.`
+                `${type === "story" ? "História" : "Série"} excluída com sucesso!`
             );
+            closeDeleteModal();
+            refreshData(); // Atualiza a lista após exclusão
 
-            // Atualizar estatísticas
-            if (user && user.id) {
-                await fetchUserStats(user.id);
-            }
-
-            // Esconder a mensagem de sucesso após 5 segundos
+            // Limpar mensagem de sucesso após 3 segundos
             setTimeout(() => {
                 setSuccessMessage("");
-            }, 5000);
+            }, 3000);
         } catch (error) {
-            console.error("Erro ao excluir:", error);
-            alert(
-                `Não foi possível excluir ${
-                    deleteModal.type === "series" ? "a série" : "a história"
-                }. Por favor, tente novamente.`
+            console.error("[DEBUG] Erro GERAL ao excluir:", error);
+            setSuccessMessage(
+                `Erro ao excluir ${
+                    deleteModal.type === "story" ? "história" : "série"
+                }: ${error.message}`
             );
+            // Limpar erro após 5 segundos
+             setTimeout(() => {
+                setSuccessMessage("");
+            }, 5000);
         } finally {
             setDeleting(false);
-            closeDeleteModal();
         }
     };
 
@@ -584,7 +616,7 @@ export default function DashboardPage() {
                                     </Link>
 
                                     <button
-                                        onClick={() => openDeleteModal(story.id, story.title)}
+                                        onClick={() => openDeleteModal(story.id, story.title, 'story')}
                                         className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB]"
                                         title="Excluir"
                                     >
@@ -634,13 +666,17 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            <DeleteModal
-                isOpen={deleteModal.open}
-                onClose={closeDeleteModal}
-                onConfirm={handleDelete}
-                title={deleteModal.title}
-                loading={deleting}
-            />
+            {/* Modal de exclusão - Restaurando a chamada original */}
+            {deleteModal.open && (
+                <DeleteModal
+                    isOpen={deleteModal.open} 
+                    onClose={closeDeleteModal}
+                    onConfirm={handleDelete} 
+                    title={`Excluir ${deleteModal.type === "story" ? "História" : "Série"}`} 
+                    message={`Tem certeza que deseja excluir "${deleteModal.title}"? Esta ação não pode ser desfeita.`} 
+                    isLoading={deleting} 
+                />
+            )}
         </div>
     );
 }

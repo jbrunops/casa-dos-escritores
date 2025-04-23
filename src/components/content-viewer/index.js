@@ -129,9 +129,8 @@ export default function ContentViewer({
           <RelatedContent items={relatedItems} type={contentType} />
         )}
 
-        {/* Seção de comentários */}
-        <div id="comments" className="mt-8 border border-gray-200 p-6 rounded-lg">
-          <h2 className="text-xl font-bold mb-6 text-gray-900">Comentários</h2>
+        {/* Seção de comentários - A div e o h2 externos foram removidos */}
+        <div id="comments" className="mt-12"> {/* Apenas um espaço superior */}
           <Comments
             storyId={contentType === "story" ? id : undefined}
             contentId={contentType === "chapter" ? id : undefined}
