@@ -336,6 +336,29 @@ export default function EditContentPage() {
 
                 setSuccess("História atualizada com sucesso!");
             } else if (contentType === "chapter") {
+                // --- START VALIDATION FOR CHAPTER NUMBER ---
+                if (chapterNumber !== originalData.chapter_number) {
+                    // Check if the new chapter number already exists in the same series
+                    const { data: existingChapter, error: checkError } = await supabase
+                        .from("chapters")
+                        .select("id")
+                        .eq("series_id", seriesId) // Ensure check is within the same series
+                        .eq("chapter_number", chapterNumber)
+                        .neq("id", id) // Exclude the current chapter being edited
+                        .limit(1)
+                        .single(); // We only need to know if one exists
+
+                    if (checkError && checkError.code !== 'PGRST116') { // Ignore 'PGRST116' (No rows found)
+                        console.error("Erro ao verificar número do capítulo existente:", checkError);
+                        throw new Error("Erro ao validar o número do capítulo. Tente novamente.");
+                    }
+
+                    if (existingChapter) {
+                        throw new Error(`O número de capítulo ${chapterNumber} já está em uso nesta série.`);
+                    }
+                }
+                // --- END VALIDATION FOR CHAPTER NUMBER ---
+
                 // Atualizar capítulo
                 const { error } = await supabase
                     .from("chapters")

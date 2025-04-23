@@ -58,23 +58,6 @@ export default function NewChapterPage() {
 
                 setSeries(seriesData);
 
-                // Buscar maior número de capítulo existente
-                const { data: chapters, error: chaptersError } = await supabase
-                    .from("chapters")
-                    .select("chapter_number")
-                    .eq("series_id", seriesId)
-                    .order("chapter_number", { ascending: false });
-
-                if (chaptersError) {
-                    console.error("Erro ao buscar capítulos:", chaptersError);
-                }
-
-                const nextNumber =
-                    chapters && chapters.length > 0
-                        ? chapters[0].chapter_number + 1
-                        : 1;
-
-                setNextChapterNumber(nextNumber);
             } catch (err) {
                 console.error("Erro ao buscar informações da série:", err);
                 setError("Não foi possível carregar as informações da série");
@@ -92,19 +75,49 @@ export default function NewChapterPage() {
         const { title, content, chapterNumber } = formData;
         
         try {
+            setLoading(true);
+            setError(null);
+
             const {
                 data: { user },
             } = await supabase.auth.getUser();
 
             if (!user) throw new Error("Você precisa estar logado");
 
+            // Buscar maior número de capítulo existente ANTES de inserir
+            const { data: chapters, error: chaptersError } = await supabase
+                .from("chapters")
+                .select("chapter_number")
+                .eq("series_id", seriesId)
+                .order("chapter_number", { ascending: false })
+                .limit(1); // Only need the highest number
+
+            if (chaptersError) {
+                console.error("Erro ao buscar último capítulo:", chaptersError);
+                throw new Error("Não foi possível determinar o próximo número de capítulo.");
+            }
+
+            const calculatedNextNumber =
+                chapters && chapters.length > 0
+                    ? chapters[0].chapter_number + 1
+                    : 1;
+
+            // Prioritize chapterNumber from form if provided and valid, otherwise use calculated
+            const finalChapterNumber = (typeof chapterNumber === 'number' && chapterNumber > 0)
+                ? chapterNumber
+                : calculatedNextNumber;
+
+            // TODO: Add validation here if chapterNumber is provided from form
+            // to ensure it doesn't already exist (similar to edit logic).
+            // For now, assumes calculatedNextNumber is the primary way or form input is trusted.
+
             // Inserir novo capítulo
-            const { data, error } = await supabase
+            const { data, error: insertError } = await supabase
                 .from("chapters")
                 .insert({
                     title,
                     content,
-                    chapter_number: chapterNumber || nextChapterNumber,
+                    chapter_number: finalChapterNumber, // Use the final determined number
                     series_id: seriesId,
                     author_id: user.id,
                     created_at: new Date().toISOString(),
@@ -112,9 +125,13 @@ export default function NewChapterPage() {
                 })
                 .select();
 
-            if (error) {
-                console.error("Erro ao inserir capítulo:", error);
-                throw error;
+            if (insertError) {
+                console.error("Erro ao inserir capítulo:", insertError);
+                // Check for unique constraint violation if added later
+                if (insertError.code === '23505') { // Postgres unique violation code
+                     throw new Error(`O número de capítulo ${finalChapterNumber} já existe nesta série.`);
+                }
+                throw insertError;
             }
 
             // Atualizar timestamp da série
@@ -142,11 +159,15 @@ export default function NewChapterPage() {
                 message: "Capítulo criado com sucesso!"
             };
         } catch (err) {
-            console.error("Erro ao criar capítulo:", err);
-            return {
+            console.error("Erro no handleSubmit:", err);
+            setError(err.message || "Ocorreu um erro ao criar o capítulo.");
+            // Return error state for the form component to display
+             return {
                 success: false,
-                message: err.message || "Ocorreu um erro ao salvar o capítulo"
+                message: err.message || "Ocorreu um erro ao criar o capítulo."
             };
+        } finally {
+             setLoading(false); // Ensure loading state is turned off
         }
     };
 
