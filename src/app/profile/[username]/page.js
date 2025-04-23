@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { generateSlug } from "@/lib/utils";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { 
     Globe, 
     Twitter, 
@@ -30,9 +31,35 @@ import ProfileStoryActions from "@/components/ProfileStoryActions";
 import DeleteModal from "@/components/DeleteModal";
 
 export async function generateMetadata({ params }) {
-    const username = await Promise.resolve(params.username);
+    const resolvedParams = await Promise.resolve(params);
+    const username = resolvedParams.username;
     try {
-        const supabase = await createServerSupabaseClient();
+        const cookieStore = cookies();
+        const supabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+            {
+                cookies: {
+                    get(name) {
+                        return cookieStore.get(name)?.value;
+                    },
+                    set(name, value, options) {
+                        try {
+                            cookieStore.set({ name, value, ...options });
+                        } catch (error) {
+                            // O erro será tratado se set falhar
+                        }
+                    },
+                    remove(name, options) {
+                        try {
+                            cookieStore.set({ name, value: '', ...options });
+                        } catch (error) {
+                           // O erro será tratado se set falhar
+                        }
+                    },
+                },
+            }
+        );
         const { data } = await supabase
             .from("profiles")
             .select("username")
@@ -50,17 +77,46 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ProfilePage({ params }) {
-    const username = await Promise.resolve(params.username);
+    const resolvedParams = await Promise.resolve(params);
+    const username = resolvedParams.username;
     const decodedUsername = decodeURIComponent(username);
 
-    const supabase = await createServerSupabaseClient();
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        {
+            cookies: {
+                get(name) {
+                    return cookieStore.get(name)?.value;
+                },
+                set(name, value, options) {
+                    try {
+                        cookieStore.set({ name, value, ...options });
+                    } catch (error) {
+                        // O erro será tratado se set falhar
+                    }
+                },
+                remove(name, options) {
+                    try {
+                        cookieStore.set({ name, value: '', ...options });
+                    } catch (error) {
+                       // O erro será tratado se set falhar
+                    }
+                },
+            },
+        }
+    );
 
-    // Verificar sessão PRIMEIRO para saber se é o dono do perfil
-    const { data: sessionData } = await supabase.auth.getSession();
-    const session = sessionData.session;
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError) {
+        console.error("--- ERRO CRÍTICO AO BUSCAR USUÁRIO ---", userError);
+        // Considerar lançar um erro ou retornar uma página de erro aqui
+        // return <ErroPage mensagem="Não foi possível autenticar o usuário." />;
+    }
+    const user = userData?.user;
 
     try {
-        // Buscar perfil
         const { data: profile } = await supabase
             .from("profiles")
             .select("*")
@@ -69,31 +125,51 @@ export default async function ProfilePage({ params }) {
 
         if (!profile) return notFound();
 
-        const isOwnProfile = session?.user?.id === profile.id;
+        const isOwnProfile = user?.id === profile.id;
 
-        // Buscar histórias (contos únicos)
+        console.log("--- DEBUG: Perfil Data ---");
+        console.log("Username Decoded:", decodedUsername);
+        console.log("Profile ID:", profile?.id);
+        console.log("Session User ID (from getUser):", user?.id);
+        console.log("Is Own Profile:", isOwnProfile);
+
         let storiesQuery = supabase
             .from("stories")
-            .select("id, title, created_at, category, view_count, tags, is_published, updated_at")
+            .select("id, title, created_at, category, view_count, is_published, updated_at")
             .eq("author_id", profile.id)
             .eq("is_part_of_series", false)
             .order("created_at", { ascending: false });
 
-        // Se NÃO for o próprio perfil, busca apenas publicadas
         if (!isOwnProfile) {
             storiesQuery = storiesQuery.eq("is_published", true);
         }
 
-        const { data: stories } = await storiesQuery;
+        let stories = null;
+        let storiesError = null;
+        try {
+            const { data: fetchedStories, error: queryError } = await storiesQuery;
+            if (queryError) {
+                storiesError = queryError;
+            } else {
+                stories = fetchedStories;
+            }
+        } catch (e) {
+            storiesError = e;
+        }
+        
+        if (storiesError) {
+            console.error("--- ERRO CRÍTICO AO BUSCAR STORIES ---", storiesError);
+        }
 
-        // Buscar séries
+        console.log("--- DEBUG: Stories Data ---");
+        console.log("Fetched Stories:", stories);
+
         const { data: series } = await supabase
             .from("series")
             .select("id, title, created_at, genre, view_count, cover_url, tags, description")
             .eq("author_id", profile.id)
             .order("created_at", { ascending: false });
 
-        // Buscar capítulos para cada série
         let allSeries = [];
         if (series && series.length > 0) {
             for (const s of series) {
@@ -111,7 +187,10 @@ export default async function ProfilePage({ params }) {
             }
         }
 
-        // Buscar capítulos populares (os 5 mais vistos)
+        console.log("--- DEBUG: Series Data ---");
+        console.log("Fetched Series (initial):", series);
+        console.log("Processed All Series (with chapters):", allSeries);
+
         const { data: popularChapters } = await supabase
             .from("chapters")
             .select("id, title, chapter_number, view_count, series_id, series:series(title)")
@@ -119,7 +198,6 @@ export default async function ProfilePage({ params }) {
             .order("view_count", { ascending: false })
             .limit(5);
 
-        // Buscar comentários recentes (os 5 mais recentes)
         const { data: comments } = await supabase
             .from("comments_with_author")
             .select("id, text, created_at, story_id, series_id, chapter_id")
@@ -127,32 +205,28 @@ export default async function ProfilePage({ params }) {
             .order("created_at", { ascending: false })
             .limit(5);
 
-        // Buscar contagem de seguidores
         const { count: followersCount } = await supabase
             .from('follows')
             .select('*', { count: 'exact', head: true })
             .eq('following_id', profile.id);
             
-        // Buscar contagem de seguindo
         const { count: followingCount } = await supabase
             .from('follows')
             .select('*', { count: 'exact', head: true })
             .eq('follower_id', profile.id);
             
-        // Verificar se o usuário logado segue este perfil
         let isFollowing = false;
-        if (session?.user && !isOwnProfile) {
+        if (user && !isOwnProfile) {
             const { data: followData } = await supabase
                 .from('follows')
                 .select('id')
-                .eq('follower_id', session.user.id)
+                .eq('follower_id', user.id)
                 .eq('following_id', profile.id)
                 .maybeSingle();
                 
             isFollowing = !!followData;
         }
 
-        // Calcular visualizações
         const totalStoryViews =
             stories?.reduce(
                 (sum, story) => sum + (parseInt(story.view_count) || 0),
@@ -176,19 +250,14 @@ export default async function ProfilePage({ params }) {
             
         const totalViews = totalStoryViews + totalSeriesViews + totalChapterViews;
 
-        // Criar uma nuvem de tags a partir de histórias e séries
+        console.log("--- DEBUG: Views Data ---");
+        console.log("Total Story Views:", totalStoryViews);
+        console.log("Total Series Views:", totalSeriesViews);
+        console.log("Total Chapter Views:", totalChapterViews);
+        console.log("Total Views Calculated:", totalViews);
+
         const tagMap = new Map();
         
-        // Adicionar tags das histórias
-        stories?.forEach(story => {
-            if (story.tags && Array.isArray(story.tags)) {
-                story.tags.forEach(tag => {
-                    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
-                });
-            }
-        });
-        
-        // Adicionar tags das séries
         allSeries?.forEach(s => {
             if (s.tags && Array.isArray(s.tags)) {
                 s.tags.forEach(tag => {
@@ -197,12 +266,10 @@ export default async function ProfilePage({ params }) {
             }
         });
         
-        // Converter para um array ordenado por frequência
         const tagsCloud = Array.from(tagMap.entries())
             .sort((a, b) => b[1] - a[1])
             .map(([tag, count]) => ({ tag, count }));
 
-        // Organizar histórias por categoria
         const storiesByCategory = {};
         stories?.forEach((story) => {
             const category = story.category || "Sem categoria";
@@ -212,7 +279,6 @@ export default async function ProfilePage({ params }) {
             storiesByCategory[category].push(story);
         });
 
-        // Encontrar categoria favorita
         let favoriteCategory = "Nenhuma";
         let maxCount = 0;
         Object.entries(storiesByCategory).forEach(
@@ -227,19 +293,20 @@ export default async function ProfilePage({ params }) {
             }
         );
 
-        // Calcular data de inscrição
+        console.log("--- DEBUG: Category Data ---");
+        console.log("Stories By Category:", storiesByCategory);
+        console.log("Favorite Category Calculated:", favoriteCategory);
+
         const joinDate = new Date(profile.created_at).toLocaleDateString('pt-BR', {
             year: 'numeric', 
             month: 'long'
         });
 
-        // Função para formatar URLs
         const formatUrl = (url) => {
             if (!url) return "#";
             return url.startsWith("http") ? url : `https://${url}`;
         };
 
-        // Função para formatar data (igual a do dashboard)
         const formatDate = (dateString) => {
             const date = new Date(dateString);
             return date.toLocaleDateString("pt-BR", {
@@ -251,10 +318,8 @@ export default async function ProfilePage({ params }) {
 
         return (
             <div className="content-wrapper py-8">
-                {/* Info do Perfil - Borda Removida */}
                 <div className="bg-white rounded-lg overflow-hidden p-6 mb-8">
                     <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-                        {/* Avatar */}
                         <div className="flex-shrink-0">
                             {profile.avatar_url ? (
                                 <div 
@@ -270,11 +335,9 @@ export default async function ProfilePage({ params }) {
                             )}
                         </div>
 
-                        {/* Info */}
                         <div className="flex-grow text-center md:text-left">
                             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{profile.username}</h1>
                             
-                            {/* Membro desde e seguidores */}
                             <div className="flex flex-wrap items-center justify-center md:justify-start text-gray-600 mb-4 gap-4">
                                 <div className="flex items-center">
                                     <Calendar size={16} className="mr-1" />
@@ -298,14 +361,12 @@ export default async function ProfilePage({ params }) {
                                 </Link>
                             </div>
 
-                            {/* Bio */}
                             {profile.bio && (
                                 <div className="mb-4 text-gray-700">
                                     <p>{profile.bio}</p>
                                 </div>
                             )}
 
-                            {/* Links sociais */}
                             <div className="flex flex-wrap gap-2 justify-center md:justify-start mb-4">
                                 {profile.website_url && (
                                     <a
@@ -357,7 +418,6 @@ export default async function ProfilePage({ params }) {
                                 )}
                             </div>
 
-                            {/* Actions */}
                             <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                                 {isOwnProfile ? (
                                     <Link
@@ -379,7 +439,6 @@ export default async function ProfilePage({ params }) {
                     </div>
                 </div>
                 
-                {/* Stats Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     <div className="bg-white rounded-lg border border-[#D7D7D7] p-4 flex items-center">
                         <div className="p-3 bg-blue-50 text-[#484DB5] rounded-full mr-4">
@@ -422,11 +481,8 @@ export default async function ProfilePage({ params }) {
                     </div>
                 </div>
 
-                {/* Layout de duas colunas para os próximos elementos */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-                    {/* Coluna principal (histórias e séries) */}
                     <div className="lg:col-span-2 space-y-8">
-                        {/* Contos Únicos */}
                         <div className="bg-white rounded-lg border border-[#D7D7D7] overflow-hidden">
                             <div className="border-b border-[#D7D7D7] p-4 bg-gray-50 flex justify-between items-center">
                                 <h2 className="flex items-center text-lg font-medium text-gray-900">
@@ -507,7 +563,6 @@ export default async function ProfilePage({ params }) {
                             </div>
                         </div>
 
-                        {/* Séries */}
                         <div className="bg-white rounded-lg border border-[#D7D7D7] overflow-hidden">
                             <div className="border-b border-[#D7D7D7] p-4 bg-gray-50">
                                 <h2 className="flex items-center text-lg font-medium text-gray-900">
@@ -529,7 +584,6 @@ export default async function ProfilePage({ params }) {
                                         {allSeries.map((s) => (
                                             <div key={s.id} className="border border-[#D7D7D7] rounded-lg overflow-hidden">
                                                 <div className="flex flex-col md:flex-row">
-                                                    {/* Capa da série (se existir) */}
                                                     {s.cover_url && (
                                                         <div className="w-full md:w-1/4 h-48 md:h-auto">
                                                             <div 
@@ -541,7 +595,6 @@ export default async function ProfilePage({ params }) {
                                                         </div>
                                                     )}
                                                     
-                                                    {/* Informações da série */}
                                                     <div className="p-4 flex-1">
                                                         <Link 
                                                             href={`/series/${s.id}`}
@@ -550,21 +603,18 @@ export default async function ProfilePage({ params }) {
                                                             {s.title}
                                                         </Link>
                                                         
-                                                        {/* Gênero */}
                                                         {s.genre && (
                                                             <div className="text-sm text-gray-600 mb-2">
                                                                 Gênero: {s.genre}
                                                             </div>
                                                         )}
                                                         
-                                                        {/* Descrição curta */}
                                                         {s.description && (
                                                             <p className="text-gray-700 mb-3 line-clamp-2">
                                                                 {s.description}
                                                             </p>
                                                         )}
                                                         
-                                                        {/* Tags */}
                                                         {s.tags && s.tags.length > 0 && (
                                                             <div className="flex flex-wrap gap-1 mb-3">
                                                                 {s.tags.slice(0, 3).map(tag => (
@@ -580,7 +630,6 @@ export default async function ProfilePage({ params }) {
                                                             </div>
                                                         )}
                                                         
-                                                        {/* Estatísticas */}
                                                         <div className="flex flex-wrap gap-4 text-sm text-gray-500">
                                                             <span className="flex items-center">
                                                                 <BookText size={14} className="mr-1" />
@@ -598,7 +647,6 @@ export default async function ProfilePage({ params }) {
                                                     </div>
                                                 </div>
                                                 
-                                                {/* Últimos capítulos */}
                                                 {s.chapters && s.chapters.length > 0 && (
                                                     <div className="border-t border-[#D7D7D7] bg-gray-50 p-3">
                                                         <h4 className="text-sm font-medium text-gray-700 mb-2">Capítulos recentes:</h4>
@@ -639,9 +687,7 @@ export default async function ProfilePage({ params }) {
                         </div>
                     </div>
                     
-                    {/* Coluna lateral (stats, tags populares, capítulos populares) */}
                     <div className="space-y-8">
-                        {/* Capítulos mais populares */}
                         <div className="bg-white rounded-lg border border-[#D7D7D7] overflow-hidden">
                             <div className="border-b border-[#D7D7D7] p-4 bg-gray-50">
                                 <h2 className="flex items-center text-lg font-medium text-gray-900">
@@ -688,7 +734,6 @@ export default async function ProfilePage({ params }) {
                             </div>
                         </div>
                         
-                        {/* Nuvem de tags */}
                         <div className="bg-white rounded-lg border border-[#D7D7D7] overflow-hidden">
                             <div className="border-b border-[#D7D7D7] p-4 bg-gray-50">
                                 <h2 className="flex items-center text-lg font-medium text-gray-900">
@@ -705,7 +750,6 @@ export default async function ProfilePage({ params }) {
                                 ) : (
                                     <div className="flex flex-wrap gap-2">
                                         {tagsCloud.map(({ tag, count }) => {
-                                            // Calcular tamanho com base na contagem
                                             const fontSize = Math.min(Math.max(count * 0.5 + 0.8, 0.8), 1.5);
                                             const opacity = Math.min(Math.max(count * 0.2 + 0.6, 0.6), 1);
                                             
@@ -727,7 +771,6 @@ export default async function ProfilePage({ params }) {
                             </div>
                         </div>
                         
-                        {/* Comentários recentes */}
                         <div className="bg-white rounded-lg border border-[#D7D7D7] overflow-hidden">
                             <div className="border-b border-[#D7D7D7] p-4 bg-gray-50">
                                 <h2 className="flex items-center text-lg font-medium text-gray-900">
@@ -744,7 +787,6 @@ export default async function ProfilePage({ params }) {
                                 ) : (
                                     <div className="space-y-4">
                                         {comments.map((comment) => {
-                                            // Determinar o link com base no tipo de conteúdo comentado
                                             let commentLink = "#";
                                             if (comment.story_id) {
                                                 commentLink = `/story/${comment.story_id}`;

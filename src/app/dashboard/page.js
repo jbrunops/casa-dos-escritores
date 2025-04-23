@@ -114,9 +114,69 @@ export default function DashboardPage() {
     }, []);
 
     async function fetchUserStories(userId) {
-        // ... lógica de busca ...
-        // Esta função pode ser removida ou comentada se não for mais usada em nenhum lugar
+        try {
+            setLoadingStories(true);
+
+            const { data, error } = await supabase
+                .from("stories")
+                .select(
+                    `
+                    id, 
+                    title, 
+                    created_at, 
+                    updated_at,
+                    is_published, 
+                    category,
+                    view_count
+                    `
+                )
+                .eq("author_id", userId)
+                .order("created_at", { ascending: false });
+
+            if (error) {
+                throw error;
+            }
+
+            // Para cada história, buscar contagem de comentários
+            const storiesWithComments = await Promise.all(
+                (data || []).map(async (story) => {
+                    try {
+                        const { count, error: countError } = await supabase
+                            .from("comments")
+                            .select("id", { count: "exact" })
+                            .eq("story_id", story.id);
+
+                        if (countError) {
+                            return {
+                                ...story,
+                                comment_count: 0,
+                            };
+                        }
+
+                        return {
+                            ...story,
+                            comment_count: count || 0,
+                        };
+                    } catch (err) {
+                        return {
+                            ...story,
+                            comment_count: 0,
+                        };
+                    }
+                })
+            );
+
+            setStories(storiesWithComments || []);
+        } catch (error) {
+            console.error("Erro ao buscar histórias:", error);
+            setStories([]);
+        } finally {
+            setLoadingStories(false);
+        }
     }
+
+    // Este é o trecho que precisa ser localizado e atualizado no arquivo src/app/dashboard/page.js
+    // Procure pela função que busca séries e sua contagem de capítulos
 
     async function fetchUserSeries(userId) {
         try {
@@ -237,9 +297,9 @@ export default function DashboardPage() {
 
     const refreshData = async () => {
         if (!user) return;
+
         try {
-            // await fetchUserStories(user.id); // Removido/Comentado
-            await fetchUserSeries(user.id);
+            await fetchUserStories(user.id);
             await fetchUserStats(user.id);
         } catch (error) {
             console.error("Erro ao atualizar dados:", error);
@@ -271,58 +331,105 @@ export default function DashboardPage() {
     };
 
     const handleDelete = async () => {
-        console.log("[DEBUG] handleDelete (Dashboard) iniciado. Estado deleteModal:", deleteModal);
-        if (!deleteModal.id || deleteModal.type !== 'series') { // Garante que só exclua séries
-            console.error("[DEBUG] ID ou Tipo inválido/não série no deleteModal:", deleteModal);
+        console.log("[DEBUG] handleDelete iniciado. Estado deleteModal:", deleteModal);
+        if (!deleteModal.id || !deleteModal.type) {
+            console.error("[DEBUG] ID ou Tipo inválido no deleteModal:", deleteModal);
             return;
         }
 
         try {
             setDeleting(true);
-            const { id } = deleteModal;
-            console.log(`[DEBUG] Tentando excluir SERIES com ID: ${id}`);
-            
-            // Verificar se a série tem capítulos (lógica mantida)
-            const { count, error: countError } = await supabase
-                .from("chapters")
-                .select("id", { count: "exact" })
-                .eq("series_id", id);
+            const { id, type } = deleteModal;
 
-            if (countError) throw countError;
-
-            if (count > 0) {
-                console.log(`[DEBUG] Excluindo ${count} capítulos da série ${id}...`);
-                const { error: chaptersError } = await supabase
-                    .from("chapters")
+            if (type === "story") {
+                console.log(`[DEBUG] Tentando excluir STORY com ID: ${id}`);
+                // Deletar história
+                const { error } = await supabase
+                    .from("stories")
                     .delete()
+                    .eq("id", id);
+
+                if (error) {
+                    console.error("[DEBUG] Erro ao excluir STORY:", error);
+                    throw error;
+                }
+                console.log(`[DEBUG] STORY com ID ${id} excluída com sucesso do DB.`);
+
+            } else if (type === "series") {
+                console.log(`[DEBUG] Tentando excluir SERIES com ID: ${id}`);
+                // Verificar se a série tem capítulos
+                const { count, error: countError } = await supabase
+                    .from("chapters")
+                    .select("id", { count: "exact" })
                     .eq("series_id", id);
-                if (chaptersError) throw chaptersError;
-                console.log(`[DEBUG] Capítulos da série ${id} excluídos.`);
+
+                if (countError) {
+                    console.error("[DEBUG] Erro ao contar capítulos da série:", countError);
+                    throw countError;
+                }
+
+                if (count > 0) {
+                    console.log(`[DEBUG] Excluindo ${count} capítulos da série ${id}...`);
+                    const { error: chaptersError } = await supabase
+                        .from("chapters")
+                        .delete()
+                        .eq("series_id", id);
+
+                    if (chaptersError) {
+                        console.error("[DEBUG] Erro ao excluir capítulos da série:", chaptersError);
+                        throw chaptersError;
+                    }
+                    console.log(`[DEBUG] Capítulos da série ${id} excluídos.`);
+                }
+
+                // Deletar a série
+                console.log(`[DEBUG] Excluindo a série ${id}...`);
+                const { error } = await supabase
+                    .from("series")
+                    .delete()
+                    .eq("id", id);
+
+                if (error) {
+                    console.error("[DEBUG] Erro ao excluir SERIES:", error);
+                    throw error;
+                }
+                 console.log(`[DEBUG] SERIES com ID ${id} excluída com sucesso do DB.`);
             }
 
-            // Deletar a série
-            console.log(`[DEBUG] Excluindo a série ${id}...`);
-            const { error } = await supabase
-                .from("series")
-                .delete()
-                .eq("id", id);
-            if (error) throw error;
-            console.log(`[DEBUG] SERIES com ID ${id} excluída com sucesso do DB.`);
-
-            setSuccessMessage("Série excluída com sucesso!");
+            setSuccessMessage(
+                `${type === "story" ? "História" : "Série"} excluída com sucesso!`
+            );
             closeDeleteModal();
             refreshData(); // Atualiza a lista após exclusão
 
-            setTimeout(() => setSuccessMessage(""), 3000);
+            // Limpar mensagem de sucesso após 3 segundos
+            setTimeout(() => {
+                setSuccessMessage("");
+            }, 3000);
         } catch (error) {
-            console.error("[DEBUG] Erro GERAL ao excluir série:", error);
-            setSuccessMessage(`Erro ao excluir série: ${error.message}`);
-            setTimeout(() => setSuccessMessage(""), 5000);
+            console.error("[DEBUG] Erro GERAL ao excluir:", error);
+            setSuccessMessage(
+                `Erro ao excluir ${
+                    deleteModal.type === "story" ? "história" : "série"
+                }: ${error.message}`
+            );
+            // Limpar erro após 5 segundos
+             setTimeout(() => {
+                setSuccessMessage("");
+            }, 5000);
         } finally {
             setDeleting(false);
         }
     };
 
+    const filteredStories = stories.filter((story) => {
+        if (activeTab === "all") return true;
+        if (activeTab === "published") return story.is_published;
+        if (activeTab === "drafts") return !story.is_published;
+        return true;
+    });
+
+    // Formatador de data
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString("pt-BR", {
@@ -332,216 +439,244 @@ export default function DashboardPage() {
         });
     };
 
-    // Renderização condicional enquanto carrega
     if (loading) {
         return (
-            <section className="content-wrapper py-8 min-h-screen">
-                <div className="flex flex-col gap-6">
-                    <div className="animate-pulse bg-gray-200 h-8 w-40 mb-4 rounded"></div>
-                    <div className="animate-pulse bg-gray-200 h-32 rounded"></div>
-                    <div className="animate-pulse bg-gray-200 h-64 rounded"></div>
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="flex flex-col items-center space-y-4">
+                    <div className="w-8 h-8 border-4 border-[#484DB5] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-gray-600">Carregando seu painel...</p>
                 </div>
-            </section>
+            </div>
         );
     }
 
     return (
-        <section className="content-wrapper py-8 min-h-screen">
-            {/* Mensagem de sucesso */}
+        <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900">Meu Dashboard</h1>
+                    <p className="text-gray-600 mt-1">Bem-vindo, {profile?.username || "Escritor"}</p>
+                </div>
+
+                <div className="flex items-center mt-4 sm:mt-0">
+                    <Link href="/dashboard/new" className="h-10 px-4 flex items-center bg-[#484DB5] text-white rounded-md hover:bg-opacity-90">
+                        <PlusCircle size={20} className="mr-2" />
+                        <span>Nova História</span>
+                    </Link>
+                </div>
+            </div>
+
             {successMessage && (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-6 rounded relative">
-                    <span className="block sm:inline">{successMessage}</span>
-                    <button
-                        onClick={() => setSuccessMessage("")}
-                        className="absolute top-0 bottom-0 right-0 px-4 py-3"
-                    >
-                        <svg
-                            className="fill-current h-6 w-6 text-green-500"
-                            role="button"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                        >
-                            <title>Fechar</title>
-                            <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
-                        </svg>
-                    </button>
+                <div className="bg-green-50 text-green-700 p-4 rounded-md mb-8">
+                    {successMessage}
                 </div>
             )}
 
-            {/* Header do Dashboard */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-800 mb-4">
-                    Olá, {profile?.username || "Escritor"}!
-                </h1>
-                <p className="text-gray-600">
-                    Bem-vindo ao seu painel de controle. Aqui você pode
-                    gerenciar suas histórias e acompanhar estatísticas.
-                </p>
-            </div>
-
-            {/* Estatísticas do usuário */}
-            <div className="mb-10 bg-white rounded-lg shadow p-6 border border-border">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                    Suas Estatísticas
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-white p-4 rounded-lg border border-border flex flex-col">
-                        <p className="text-gray-500 text-sm">
-                            Histórias Publicadas
-                        </p>
-                        <div className="flex items-end justify-between mt-2">
-                            <p className="text-2xl font-bold text-primary">
-                                {stats.publishedStories}
-                            </p>
-                            <span className="text-primary">
-                                <BookOpen size={22} />
-                            </span>
-                        </div>
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB]">
+                    <div className="text-center">
+                        <span className="block text-2xl sm:text-3xl font-bold text-[#484DB5] mb-1">{stats.totalStories}</span>
+                        <span className="text-sm sm:text-base text-gray-600">Total de histórias</span>
                     </div>
+                </div>
 
-                    <div className="bg-white p-4 rounded-lg border border-border flex flex-col">
-                        <p className="text-gray-500 text-sm">
-                            Total de Histórias
-                        </p>
-                        <div className="flex items-end justify-between mt-2">
-                            <p className="text-2xl font-bold text-primary">
-                                {stats.totalStories}
-                            </p>
-                            <span className="text-primary">
-                                <Layers size={22} />
-                            </span>
-                        </div>
+                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB]">
+                    <div className="text-center">
+                        <span className="block text-2xl sm:text-3xl font-bold text-[#484DB5] mb-1">{stats.publishedStories}</span>
+                        <span className="text-sm sm:text-base text-gray-600">Publicadas</span>
                     </div>
+                </div>
 
-                    <div className="bg-white p-4 rounded-lg border border-border flex flex-col">
-                        <p className="text-gray-500 text-sm">
-                            Visualizações Totais
-                        </p>
-                        <div className="flex items-end justify-between mt-2">
-                            <p className="text-2xl font-bold text-primary">
-                                {stats.totalViews}
-                            </p>
-                            <span className="text-primary">
-                                <Eye size={22} />
-                            </span>
-                        </div>
+                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB]">
+                    <div className="text-center">
+                        <span className="block text-2xl sm:text-3xl font-bold text-[#484DB5] mb-1">{stats.totalViews}</span>
+                        <span className="text-sm sm:text-base text-gray-600">Visualizações</span>
                     </div>
+                </div>
 
-                    <div className="bg-white p-4 rounded-lg border border-border flex flex-col">
-                        <p className="text-gray-500 text-sm">
-                            Comentários Recebidos
-                        </p>
-                        <div className="flex items-end justify-between mt-2">
-                            <p className="text-2xl font-bold text-primary">
-                                {stats.totalComments}
-                            </p>
-                            <span className="text-primary">
-                                <MessageSquare size={22} />
-                            </span>
-                        </div>
+                <div className="bg-white p-4 rounded-lg border border-[#E5E7EB]">
+                    <div className="text-center">
+                        <span className="block text-2xl sm:text-3xl font-bold text-[#484DB5] mb-1">{stats.totalComments}</span>
+                        <span className="text-sm sm:text-base text-gray-600">Comentários</span>
                     </div>
                 </div>
             </div>
 
-            {/* Seção de Suas Séries */}
-            <div className="mb-10">
-                <div className="flex flex-wrap items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-gray-800">
-                        Suas Séries
-                    </h2>
-                    <div className="flex items-center space-x-2 mt-2 md:mt-0">
-                        <Link
-                            href="/dashboard/new-series"
-                            className="bg-primary hover:bg-primary-dark text-white font-medium h-10 px-4 rounded-md flex items-center transition-colors duration-200"
-                        >
-                            <Plus size={18} className="mr-1.5" />
-                            Nova Série
+            <div className="bg-white rounded-lg border border-[#E5E7EB] mb-8">
+                <div className="p-6 border-b border-[#E5E7EB]">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                        <h2 className="text-xl font-bold text-gray-900 mb-4 sm:mb-0">Minhas Histórias</h2>
+
+                        <div className="flex flex-wrap gap-2">
+                            <button
+                                className={`h-10 px-2 sm:px-4 text-sm sm:text-base rounded-md ${
+                                    activeTab === "all" 
+                                    ? "bg-[#484DB5] text-white" 
+                                    : "bg-white border border-[#E5E7EB] text-gray-600"
+                                }`}
+                                onClick={() => setActiveTab("all")}
+                            >
+                                Todas
+                            </button>
+                            <button
+                                className={`h-10 px-2 sm:px-4 text-sm sm:text-base rounded-md ${
+                                    activeTab === "published"
+                                    ? "bg-[#484DB5] text-white"
+                                    : "bg-white border border-[#E5E7EB] text-gray-600"
+                                }`}
+                                onClick={() => setActiveTab("published")}
+                            >
+                                Publicadas
+                            </button>
+                            <button
+                                className={`h-10 px-2 sm:px-4 text-sm sm:text-base rounded-md ${
+                                    activeTab === "drafts"
+                                    ? "bg-[#484DB5] text-white"
+                                    : "bg-white border border-[#E5E7EB] text-gray-600"
+                                }`}
+                                onClick={() => setActiveTab("drafts")}
+                            >
+                                Rascunhos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {loadingStories ? (
+                    <div className="flex items-center justify-center p-8">
+                        <div className="flex flex-col items-center space-y-4">
+                            <div className="w-8 h-8 border-4 border-[#484DB5] border-t-transparent rounded-full animate-spin"></div>
+                            <p className="text-gray-600">Carregando histórias...</p>
+                        </div>
+                    </div>
+                ) : filteredStories.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center p-8 text-center">
+                        <p className="text-gray-600 mb-4">
+                            {activeTab === "all"
+                                ? "Você ainda não criou nenhuma história."
+                                : activeTab === "published"
+                                ? "Você ainda não publicou nenhuma história."
+                                : "Você não tem nenhum rascunho."}
+                        </p>
+                        {/* <Link href="/dashboard/new" className="h-10 px-4 flex items-center bg-[#484DB5] text-white rounded-md hover:bg-opacity-90">
+                            Criar minha primeira história
+                        </Link> */}
+                    </div>
+                ) : (
+                    <div className="divide-y divide-[#E5E7EB]">
+                        {filteredStories.map((story) => (
+                            <div key={story.id} className="flex justify-between items-center p-6 hover:bg-gray-50">
+                                <div className="flex-1">
+                                    <h3 className="font-medium text-gray-900 mb-1">
+                                        {story.title}
+                                    </h3>
+
+                                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                                        <span>{story.category || "Sem categoria"}</span>
+                                        <span className={`px-2 py-1 rounded-full text-xs ${
+                                            story.is_published
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-yellow-100 text-yellow-700"
+                                        }`}>
+                                            {story.is_published ? "Publicado" : "Rascunho"}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center space-x-6 mt-2 text-sm text-gray-600">
+                                        <span className="flex items-center">
+                                            <Eye size={14} className="mr-1" />
+                                            {story.view_count || 0}
+                                        </span>
+                                        <span className="flex items-center">
+                                            <MessageSquare size={14} className="mr-1" />
+                                            {story.comment_count || 0}
+                                        </span>
+                                        <span className="flex items-center">
+                                            <BookOpen size={14} className="mr-1" />
+                                            {formatDate(story.created_at)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                    <Link
+                                        href={`/story/${generateSlug(story.title, story.id)}`}
+                                        className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB]"
+                                        title="Visualizar"
+                                    >
+                                        <Eye size={18} className="text-gray-600" />
+                                    </Link>
+
+                                    <Link
+                                        href={`/dashboard/edit/${story.id}`}
+                                        className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB]"
+                                        title="Editar"
+                                    >
+                                        <Edit3 size={18} className="text-gray-600" />
+                                    </Link>
+
+                                    <button
+                                        onClick={() => openDeleteModal(story.id, story.title, 'story')}
+                                        className="h-10 w-10 flex items-center justify-center rounded-md border border-[#E5E7EB]"
+                                        title="Excluir"
+                                    >
+                                        <Trash2 size={18} className="text-gray-600" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <div className="bg-white rounded-lg border border-[#E5E7EB]">
+                <div className="p-6 border-b border-[#E5E7EB] flex flex-row justify-between items-center">
+                    <h2 className="text-xl font-bold text-gray-900">Minhas Séries</h2>
+                    <Link href="/series" className="h-10 px-4 flex items-center text-[#484DB5]">
+                        <BookOpen size={18} className="mr-2" />
+                        <span>Ver minhas séries</span>
+                    </Link>
+                </div>
+                
+                <div className="p-6">
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="text-center">
+                            <span className="block text-2xl sm:text-3xl font-bold text-[#484DB5] mb-1">{series.length}</span>
+                            <span className="text-sm sm:text-base text-gray-600">Total de séries</span>
+                        </div>
+                        <div className="text-center">
+                            <span className="block text-2xl sm:text-3xl font-bold text-[#484DB5] mb-1">
+                                {series.filter(s => s.is_completed).length}
+                            </span>
+                            <span className="text-sm sm:text-base text-gray-600">Completas</span>
+                        </div>
+                        <div className="text-center">
+                            <span className="block text-2xl sm:text-3xl font-bold text-[#484DB5] mb-1">
+                                {series.filter(s => !s.is_completed).length}
+                            </span>
+                            <span className="text-sm sm:text-base text-gray-600">Em andamento</span>
+                        </div>
+                    </div>
+                    <div className="mt-6 text-center">
+                        <Link href="/dashboard/new-series" className="h-10 px-4 inline-flex items-center bg-[#484DB5] text-white rounded-md hover:bg-opacity-90">
+                            <Plus size={20} className="mr-2" />
+                            <span>Criar nova série</span>
                         </Link>
                     </div>
                 </div>
-                <div className="bg-white rounded-lg shadow overflow-hidden border border-border">
-                    {loadingSeries ? (
-                        <div className="p-8 text-center">
-                            <p className="text-gray-500">Carregando séries...</p>
-                        </div>
-                    ) : series.length === 0 ? (
-                        <div className="p-8 text-center">
-                            <p className="text-gray-500 mb-4">
-                                Você ainda não tem séries.
-                            </p>
-                            <Link
-                                href="/dashboard/new-series"
-                                className="inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark"
-                            >
-                                <PlusCircle className="mr-2" size={16} />
-                                Criar minha primeira série
-                            </Link>
-                        </div>
-                    ) : (
-                        <table className="min-w-full divide-y divide-border">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Gênero</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Status</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Capítulos</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Atualizada</th>
-                                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-border">
-                                {series.map((s) => (
-                                    <tr key={s.id}>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <Link href={`/series/${s.id}`} className="text-sm font-medium text-gray-900 hover:text-primary">
-                                                {s.title}
-                                            </Link>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
-                                            <div className="text-sm text-gray-500">{s.genre || "-"}</div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${s.is_completed ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                                                {s.is_completed ? "Completa" : "Em andamento"}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
-                                            {s.chapter_count || 0} 
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                                            {formatDate(s.updated_at || s.created_at)}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <div className="flex items-center justify-end space-x-1">
-                                                <Link href={`/series/${s.id}`} title="Visualizar" className="text-gray-400 hover:text-primary p-2 inline-flex items-center justify-center rounded-md hover:bg-gray-100">
-                                                    <Eye size={18} />
-                                                </Link>
-                                                <Link href={`/dashboard/edit-series/${s.id}`} title="Editar" className="text-gray-400 hover:text-primary p-2 inline-flex items-center justify-center rounded-md hover:bg-gray-100">
-                                                    <Edit3 size={18} />
-                                                </Link>
-                                                <button onClick={() => openDeleteModal(s.id, s.title, 'series')} title="Excluir" className="text-gray-400 hover:text-red-600 p-2 inline-flex items-center justify-center rounded-md hover:bg-red-50" disabled={deleting}>
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    )}
-                </div>
             </div>
 
-            {/* Modal de confirmação de exclusão */}
-            <DeleteModal
-                isOpen={deleteModal.open && deleteModal.type === 'series'} // Garante que só abra para séries
-                title={`Excluir Série`}
-                message={`Tem certeza que deseja excluir a série "${deleteModal.title}"? Todos os capítulos associados também serão excluídos. Esta ação não pode ser desfeita.`}
-                confirmLabel="Excluir Série"
-                onConfirm={handleDelete}
-                onCancel={closeDeleteModal}
-                isDeleting={deleting}
-            />
-        </section>
+            {/* Modal de exclusão - Restaurando a chamada original */}
+            {deleteModal.open && (
+                <DeleteModal
+                    isOpen={deleteModal.open} 
+                    onClose={closeDeleteModal}
+                    onConfirm={handleDelete} 
+                    title={`Excluir ${deleteModal.type === "story" ? "História" : "Série"}`} 
+                    message={`Tem certeza que deseja excluir "${deleteModal.title}"? Esta ação não pode ser desfeita.`} 
+                    isLoading={deleting} 
+                />
+            )}
+        </div>
     );
 }
