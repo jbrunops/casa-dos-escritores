@@ -9,7 +9,15 @@ export default function NewSeriesPage() {
     const supabase = createBrowserClient();
 
     const handleSubmit = async (formData) => {
-        const { title, description, category, tags, coverFile } = formData;
+        const { 
+            title, 
+            description, 
+            category, 
+            tags, 
+            coverFile,
+            isEditing, 
+            id 
+        } = formData;
         
         try {
             const {
@@ -19,7 +27,7 @@ export default function NewSeriesPage() {
             if (!user) throw new Error("Você precisa estar logado");
 
             // Upload da capa, se fornecida
-            let coverUrl = null;
+            let coverUrl = formData.coverUrl; // Usar URL existente se disponível e não tiver nova imagem
             if (coverFile) {
                 try {
                     const formData = new FormData();
@@ -48,42 +56,70 @@ export default function NewSeriesPage() {
                 }
             }
 
-            // Criar série
-            const { data, error } = await supabase
-                .from("series")
-                .insert({
-                    title,
-                    description,
-                    genre: category,
-                    tags,
-                    author_id: user.id,
-                    cover_url: coverUrl,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                })
-                .select();
+            let result;
+            
+            if (isEditing) {
+                // Atualizar série existente
+                const { data, error } = await supabase
+                    .from("series")
+                    .update({
+                        title,
+                        description,
+                        genre: category,
+                        tags,
+                        cover_url: coverUrl,
+                        updated_at: new Date().toISOString(),
+                    })
+                    .eq("id", id)
+                    .select();
 
-            if (error) throw error;
+                if (error) throw error;
+                result = data;
+                
+                // Redirecionar após breve pausa
+                setTimeout(() => {
+                    router.push(`/series/${id}`);
+                }, 1500);
+            } else {
+                // Criar nova série
+                const { data, error } = await supabase
+                    .from("series")
+                    .insert({
+                        title,
+                        description,
+                        genre: category,
+                        tags,
+                        author_id: user.id,
+                        cover_url: coverUrl,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                    })
+                    .select();
 
-            // Notificar seguidores sobre a nova série
-            if (data && data[0]) {
-                await notifyFollowers(user.id, data[0].id, title);
+                if (error) throw error;
+                result = data;
+                
+                // Notificar seguidores sobre a nova série
+                if (data && data[0]) {
+                    await notifyFollowers(user.id, data[0].id, title);
+                }
+
+                // Redirecionar após breve pausa
+                setTimeout(() => {
+                    router.push(`/dashboard/new-chapter/${data[0].id}`);
+                }, 1500);
             }
-
-            // Redirecionar após breve pausa
-            setTimeout(() => {
-                router.push(`/dashboard/new-chapter/${data[0].id}`);
-            }, 1500);
 
             return {
                 success: true,
-                message: "Série criada com sucesso!"
+                message: isEditing ? "Série atualizada com sucesso!" : "Série criada com sucesso!",
+                data: result
             };
         } catch (err) {
-            console.error("Erro na criação da série:", err);
+            console.error(isEditing ? "Erro na atualização da série:" : "Erro na criação da série:", err);
             return {
                 success: false,
-                message: err.message || "Ocorreu um erro ao criar a série"
+                message: err.message || (isEditing ? "Ocorreu um erro ao atualizar a série" : "Ocorreu um erro ao criar a série")
             };
         }
     };
