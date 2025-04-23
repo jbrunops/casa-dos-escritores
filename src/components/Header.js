@@ -17,7 +17,8 @@ import {
     LogIn,
     UserPlus,
     Bell,
-    Search
+    Search,
+    PlusCircle
 } from "lucide-react";
 import NotificationBell from "./NotificationBell";
 import MenuItem from "./MenuItem";
@@ -187,9 +188,9 @@ export default function Header() {
     // Configuração dos itens do menu de usuário
     const userMenuItems = user ? [
         {
-            label: "Meu Painel",
-            href: "/dashboard",
-            icon: <LayoutDashboard size={18} />
+            label: "Criar Histórias",
+            href: "/dashboard/new",
+            icon: <PlusCircle size={18} />
         },
         {
             label: "Meu Perfil",
@@ -371,11 +372,11 @@ export default function Header() {
                                     <>
                                         <li>
                                             <MenuItem 
-                                                href="/dashboard"
-                                                icon={<LayoutDashboard size={20} />}
+                                                href="/dashboard/new"
+                                                icon={<PlusCircle size={20} />}
                                                 onClick={() => setShowMobileMenu(false)}
                                             >
-                                                Meu Painel
+                                                Criar Histórias
                                             </MenuItem>
                                         </li>
                                         <li>

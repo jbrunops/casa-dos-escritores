@@ -23,51 +23,77 @@ export default function LoginPage() {
         setSuccess(false);
 
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const { data, error: signInError } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
 
-            if (error) throw error;
+            if (signInError) throw signInError;
 
-            // Verificar se o perfil existe e criar se necessário
+            let userProfile = null;
+            let profileUsername = null;
+
+            // Tentar buscar o perfil existente
             try {
-                const { data: profile, error: profileError } = await supabase
+                const { data: fetchedProfile, error: profileFetchError } = await supabase
                     .from("profiles")
-                    .select("id")
+                    .select("id, username") // Buscar username também
                     .eq("id", data.user.id)
                     .single();
 
+                if (profileFetchError && profileFetchError.code !== "PGRST116") {
+                    // Se o erro NÃO for "perfil não encontrado", logar mas continuar
+                    console.error("Erro ao buscar perfil existente:", profileFetchError);
+                } else {
+                    userProfile = fetchedProfile;
+                    profileUsername = fetchedProfile?.username;
+                }
+
                 // Se o perfil não existir, criar um novo
-                if (profileError && profileError.code === "PGRST116") {
-                    // Extrair username dos metadados do usuário ou do email
-                    const username =
+                if (!userProfile) {
+                    console.log("Perfil não encontrado, tentando criar um novo...");
+                    const defaultUsername =
                         data.user.user_metadata?.username ||
                         email.split("@")[0] ||
                         `user_${Math.random().toString(36).substring(2, 7)}`;
 
-                    // Criar perfil
-                    await supabase.from("profiles").insert({
-                        id: data.user.id,
-                        username,
-                        email: data.user.email,
-                        role: "user",
-                        created_at: new Date().toISOString(),
-                    });
-
-                    console.log("Perfil criado automaticamente após login");
+                    const { data: newProfile, error: insertError } = await supabase
+                        .from("profiles")
+                        .insert({
+                            id: data.user.id,
+                            username: defaultUsername,
+                            email: data.user.email,
+                            role: "user",
+                            created_at: new Date().toISOString(),
+                        })
+                        .select("username") // Selecionar o username criado
+                        .single();
+                        
+                    if (insertError) {
+                        console.error("Erro ao CRIAR perfil:", insertError);
+                        // Não lançar erro aqui, tentar redirecionar para home como fallback
+                    } else {
+                        profileUsername = newProfile?.username; // Usar o username do perfil recém-criado
+                        console.log("Perfil criado automaticamente após login com username:", profileUsername);
+                    }
                 }
-            } catch (profileError) {
-                console.error("Erro ao verificar/criar perfil:", profileError);
-                // Continuar mesmo se houver erro - middleware tentará criar também
+            } catch (profileHandlingError) {
+                console.error("Erro GERAL ao verificar/criar perfil:", profileHandlingError);
+                // Continuar mesmo se houver erro, tentar redirecionar para home
             }
 
             setSuccess(true);
 
-            // Redirecionar após breve pausa para mostrar a mensagem de sucesso
+            // Redirecionar após breve pausa
             setTimeout(() => {
-                router.push("/dashboard");
-                router.refresh();
+                if (profileUsername) {
+                    console.log("Redirecionando para o perfil:", profileUsername);
+                    router.push(`/profile/${encodeURIComponent(profileUsername)}`);
+                } else {
+                    console.warn("Não foi possível obter o username, redirecionando para home.");
+                    router.push("/"); // Fallback para home se username não for encontrado
+                }
+                 router.refresh(); // Atualiza o estado do servidor (importante após login)
             }, 1000);
         } catch (err) {
             const errorMessages = {
