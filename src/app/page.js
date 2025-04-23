@@ -36,12 +36,15 @@ export default async function HomePage() {
             {/* Adiciona o H1 principal da página inicial */}
             <h1 className="sr-only">Casa Dos Escritores: Sua Plataforma para Publicar e Conectar</h1>
             
+            {/* NOVA SEÇÃO: Séries Destacadas - Agora no topo */}
+            <SeriesHighlights />
+            
             {/* Seção de 3 colunas */}
-            <section className="max-w-[75rem] mx-auto px-4 md:px-0 three-columns-section">
+            <section className="max-w-[75rem] mx-auto px-4 md:px-0 py-8 three-columns-section">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Coluna 1: Histórias Recentes */}
                     <div className="column">
-                        <h2 className="text-2xl font-extrabold text-black mb-4 border-[#E5E7EB] pb-2 relative">
+                        <h2 className="text-2xl font-extrabold text-black mb-4 border-[#D7D7D7] pb-2 relative">
                             Recentes
                             <span className="block h-1 w-32 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
                         </h2>
@@ -50,7 +53,7 @@ export default async function HomePage() {
 
                     {/* Coluna 2: Mais Comentados */}
                     <div className="column">
-                        <h2 className="text-2xl font-extrabold text-black mb-4  border-[#E5E7EB] pb-2 relative">
+                        <h2 className="text-2xl font-extrabold text-black mb-4 border-[#D7D7D7] pb-2 relative">
                             Mais Comentados
                             <span className="block h-1 w-32 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
                         </h2>
@@ -59,18 +62,13 @@ export default async function HomePage() {
 
                     {/* Coluna 3: Top 10 Escritores */}
                     <div className="column">
-                        <h2 className="text-2xl font-extrabold text-black mb-4  border-[#E5E7EB] pb-2 relative">
+                        <h2 className="text-2xl font-extrabold text-black mb-4 border-[#D7D7D7] pb-2 relative">
                             Escritores em Destaque
                             <span className="block h-1 w-32 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
                         </h2>
                         <TopWritersList writers={topWriters} />
                     </div>
                 </div>
-            </section>
-
-            {/* NOVA SEÇÃO: Séries Destacadas */}
-            <section className="max-w-[75rem] mx-auto px-4 md:px-0 series-highlights-section">
-                <SeriesHighlights />
             </section>
 
             <section className="max-w-[75rem] mx-auto px-4 md:px-0 py-12 features-section">
@@ -80,7 +78,7 @@ export default async function HomePage() {
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 features-grid">
-                    <div className="bg-white p-6 rounded-lg shadow-md border border-[#E5E7EB] flex flex-col items-center text-center feature-card">
+                    <div className="bg-white p-6 rounded-lg shadow-md border border-[#D7D7D7] flex flex-col items-center text-center feature-card">
                         <div className="bg-[#484DB5]/10 p-4 rounded-full mb-4 feature-icon">
                             <Edit size={32} color="#484DB5" />
                         </div>
@@ -91,7 +89,7 @@ export default async function HomePage() {
                         </p>
                     </div>
 
-                    <div className="bg-white p-6 rounded-lg shadow-md border border-[#E5E7EB] flex flex-col items-center text-center feature-card">
+                    <div className="bg-white p-6 rounded-lg shadow-md border border-[#D7D7D7] flex flex-col items-center text-center feature-card">
                         <div className="bg-[#484DB5]/10 p-4 rounded-full mb-4 feature-icon">
                             <BookOpen size={32} color="#484DB5" />
                         </div>
@@ -102,7 +100,7 @@ export default async function HomePage() {
                         </p>
                     </div>
 
-                    <div className="bg-white p-6 rounded-lg shadow-md border border-[#E5E7EB] flex flex-col items-center text-center feature-card">
+                    <div className="bg-white p-6 rounded-lg shadow-md border border-[#D7D7D7] flex flex-col items-center text-center feature-card">
                         <div className="bg-[#484DB5]/10 p-4 rounded-full mb-4 feature-icon">
                             <Share2 size={32} color="#484DB5" />
                         </div>

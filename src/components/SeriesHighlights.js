@@ -3,11 +3,9 @@
 
 // REMOVIDO: import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image"; // ADICIONADO: Importar Image
-// REMOVIDO: import { createBrowserClient } from "@/lib/supabase-browser";
-import { createServerSupabaseClient } from "@/lib/supabase-server"; // ADICIONADO: Importar cliente do servidor
-import { Book, ChevronRight } from "lucide-react";
-import { generateSlug } from "@/lib/utils";
+import { ChevronRight } from "lucide-react";
+import { createServerSupabaseClient } from "@/lib/supabase-server";
+import SeriesCard from "./SeriesCard";
 
 // ADICIONADO: tornar async
 export default async function SeriesHighlights() {
@@ -21,7 +19,7 @@ export default async function SeriesHighlights() {
 
     try {
         console.log("[Server] Buscando séries populares para Highlights");
-        // Buscar as 5 séries mais visualizadas, incluindo dados do autor
+        // Buscar as 6 séries mais visualizadas (agora lg:grid-cols-6)
         const { data: initialSeries, error: seriesError } = await supabase
             .from("series_with_author")
             .select(
@@ -37,7 +35,7 @@ export default async function SeriesHighlights() {
               `
             )
             .order("view_count", { ascending: false })
-            .limit(5);
+            .limit(6);
 
         if (seriesError) {
             console.error("[Server] Erro na consulta das séries (Highlights):", seriesError);
@@ -94,13 +92,13 @@ export default async function SeriesHighlights() {
     }
 
     return (
-        <section className="py-8">
-            <div className="max-w-[75rem] mx-auto">
+        <section className="pb-6 border-b border-[#D7D7D7]">
+            <div className="max-w-[75rem] mx-auto px-4 md:px-0">
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-3xl font-extrabold text-black relative">
+                    <h2 className="text-2xl font-extrabold text-black relative">
                         Séries em Destaque
                         {/* Mantido span visual */}
-                        <span className="block h-1 w-64 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span> 
+                        <span className="block h-1 w-48 mt-2 bg-gradient-to-r from-[#484DB5] to-[#484DB5]/20 rounded-full animate-pulse"></span> 
                     </h2>
                     <Link href="/series" className="flex items-center text-[#484DB5] hover:underline">
                         <span>Ver Todas</span>
@@ -108,75 +106,15 @@ export default async function SeriesHighlights() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-                    {/* Usar seriesWithDetails */} 
+                {/* Aplicando 6 colunas a partir de lg, e ajustando gap a partir de lg */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 lg:gap-2">
                     {seriesWithDetails.map((serie, index) => (
-                        <Link
-                            // MUDADO: Usar generateSlug com ID
-                            href={`/series/${serie.id}`}
+                        <SeriesCard 
                             key={serie.id}
-                            className="flex flex-col rounded-lg border border-[#E5E7EB] overflow-hidden hover:shadow-md transition-shadow bg-white"
-                        >
-                            <div className="relative w-full pt-[150%]"> 
-                                {index === 0 ? (
-                                    <div className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 text-sm font-bold rounded z-10">
-                                        #1
-                                    </div>
-                                ) : (
-                                    <div className="absolute top-2 left-2 bg-[#484DB5] text-white px-2 py-1 text-sm font-bold rounded z-10">
-                                        #{index + 1}
-                                    </div>
-                                )}
-                                {serie.cover_url ? (
-                                    // SUBSTITUÍDO: img por Image
-                                    <Image
-                                        src={serie.cover_url}
-                                        alt={serie.title}
-                                        fill
-                                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                                        className="object-cover" // Mantém object-cover
-                                        priority={index === 0} // Adicionado priority para a primeira imagem
-                                    />
-                                ) : (
-                                    // MANTIDO: Fallback visual
-                                    <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-[#484DB5] text-white text-4xl font-bold">
-                                        {serie.title.charAt(0).toUpperCase()}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="p-3 flex-grow flex flex-col">
-                                <h3 className="font-bold text-base line-clamp-2 mb-1">{serie.title}</h3>
-                                <p className="text-xs text-gray-600 mb-2">
-                                    de {serie.author_name} {/* Usar author_name populado */}
-                                </p>
-                                {serie.genre && (
-                                    <div className="mb-2">
-                                        <span className="text-xs text-[#484DB5] font-medium">
-                                            › {serie.genre}
-                                        </span>
-                                    </div>
-                                )}
-                                <div className="mt-auto flex items-center justify-between text-xs text-gray-600">
-                                    {/* Mantida estrutura visual dos ícones */}
-                                    <div className="flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                        {serie.view_count.toLocaleString("pt-BR")}
-                                    </div>
-                                    <div className="flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        {serie.chapter_count} {/* Usar chapter_count populado */}
-                                    </div>
-                                    <span className="text-xs text-[#484DB5] bg-purple-100 px-2 py-0.5 rounded">
-                                        {serie.is_completed ? "Completa" : "escrevendo..."}
-                                    </span>
-                                </div>
-                            </div>
-                        </Link>
+                            serie={serie}
+                            index={index}
+                            showRanking={true}
+                        />
                     ))}
                 </div>
             </div>
