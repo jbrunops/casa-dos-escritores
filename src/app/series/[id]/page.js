@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 import { createBrowserClient } from "@/lib/supabase-browser";
 import SeriesActions from "@/components/SeriesActions";
 import Comments from "@/components/Comments";
-import { Eye, BookOpen, Calendar, User, Edit, Trash2, Plus } from "lucide-react";
+import DeleteModal from "@/components/DeleteModal";
+import { Eye, BookOpen, Calendar, User, Edit, Trash2, Plus, CheckCircle2, AlertTriangle } from "lucide-react";
 import { useParams } from "next/navigation";
 import { extractIdFromSlug, generateSlug } from "@/lib/utils";
 
@@ -21,6 +22,16 @@ export default function SeriesPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentUserId, setCurrentUserId] = useState(null);
+    // Estados para o modal de exclusão
+    const [deleteModal, setDeleteModal] = useState({
+        open: false,
+        id: null,
+        title: "",
+        type: "chapter"
+    });
+    const [deleting, setDeleting] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
     const supabase = createBrowserClient();
 
     useEffect(() => {
@@ -120,22 +131,86 @@ export default function SeriesPage() {
         return date.toLocaleDateString("pt-BR");
     };
 
-    const handleDeleteChapter = async (chapterId) => {
-        if (!confirm("Tem certeza que deseja excluir este capítulo?")) return;
+    // Abrir o modal de confirmação de exclusão
+    const openDeleteModal = (id, title) => {
+        setErrorMessage(""); // Limpa erro anterior
+        setSuccessMessage(""); // Limpa sucesso anterior
+        setDeleteModal({ open: true, id, title, type: "chapter" });
+    };
+
+    // Fechar o modal de confirmação de exclusão
+    const closeDeleteModal = () => {
+        setDeleteModal({ open: false, id: null, title: "", type: "chapter" });
+    };
+
+    // Função executada ao confirmar a exclusão no modal
+    const handleConfirmDelete = async () => {
+        if (!deleteModal.id) {
+            setErrorMessage("Erro interno: ID do capítulo não encontrado.");
+            return;
+        }
+
+        setDeleting(true);
+        setErrorMessage("");
+        setSuccessMessage("");
+        const chapterIdToDelete = deleteModal.id;
 
         try {
-            const { error } = await supabase
+            // ----- Verificação de Autoria (Manter a lógica, remover logs) ----- 
+            const { data: { user } } = await supabase.auth.getUser();
+            const currentUserId = user?.id;
+
+            if (!currentUserId) {
+                throw new Error("Usuário não autenticado.");
+            }
+
+            const { data: chapterData, error: fetchError } = await supabase
+                .from('chapters')
+                .select('author_id')
+                .eq('id', chapterIdToDelete)
+                .single();
+            
+            if (fetchError) {
+                 throw new Error(`Erro ao buscar dados do capítulo: ${fetchError.message}`);
+            }
+            if (!chapterData) {
+                 throw new Error(`Capítulo com ID ${chapterIdToDelete} não encontrado.`);
+            }
+            
+            const chapterAuthorId = chapterData.author_id;
+
+            if (currentUserId !== chapterAuthorId) {
+                 throw new Error("Você não tem permissão para excluir este capítulo.");
+            }
+            // ----- FIM Verificação -----
+
+            const { error: deleteError } = await supabase
                 .from("chapters")
                 .delete()
-                .eq("id", chapterId);
+                .eq("id", chapterIdToDelete);
 
-            if (error) throw error;
+            if (deleteError) {
+                if (deleteError.code === '23503') {
+                    throw new Error("Não é possível excluir o capítulo pois existem comentários associados.");
+                }
+                if (deleteError.code === '42501') {
+                     throw new Error("Permissão negada pela política de segurança.");
+                }
+                throw new Error(deleteError.message || "Erro desconhecido do Supabase ao excluir.");
+            }
 
-            // Atualizar a lista de capítulos localmente
-            setChapters(chapters.filter((chapter) => chapter.id !== chapterId));
+            setChapters(chapters.filter((chapter) => chapter.id !== chapterIdToDelete));
+            setSuccessMessage("Capítulo excluído com sucesso!");
+            closeDeleteModal();
+
+            setTimeout(() => setSuccessMessage(""), 3000);
+
         } catch (err) {
             console.error("Erro ao excluir capítulo:", err);
-            alert("Erro ao excluir capítulo. Por favor, tente novamente.");
+            setErrorMessage(`Erro ao excluir capítulo: ${err.message}`);
+             setTimeout(() => setErrorMessage(""), 5000);
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -167,6 +242,19 @@ export default function SeriesPage() {
 
     return (
         <div className="max-w-[75rem] mx-auto px-4 sm:px-0 py-8">
+            {/* Mensagens de Feedback */} 
+            {successMessage && (
+                <div className="flex items-center p-4 mb-4 bg-green-50 text-green-700 rounded-md border border-green-200">
+                    <CheckCircle2 size={20} className="mr-2 flex-shrink-0" />
+                    <span>{successMessage}</span>
+                </div>
+            )}
+            {errorMessage && (
+                <div className="flex items-center p-4 mb-4 bg-red-50 text-red-700 rounded-md border border-red-200">
+                    <AlertTriangle size={20} className="mr-2 flex-shrink-0" />
+                    <span>{errorMessage}</span>
+                </div>
+            )}
             {/* Header com informações da série */}
             <div className="flex flex-col md:flex-row p-6 gap-6 border border-[#E5E7EB] mb-6">
                 <div className="w-full md:w-1/3 lg:w-1/4">
@@ -321,10 +409,11 @@ export default function SeriesPage() {
                                             </Link>
                                             <button
                                                 onClick={() =>
-                                                    handleDeleteChapter(chapter.id)
+                                                    openDeleteModal(chapter.id, chapter.title)
                                                 }
                                                 className="flex items-center justify-center h-10 w-10 text-gray-600 hover:text-red-600 rounded-md border border-[#E5E7EB] hover:border-red-300 transition-all duration-300 hover:-translate-y-1"
                                                 title="Excluir Capítulo"
+                                                disabled={deleting}
                                             >
                                                 <Trash2 size={16} />
                                             </button>
@@ -337,14 +426,17 @@ export default function SeriesPage() {
                 )}
             </div>
             
-            {/* Seção de comentários */}
-            <div className="p-6 border border-[#E5E7EB]">
-                <Comments 
-                    contentId={id} 
-                    contentType="series" 
-                    userId={currentUserId}
+            {/* Modal de exclusão */} 
+            {deleteModal.open && (
+                <DeleteModal
+                    isOpen={deleteModal.open}
+                    onClose={closeDeleteModal}
+                    onConfirm={handleConfirmDelete}
+                    title="Excluir Capítulo"
+                    message={`Tem certeza que deseja excluir o capítulo "${deleteModal.title || 'este capítulo'}"? Comentários associados também podem ser afetados. Esta ação não pode ser desfeita.`}
+                    isLoading={deleting}
                 />
-            </div>
+            )}
         </div>
     );
 }

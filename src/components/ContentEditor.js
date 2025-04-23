@@ -16,7 +16,8 @@ import {
     BookOpen,
     Book,
     Image,
-    UploadCloud
+    UploadCloud,
+    Loader2
 } from "lucide-react";
 
 export default function ContentEditor({
@@ -57,6 +58,7 @@ export default function ContentEditor({
     
     // Estados específicos para capítulos
     const [chapterNumber, setChapterNumber] = useState(1);
+    const [loadingChapterNumber, setLoadingChapterNumber] = useState(false);
     const [series, setSeries] = useState(null);
     const [loading, setLoading] = useState(false);
 
@@ -116,6 +118,40 @@ export default function ContentEditor({
             setReadingTime(0);
         }
     }, [currentContent]);
+
+    // Buscar o próximo número do capítulo quando for criar um novo capítulo
+    useEffect(() => {
+        const fetchNextChapterNumber = async () => {
+            if (type === 'chapter' && seriesId && !isEditingModeRef.current) { // Apenas para criação
+                setLoadingChapterNumber(true);
+                try {
+                    const { data: lastChapter, error } = await supabase
+                        .from('chapters')
+                        .select('chapter_number')
+                        .eq('series_id', seriesId)
+                        .order('chapter_number', { ascending: false })
+                        .limit(1)
+                        .single();
+
+                    if (error && error.code !== 'PGRST116') { // Ignora erro 'No rows found'
+                        throw error;
+                    }
+
+                    const nextNumber = lastChapter ? lastChapter.chapter_number + 1 : 1;
+                    setChapterNumber(nextNumber);
+
+                } catch (err) {
+                    console.error("Erro ao buscar próximo número do capítulo:", err);
+                    setError("Não foi possível determinar o número do próximo capítulo.");
+                    // Manter 1 como fallback ou considerar outra estratégia
+                } finally {
+                    setLoadingChapterNumber(false);
+                }
+            }
+        };
+
+        fetchNextChapterNumber();
+    }, [type, seriesId, supabase, isEditingModeRef]);
 
     // Manipuladores de eventos específicos para séries
     const handleCoverChange = (e) => {
@@ -448,23 +484,38 @@ export default function ContentEditor({
                         </div>
                     )}
 
-                    {/* Campo Número do Capítulo - Mostrar APENAS se for CAPÍTULO e estiver EDITANDO */}
-                    {type === "chapter" && isEditingModeRef.current && (
-                        <div className="space-y-2">
+                    {/* Número do Capítulo (Apenas para tipo 'chapter') */}
+                    {type === "chapter" && (
+                       <div className="space-y-2">
                             <label htmlFor="chapterNumber" className="block text-sm font-medium text-gray-700">
-                                Número do Capítulo* 
+                                Número do Capítulo*
                             </label>
-                            <input
-                                id="chapterNumber"
-                                type="number"
-                                min="1"
-                                value={chapterNumber} // Usar estado local, se houver
-                                // onChange={(e) => setChapterNumber(parseInt(e.target.value))} // Talvez desabilitar a edição?
-                                className="w-full h-10 px-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200 bg-gray-50" // Adicionado bg-gray-50 para indicar não editável
-                                required
-                                readOnly // Tornar read-only para evitar edição manual confusa
-                            />
-                             <p className="text-xs text-gray-500">O número do capítulo é gerenciado automaticamente.</p> {/* Mensagem informativa */} 
+                            {
+                                // Se estiver criando (não editando) e carregando o número
+                                !isEditingModeRef.current && loadingChapterNumber ? (
+                                    <div className="flex items-center text-gray-500 h-10 px-3 border border-[#E5E7EB] rounded-md bg-gray-100">
+                                        <Loader2 className="animate-spin mr-2" size={16} />
+                                        Buscando próximo número...
+                                    </div>
+                                ) : (
+                                    // Se estiver criando (e já carregou) ou editando
+                                    <input
+                                        id="chapterNumber"
+                                        type="number"
+                                        min="1"
+                                        value={chapterNumber} // Usa o estado chapterNumber
+                                        // Se estiver criando, é readOnly. Se editando, também (gerenciado automaticamente)
+                                        readOnly
+                                        className="w-full h-10 px-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200 bg-gray-100 cursor-not-allowed"
+                                        required
+                                    />
+                                )
+                            }
+                            <p className="text-xs text-gray-500">
+                                {isEditingModeRef.current
+                                    ? "O número do capítulo não pode ser alterado."
+                                    : "Este número é determinado automaticamente com base nos capítulos existentes."}
+                            </p>
                         </div>
                     )}
                 </div>
