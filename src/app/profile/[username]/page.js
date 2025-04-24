@@ -509,56 +509,53 @@ export default async function ProfilePage({ params }) {
                                         <p>Nenhum conto {isOwnProfile ? 'criado' : 'publicado'} ainda.</p>
                                     </div>
                                 ) : (
-                                    <table className="min-w-full divide-y divide-border">
-                                        <thead className="bg-gray-50">
-                                            <tr>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
-                                                {isOwnProfile && (
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Status</th>
-                                                )}
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Visualizações</th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Atualizada</th>
-                                                {isOwnProfile && (
-                                                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                                                )}
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white divide-y divide-border">
-                                            {stories.map((story) => (
-                                                <tr key={story.id}>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <Link href={`/story/${generateSlug(story.title, story.id)}`} className="text-sm font-medium text-gray-900 hover:text-[#484DB5]">
-                                                            {story.title}
-                                                        </Link>
-                                                        <div className="text-xs text-gray-500">{story.category || "Sem categoria"}</div>
-                                                    </td>
-                                                    {isOwnProfile && (
-                                                        <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
-                                                            <span
-                                                                className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${story.is_published
-                                                                    ? "bg-green-100 text-green-800"
-                                                                    : "bg-yellow-100 text-yellow-800"
-                                                                    }`}
-                                                            >
-                                                                {story.is_published ? "Publicada" : "Rascunho"}
-                                                            </span>
-                                                        </td>
-                                                    )}
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
-                                                        {story.view_count || 0}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                                                        {formatDate(story.updated_at || story.created_at)}
-                                                    </td>
-                                                    {isOwnProfile && (
-                                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                            <ProfileStoryActions story={story} isOwnProfile={isOwnProfile} />
-                                                        </td>
-                                                    )}
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                    <>
+                                        {/* Usar o layout de cards para TODOS os tamanhos de tela */}
+                                        <div className="block">
+                                            <div className="space-y-4">
+                                                {stories.map((story) => (
+                                                    <div key={story.id} className="bg-white border border-[#D7D7D7] rounded-md overflow-hidden">
+                                                        <div className="px-4 py-3 border-b border-[#D7D7D7]">
+                                                            <div className="flex justify-between items-start">
+                                                                <Link 
+                                                                    href={`/story/${generateSlug(story.title, story.id)}`} 
+                                                                    className="text-sm font-medium text-gray-900 hover:text-[#484DB5] block pr-2 truncate"
+                                                                    title={story.title}
+                                                                >
+                                                                    {story.title}
+                                                                </Link>
+                                                                {isOwnProfile && (
+                                                                    <div className="flex-shrink-0">
+                                                                        <ProfileStoryActions story={story} isOwnProfile={isOwnProfile} />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className="text-xs text-gray-500 mt-1 truncate">{story.category || "Sem categoria"}</div>
+                                                        </div>
+                                                        <div className="px-4 py-2 flex justify-between items-center text-xs text-gray-500 bg-gray-50">
+                                                            <div className="flex items-center">
+                                                                <Eye size={14} className="mr-1" />
+                                                                {story.view_count || 0} visualizações
+                                                            </div>
+                                                            {isOwnProfile && (
+                                                                <span
+                                                                    className={`px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${story.is_published
+                                                                        ? "bg-green-100 text-green-800"
+                                                                        : "bg-yellow-100 text-yellow-800"
+                                                                        }`}
+                                                                >
+                                                                    {story.is_published ? "Publicada" : "Rascunho"}
+                                                                </span>
+                                                            )}
+                                                            <div>
+                                                                {formatDate(story.updated_at || story.created_at)}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </>
                                 )}
                             </div>
                         </div>

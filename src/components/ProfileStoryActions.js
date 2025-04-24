@@ -85,31 +85,30 @@ export default function ProfileStoryActions({ story, isOwnProfile }) {
 
     return (
         <div className="flex items-center justify-end space-x-1">
-             {/* Mensagens de feedback dentro das ações */}
-            {/* {successMessage && <span className="text-xs text-green-600 mr-2">{successMessage}</span>} */} 
-            {/* {errorMessage && <span className="text-xs text-red-600 mr-2">{errorMessage}</span>} */} 
-
             <Link
                 href={`/story/${generateSlug(story.title, story.id)}`}
                 title="Visualizar"
-                className="text-gray-400 hover:text-primary p-2 inline-flex items-center justify-center rounded-md hover:bg-gray-100"
+                className="text-gray-400 hover:text-[#484DB5] p-1 inline-flex items-center justify-center rounded-md hover:bg-gray-100"
+                aria-label="Visualizar"
             >
-                <Eye size={18} />
+                <Eye size={16} />
             </Link>
             <Link
                 href={`/dashboard/edit/${story.id}`}
                 title="Editar"
-                className="text-gray-400 hover:text-primary p-2 inline-flex items-center justify-center rounded-md hover:bg-gray-100"
+                className="text-gray-400 hover:text-[#484DB5] p-1 inline-flex items-center justify-center rounded-md hover:bg-gray-100"
+                aria-label="Editar"
             >
-                <Edit3 size={18} />
+                <Edit3 size={16} />
             </Link>
             <button
                 onClick={openDeleteModalHandler}
                 title="Excluir"
-                className="text-gray-400 hover:text-red-600 p-2 inline-flex items-center justify-center rounded-md hover:bg-red-50"
+                className="text-gray-400 hover:text-red-600 p-1 inline-flex items-center justify-center rounded-md hover:bg-red-50"
                 disabled={deleting}
+                aria-label="Excluir"
             >
-                <Trash2 size={18} />
+                <Trash2 size={16} />
             </button>
 
             <DeleteModal
@@ -119,7 +118,7 @@ export default function ProfileStoryActions({ story, isOwnProfile }) {
                 title={`Excluir História`}
                 message={`Tem certeza que deseja excluir a história "${deleteModal.title}"? Esta ação não pode ser desfeita.`}
                 isLoading={deleting}
-                errorMessage={errorMessage} // Passa o erro para o modal
+                errorMessage={errorMessage}
             />
         </div>
     );
