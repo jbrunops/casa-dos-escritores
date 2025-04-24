@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { Edit, BookOpen, Share2, MessageSquare, BookText, Book } from "lucide-react";
-import SeriesHighlights from "@/components/SeriesHighlights";
+import RankedSeriesList from "@/components/RankedSeriesList";
 import { generateSlug, createSummary, formatDate } from "@/lib/utils";
 import RecentContentList from "@/components/RecentContentList";
 import MostCommentedList from "@/components/MostCommentedList";
@@ -36,8 +36,23 @@ export default async function HomePage() {
             {/* Adiciona o H1 principal da página inicial */}
             <h1 className="sr-only">Casa Dos Escritores: Sua Plataforma para Publicar e Conectar</h1>
             
-            {/* NOVA SEÇÃO: Séries Destacadas - Agora no topo */}
-            <SeriesHighlights />
+            {/* SEÇÃO: Séries em Destaque (Mais Vistas) */}
+            <RankedSeriesList 
+              title="Séries em Destaque"
+              orderByField="view_count"
+              orderByAscending={false}
+              limit={8}
+            />
+
+            {/* NOVA SEÇÃO: Novas Séries (Mais Recentes) - Adicionado padding top */}
+            <div className="pt-6">
+              <RankedSeriesList 
+                title="Novas Séries"
+                orderByField="created_at"
+                orderByAscending={false}
+                limit={8}
+              />
+            </div>
             
             {/* Seção de 3 colunas */}
             <section className="max-w-[75rem] mx-auto px-4 md:px-0 py-8 three-columns-section">

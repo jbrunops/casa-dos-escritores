@@ -7,9 +7,9 @@ export default function SeriesCard({ serie, index, showRanking = false }) {
       href={`/series/${serie.id}`}
       className="flex flex-col rounded-lg border border-[#D7D7D7] overflow-hidden hover:shadow-md transition-shadow bg-white"
     >
-      <div className="relative w-full pt-[150%]">
+      <div className="relative w-full pt-[140%]">
         {showRanking && (
-          <div className={`absolute top-2 left-2 bg-[#484DB5] text-white px-2 py-1 text-xs font-bold rounded z-10`}>
+          <div className={`absolute bottom-2 left-2 bg-[#484DB5] text-white px-2 py-1 text-xs font-bold rounded z-10`}>
             #{index + 1}
           </div>
         )}
