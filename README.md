@@ -12,14 +12,14 @@ O projeto é construído sobre um stack moderno de tecnologias web:
 *   **Linguagem:** JavaScript
 *   **Biblioteca UI:** React
 *   **Estilização:** Tailwind CSS (com PostCSS)
-*   **Backend & Banco de Dados:** Supabase (utilizando funções RPC para acesso a dados e provavelmente Supabase Auth para autenticação)
+*   **Backend & Banco de Dados:** Supabase (utilizando funções RPC para acesso a dados e Supabase Auth para autenticação)
 *   **Ícones:** Lucide React
 
 ## Funcionalidades Principais
 
 A plataforma oferece um conjunto rico de funcionalidades para autores e leitores:
 
-*   **Autenticação de Usuários:** Sistema de registro e login seguro (provavelmente gerenciado pelo Supabase Auth).
+*   **Autenticação de Usuários:** Sistema de registro e login seguro gerenciado pelo Supabase Auth.
 *   **Publicação de Conteúdo:** Autores podem criar e gerenciar:
     *   Histórias individuais
     *   Capítulos dentro de histórias
@@ -34,7 +34,7 @@ A plataforma oferece um conjunto rico de funcionalidades para autores e leitores
     *   Sistema de comentários nas publicações.
     *   Ranking de escritores com base em engajamento ou publicações.
 *   **Painéis:**
-    *   Dashboard para usuários logados (funcionalidade específica a ser detalhada).
+    *   Dashboard para usuários logados.
     *   Seção de Administração para gerenciamento da plataforma.
 *   **Notificações:** Sistema para informar os usuários sobre interações relevantes.
 *   **Otimização para Motores de Busca (SEO):** Metadados dinâmicos e Schema Markup (JSON-LD) para melhor indexação.
@@ -51,7 +51,7 @@ O código fonte está organizado seguindo as convenções do Next.js App Router,
     *   `api/`: Rotas de API, se houver alguma customizada além do Supabase.
 *   **`src/components/`**: Armazena componentes React reutilizáveis usados em diferentes partes da aplicação (ex: `Header`, `RankedSeriesList`, `TopWritersList`, componentes de anúncios como `Ads/AdUnit1`).
 *   **`src/lib/`**: Contém código de suporte e utilitários.
-    *   `supabase-server.js` / `supabase-client.js` (provável): Configuração e inicialização do cliente Supabase.
+    *   `supabase-server.js` / `supabase-client.js`: Configuração e inicialização do cliente Supabase.
     *   `utils.js`: Funções auxiliares genéricas (formatação de datas, geração de slugs, etc.).
 *   **`src/styles/`** (ou `src/app/globals.css`): Arquivos de estilização global e configurações base do Tailwind CSS.
 *   **`public/`**: Diretório para assets estáticos (imagens, fontes, etc.).
@@ -68,9 +68,9 @@ A interface é construída utilizando Tailwind CSS, aplicando uma abordagem util
 
 ## Gerenciamento de Dados
 
-O Supabase atua como a principal solução de backend-as-a-service, gerenciando o banco de dados (provavelmente PostgreSQL), autenticação e fornecendo APIs para interação com os dados. O acesso aos dados no frontend é realizado principalmente através de chamadas a funções RPC (`supabase.rpc(...)`) definidas no backend do Supabase, garantindo uma camada de abstração e segurança.
+O Supabase atua como a principal solução de backend-as-a-service, gerenciando o banco de dados PostgreSQL, a autenticação (Supabase Auth) e fornecendo APIs para interação com os dados. O acesso aos dados no frontend é realizado principalmente através de chamadas a funções RPC (`supabase.rpc(...)`) definidas no backend do Supabase, garantindo uma camada de abstração e segurança.
 
-O arquivo `supabase-types.ts` sugere o uso de tipos gerados automaticamente a partir do schema do banco de dados Supabase para garantir a segurança de tipos nas interações.
+O arquivo `supabase-types.ts` contém tipos gerados automaticamente a partir do schema do banco de dados Supabase para garantir a segurança de tipos nas interações.
 
 ---
 *Este README descreve o estado atual e a arquitetura da aplicação Casa Dos Escritores.*
