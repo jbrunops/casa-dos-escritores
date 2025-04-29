@@ -48,7 +48,7 @@ O código fonte está organizado seguindo as convenções do Next.js App Router,
     *   `layout.js`: Define o layout raiz global, incluindo `<html>`, `<head>`, `<body>`, header, footer e scripts globais (como AdSense).
     *   `page.js`: Componente da página inicial.
     *   Subdiretórios como `(auth)`, `admin`, `categories`, `chapter`, `dashboard`, `notifications`, `profile`, `search`, `series`, `story`: Definem as rotas e páginas para cada funcionalidade específica.
-    *   `api/`: Rotas de API, se houver alguma customizada além do Supabase.
+    *   `api/`: Contém as rotas de API customizadas do Next.js, complementando as funcionalidades do Supabase.
 *   **`src/components/`**: Armazena componentes React reutilizáveis usados em diferentes partes da aplicação (ex: `Header`, `RankedSeriesList`, `TopWritersList`, componentes de anúncios como `Ads/AdUnit1`).
 *   **`src/lib/`**: Contém código de suporte e utilitários.
     *   `supabase-server.js` / `supabase-client.js`: Configuração e inicialização do cliente Supabase.
