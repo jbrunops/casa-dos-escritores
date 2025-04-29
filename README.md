@@ -1,3 +1,80 @@
+# Casa Dos Escritores
+
+## Visão Geral
+
+A Casa Dos Escritores é uma plataforma online projetada para conectar autores e leitores. Ela oferece um espaço para escritores publicarem suas obras (histórias, capítulos, séries), interagirem com a comunidade e acompanharem seu desempenho, enquanto leitores podem descobrir novos conteúdos, seguir seus autores favoritos e participar das discussões.
+
+## Tecnologias Principais
+
+O projeto é construído sobre um stack moderno de tecnologias web:
+
+*   **Framework Frontend:** Next.js (utilizando App Router)
+*   **Linguagem:** JavaScript
+*   **Biblioteca UI:** React
+*   **Estilização:** Tailwind CSS (com PostCSS)
+*   **Backend & Banco de Dados:** Supabase (utilizando funções RPC para acesso a dados e provavelmente Supabase Auth para autenticação)
+*   **Ícones:** Lucide React
+
+## Funcionalidades Principais
+
+A plataforma oferece um conjunto rico de funcionalidades para autores e leitores:
+
+*   **Autenticação de Usuários:** Sistema de registro e login seguro (provavelmente gerenciado pelo Supabase Auth).
+*   **Publicação de Conteúdo:** Autores podem criar e gerenciar:
+    *   Histórias individuais
+    *   Capítulos dentro de histórias
+    *   Séries para agrupar histórias relacionadas
+*   **Descoberta de Conteúdo:**
+    *   Página inicial com seções dinâmicas (Séries em Destaque, Novas Séries, Conteúdo Recente, Mais Comentados, Escritores em Destaque).
+    *   Navegação por Categorias.
+    *   Navegação por Séries.
+    *   Funcionalidade de Busca.
+*   **Perfis de Usuário:** Páginas dedicadas aos perfis dos escritores, exibindo suas publicações e informações.
+*   **Interação Social:**
+    *   Sistema de comentários nas publicações.
+    *   Ranking de escritores com base em engajamento ou publicações.
+*   **Painéis:**
+    *   Dashboard para usuários logados (funcionalidade específica a ser detalhada).
+    *   Seção de Administração para gerenciamento da plataforma.
+*   **Notificações:** Sistema para informar os usuários sobre interações relevantes.
+*   **Otimização para Motores de Busca (SEO):** Metadados dinâmicos e Schema Markup (JSON-LD) para melhor indexação.
+*   **Monetização:** Integração com Google AdSense para exibição de anúncios através de blocos específicos (Ad Units) gerenciados como componentes React.
+
+## Estrutura do Projeto
+
+O código fonte está organizado seguindo as convenções do Next.js App Router, dentro do diretório `src`:
+
+*   **`src/app/`**: Contém a estrutura principal de roteamento da aplicação.
+    *   `layout.js`: Define o layout raiz global, incluindo `<html>`, `<head>`, `<body>`, header, footer e scripts globais (como AdSense).
+    *   `page.js`: Componente da página inicial.
+    *   Subdiretórios como `(auth)`, `admin`, `categories`, `chapter`, `dashboard`, `notifications`, `profile`, `search`, `series`, `story`: Definem as rotas e páginas para cada funcionalidade específica.
+    *   `api/`: Rotas de API, se houver alguma customizada além do Supabase.
+*   **`src/components/`**: Armazena componentes React reutilizáveis usados em diferentes partes da aplicação (ex: `Header`, `RankedSeriesList`, `TopWritersList`, componentes de anúncios como `Ads/AdUnit1`).
+*   **`src/lib/`**: Contém código de suporte e utilitários.
+    *   `supabase-server.js` / `supabase-client.js` (provável): Configuração e inicialização do cliente Supabase.
+    *   `utils.js`: Funções auxiliares genéricas (formatação de datas, geração de slugs, etc.).
+*   **`src/styles/`** (ou `src/app/globals.css`): Arquivos de estilização global e configurações base do Tailwind CSS.
+*   **`public/`**: Diretório para assets estáticos (imagens, fontes, etc.).
+*   **Arquivos de Configuração:**
+    *   `next.config.mjs`: Configurações específicas do Next.js.
+    *   `tailwind.config.js`/`tailwind.config.ts`: Configuração do Tailwind CSS.
+    *   `postcss.config.js`/`postcss.config.ts`: Configuração do PostCSS.
+    *   `jsconfig.json`/`tsconfig.json`: Configurações do JavaScript/TypeScript.
+    *   `.eslintrc.json`/`eslint.config.mjs`: Configurações do ESLint para linting de código.
+
+## Design e Interface do Usuário (UI)
+
+A interface é construída utilizando Tailwind CSS, aplicando uma abordagem utility-first para estilização rápida e consistente. Estilos globais e configurações base do Tailwind estão definidos em `src/app/globals.css`. A biblioteca Lucide React fornece um conjunto de ícones SVG consistentes.
+
+## Gerenciamento de Dados
+
+O Supabase atua como a principal solução de backend-as-a-service, gerenciando o banco de dados (provavelmente PostgreSQL), autenticação e fornecendo APIs para interação com os dados. O acesso aos dados no frontend é realizado principalmente através de chamadas a funções RPC (`supabase.rpc(...)`) definidas no backend do Supabase, garantindo uma camada de abstração e segurança.
+
+O arquivo `supabase-types.ts` sugere o uso de tipos gerados automaticamente a partir do schema do banco de dados Supabase para garantir a segurança de tipos nas interações.
+
+---
+*Este README descreve o estado atual e a arquitetura da aplicação Casa Dos Escritores.*
+
 ## Funcionalidades Detalhadas
 
 ### 1. Listagem de Categorias (`/categories`)
