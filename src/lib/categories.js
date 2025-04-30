@@ -16,7 +16,7 @@ const categoryDescriptions = {
 };
 
 // Lista padrão de categorias se não houver histórias/séries ainda
-const defaultCategories = [
+export const defaultCategories = [
     "Fantasia",
     "Romance",
     "Terror",
