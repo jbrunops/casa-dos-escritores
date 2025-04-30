@@ -19,6 +19,7 @@ import {
     UploadCloud,
     Loader2
 } from "lucide-react";
+import { defaultCategories } from "@/lib/categories";
 
 export default function ContentEditor({
     type = "story", // "story", "series", "chapter"
@@ -67,19 +68,8 @@ export default function ContentEditor({
     const router = useRouter();
     const supabase = createBrowserClient();
 
-    // Lista de categorias disponíveis
-    const categories = [
-        "Fantasia",
-        "Romance",
-        "Terror",
-        "LGBTQ+",
-        "Humor",
-        "Poesia",
-        "Ficção Científica",
-        "Brasileiro",
-        "Anime",
-        "Outros",
-    ];
+    // Usa a lista importada de categorias
+    const categories = defaultCategories;
 
     // Determinar se estamos em modo de edição baseado na presença de um ID existente
     const isEditingModeRef = useRef(!!existingId);
