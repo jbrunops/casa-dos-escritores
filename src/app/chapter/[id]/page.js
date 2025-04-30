@@ -10,27 +10,81 @@ export async function generateMetadata({ params }) {
     const resolvedParams = await Promise.resolve(params);
     const slug = resolvedParams.id;
     const id = extractIdFromSlug(slug) || slug;
-    
+    const defaultImageUrl = 'https://casadosescritores.com.br/og-default-image.jpg'; // Imagem padrão
+
     try {
         const supabase = await createServerSupabaseClient();
         const { data: chapter } = await supabase
             .from("chapters")
-            .select("title, series_id, series(title)")
+            .select("title, series_id, series(title, cover_url)")
             .eq("id", id)
             .single();
 
-        if (chapter) {
+        if (chapter && chapter.series) {
+            const chapterTitle = chapter.title;
+            const seriesTitle = chapter.series.title;
+            const pageTitle = `${chapterTitle} | ${seriesTitle} - Casa dos Escritores`;
+            const description = `Leia o capítulo "${chapterTitle}" da série "${seriesTitle}" na Casa dos Escritores.`;
+            // Usar cover_url se existir, senão a padrão
+            const imageUrl = chapter.series.cover_url || defaultImageUrl;
+            const pageUrl = `https://casadosescritores.com.br/chapter/${slug}`; // URL canônica da página do capítulo
+
             return {
-                title: `${chapter.title} | ${chapter.series.title} - Casa dos Escritores`,
-                description: `Leia o capítulo "${chapter.title}" da série "${chapter.series.title}" na Casa dos Escritores`,
+                title: pageTitle,
+                description: description,
+                openGraph: {
+                    title: pageTitle,
+                    description: description,
+                    url: pageUrl,
+                    siteName: 'Casa dos Escritores',
+                    images: [
+                      {
+                        url: imageUrl,
+                        width: 1200, // Largura padrão para OG images
+                        height: 630, // Altura padrão para OG images
+                        alt: `${seriesTitle} - Capa da Série`,
+                      },
+                    ],
+                    locale: 'pt_BR',
+                    type: 'article', // Marcado como artigo
+                    // Opcional: Adicionar autor do artigo se disponível no chapter
+                    // article: {
+                    //   authors: ['Nome do Autor'], // Buscar nome do autor
+                    // },
+                },
+                twitter: {
+                    card: 'summary_large_image',
+                    title: pageTitle,
+                    description: description,
+                    images: [imageUrl],
+                    // creator: '@twitterDoAutor', // Opcional: Buscar @ do autor
+                    // site: '@casadosescritores', // Opcional: Se tiver twitter do site
+                },
             };
         }
     } catch (error) {
-        console.error("Erro ao buscar dados para metadata:", error);
+        console.error("Erro ao buscar dados para metadata do capítulo:", error);
     }
 
+    // Fallback metadata se derro ou não encontrar capítulo/série
     return {
         title: "Leitura de Capítulo - Casa dos Escritores",
+        description: "Leia capítulos de diversas séries na Casa dos Escritores.",
+         openGraph: {
+            title: "Leitura de Capítulo - Casa dos Escritores",
+            description: "Leia capítulos de diversas séries na Casa dos Escritores.",
+            images: [{ url: defaultImageUrl, width: 1200, height: 630, alt: 'Casa dos Escritores' }],
+            url: 'https://casadosescritores.com.br',
+            siteName: 'Casa dos Escritores',
+            locale: 'pt_BR',
+            type: 'website',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: "Leitura de Capítulo - Casa dos Escritores",
+            description: "Leia capítulos de diversas séries na Casa dos Escritores.",
+            images: [defaultImageUrl],
+        },
     };
 }
 
