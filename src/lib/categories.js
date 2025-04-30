@@ -11,6 +11,8 @@ const categoryDescriptions = {
     "Ficção Científica": "Visões do futuro, tecnologia avançada e exploração espacial.",
     "Brasileiro": "Histórias com o charme, cultura e identidade brasileira.",
     "Anime": "Narrativas inspiradas no estilo japonês de storytelling.",
+    "Biografias": "Relatos inspiradores sobre a vida de pessoas reais.",
+    "Contos": "Narrativas curtas com personagens e enredos concisos.",
     "Outros": "Gêneros diversos e histórias que desafiam classificações.",
 };
 
@@ -25,6 +27,8 @@ const defaultCategories = [
     "Ficção Científica",
     "Brasileiro",
     "Anime",
+    "Biografias",
+    "Contos",
     "Outros",
 ];
 
