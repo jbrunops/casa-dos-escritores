@@ -15,12 +15,48 @@ export default async function HomePage() {
     const [
         { data: recentContent, error: recentError },
         { data: mostCommentedContent, error: commentedError },
-        { data: topWriters, error: writersError }
+        { data: topWriters, error: writersError },
+        { data: featuredSeries, error: featuredSeriesError }
     ] = await Promise.all([
         supabase.rpc('get_recent_content', { p_limit: 10, p_offset: 0 }),
         supabase.rpc('get_most_commented_content', { p_limit: 10, p_offset: 0 }),
-        supabase.rpc('get_top_writers', { p_limit: 10, p_offset: 0 })
+        supabase.rpc('get_top_writers', { p_limit: 10, p_offset: 0 }),
+        // Buscar séries em destaque para passar como dados iniciais para RankedSeriesList
+        supabase.from("series_with_author")
+            .select(`
+                id,
+                title,
+                cover_url,
+                genre,
+                view_count,
+                is_completed,
+                author_id,
+                author_name,
+                created_at
+            `)
+            .order('view_count', { ascending: false })
+            .limit(8)
     ]);
+
+    // Buscar contagem de capítulos para séries em destaque
+    let seriesWithChapters = [];
+    if (featuredSeries?.length > 0) {
+        const seriesIds = featuredSeries.map(s => s.id);
+        const { data: chapterCounts } = await supabase
+            .from('chapters')
+            .select('series_id, id')
+            .in('series_id', seriesIds);
+
+        const countsMap = chapterCounts?.reduce((acc, { series_id }) => {
+            acc[series_id] = (acc[series_id] || 0) + 1;
+            return acc;
+        }, {}) || {};
+
+        seriesWithChapters = featuredSeries.map(serie => ({
+            ...serie,
+            chapter_count: countsMap[serie.id] || 0,
+        }));
+    }
 
     // Logar os dados recebidos *antes* de checar erros
     console.log("[ Server ] Dados recebidos - Recentes:", JSON.stringify(recentContent, null, 2));
@@ -31,6 +67,7 @@ export default async function HomePage() {
     if (recentError) console.error("[ Server ] Erro ao buscar conteúdo recente:", JSON.stringify(recentError, null, 2));
     if (commentedError) console.error("[ Server ] Erro ao buscar conteúdo mais comentado:", JSON.stringify(commentedError, null, 2));
     if (writersError) console.error("[ Server ] Erro ao buscar top escritores:", JSON.stringify(writersError, null, 2));
+    if (featuredSeriesError) console.error("[ Server ] Erro ao buscar séries em destaque:", JSON.stringify(featuredSeriesError, null, 2));
 
     return (
         <>
@@ -43,17 +80,18 @@ export default async function HomePage() {
               orderByField="view_count"
               orderByAscending={false}
               limit={8}
+              initialData={seriesWithChapters}
             />
 
             {/* NOVA SEÇÃO: Novas Séries (Mais Recentes) - Adicionado padding top */}
-            <div className="pt-6">
+            {/* <div className="pt-6">
               <RankedSeriesList 
                 title="Novas Séries"
                 orderByField="created_at"
                 orderByAscending={false}
                 limit={8}
               />
-            </div>
+            </div> */}
             
             {/* Seção de 3 colunas */}
             <section className="max-w-[75rem] mx-auto px-4 md:px-0 py-8 three-columns-section">
