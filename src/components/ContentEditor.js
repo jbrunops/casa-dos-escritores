@@ -17,9 +17,11 @@ import {
     Book,
     Image,
     UploadCloud,
-    Loader2
+    Loader2,
+    Trash2
 } from "lucide-react";
 import { defaultCategories } from "@/lib/categories";
+import DeleteModal from "@/components/DeleteModal";
 
 export default function ContentEditor({
     type = "story", // "story", "series", "chapter"
@@ -64,6 +66,10 @@ export default function ContentEditor({
     const [loadingChapterNumber, setLoadingChapterNumber] = useState(false);
     const [series, setSeries] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    // Estados para o Modal de Exclusão
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const router = useRouter();
     const supabase = createBrowserClient();
@@ -567,9 +573,64 @@ export default function ContentEditor({
         return isEditingModeRef.current ? <Save size={16} className="mr-2" /> : <Send size={16} className="mr-2" />;
     };
 
+    const getPublishButtonText = () => {
+        if (isEditingModeRef.current) {
+            return type === 'chapter' ? 'Atualizar Capítulo' : type === 'series' ? 'Atualizar Série' : 'Atualizar História';
+        } else {
+            return type === 'chapter' ? 'Publicar Capítulo' : type === 'series' ? 'Publicar Série' : 'Publicar História';
+        }
+    };
+
+    const getPublishButtonIcon = () => {
+        return isEditingModeRef.current ? <Save size={16} className="mr-2" /> : <Send size={16} className="mr-2" />;
+    };
+    
+    // Nova função para lidar com a exclusão
+    const handleDelete = async () => {
+        if (!existingId) return;
+
+        setIsDeleting(true);
+        setError(null); // Limpar erros anteriores
+
+        const tableName = type === "story" ? "stories" : type === "chapter" ? "chapters" : null;
+        if (!tableName) {
+            setError("Tipo de conteúdo inválido para exclusão.");
+            setIsDeleting(false);
+            setShowDeleteModal(false);
+            return;
+        }
+
+        try {
+            const { error: deleteError } = await supabase
+                .from(tableName)
+                .delete()
+                .eq("id", existingId);
+
+            if (deleteError) throw deleteError;
+
+            setSuccess(`${type === "story" ? "História" : "Capítulo"} excluíd${type === "story" ? "a" : "o"} com sucesso!`);
+            // Aguardar um pouco para o usuário ver a mensagem de sucesso antes de redirecionar
+            setTimeout(() => {
+                // Se for capítulo e tivermos seriesId, tentar voltar para a página da série
+                if (type === "chapter" && series?.id) { // 'series' é o estado que guarda dados da série do capítulo
+                    router.push(`/series/${series.id}`); // Idealmente usar slug da série se disponível
+                } else {
+                    router.push(backPath); // Usar o backPath genérico
+                }
+            }, 1500);
+
+        } catch (err) {
+            console.error(`Erro ao excluir ${type}:`, err);
+            setError(`Não foi possível excluir. ${err.message}`);
+        } finally {
+            setIsDeleting(false);
+            setShowDeleteModal(false);
+        }
+    };
+
     // Renderização do formulário baseada no tipo
     return (
-        <div className="max-w-[75rem] mx-auto px-4 sm:px-6 md:px-0 py-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-0 py-8">
             {loading ? (
                 <div className="flex items-center justify-center h-40">
                     <Loader2 size={40} className="animate-spin text-[#484DB5]" />
@@ -810,48 +871,58 @@ export default function ContentEditor({
                         )}
 
                         {/* Botões de ação - comum a todos os tipos */}
-                        <div className="flex items-center justify-end space-x-4 pt-4 border-t border-[#E5E7EB]">
-                            {/* Botão de salvar como rascunho - apenas para histórias */}
-                            {type === "story" && (
+                        <div className="flex flex-col sm:flex-row justify-end items-center gap-3 mt-8 pt-6 border-t border-gray-200">
+                            {isEditingModeRef.current && type !== "series" && ( // Botão de excluir só para story/chapter em modo de edição
                                 <button
                                     type="button"
-                                    onClick={(e) => handleSubmit(e, true)}
-                                    disabled={saving || !currentTitle.trim() || !formTouched}
-                                    className="h-10 px-4 flex items-center justify-center border border-[#E5E7EB] rounded-md text-gray-700 hover:bg-gray-50 hover:shadow-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    onClick={() => setShowDeleteModal(true)}
+                                    disabled={saving || publishing || isDeleting}
+                                    className="w-full sm:w-auto h-10 px-4 inline-flex items-center justify-center gap-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed order-last sm:order-first"
                                 >
-                                    {saving ? (
-                                        <div className="w-5 h-5 border-2 border-t-[#484DB5] border-r-[#E5E7EB] border-b-[#E5E7EB] border-l-[#E5E7EB] rounded-full animate-spin mr-2"></div>
-                                    ) : (
-                                        <Save size={18} className="mr-2" />
-                                    )}
-                                    <span>Salvar como rascunho</span>
+                                    <Trash2 size={16} />
+                                    Excluir {type === "story" ? "História" : "Capítulo"}
                                 </button>
                             )}
+                            
+                            {/* Espaçador para empurrar outros botões para a direita se o botão de excluir estiver presente */}
+                            {isEditingModeRef.current && type !== "series" && <div className="hidden sm:block sm:flex-grow"></div>}
 
-                            {/* Botão de publicar/criar */}
+                            {type !== "series" && ( // Botão de salvar rascunho para story/chapter
+                                <button
+                                    type="button" // Mudado para type="button" para não submeter o form diretamente
+                                    onClick={(e) => handleSubmit(e, true)} // Chama handleSubmit com isDraft = true
+                                    disabled={saving || publishing || isDeleting || !formTouched}
+                                    className="w-full sm:w-auto h-10 px-4 inline-flex items-center justify-center gap-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {getSubmitButtonIcon()}{" "}
+                                    {getSubmitButtonText()}
+                                </button>
+                            )}
                             <button
-                                type="submit"
-                                disabled={
-                                    publishing || 
-                                    !currentTitle.trim() || 
-                                    !formTouched || 
-                                    (requireCategory && !currentCategory && (type === "story" || type === "series")) ||
-                                    ((type === "story" || type === "chapter") && !currentContent.trim())
-                                }
-                                className="h-10 px-4 flex items-center justify-center bg-[#484DB5] text-white rounded-md hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                type="submit" // Botão principal de submissão (Publicar/Salvar Série)
+                                disabled={saving || publishing || isDeleting || (type !== "series" && !formTouched)}
+                                className="w-full sm:w-auto h-10 px-6 inline-flex items-center justify-center gap-2 bg-[#484DB5] text-white rounded-md hover:bg-[#484DB5]/90 focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {publishing ? (
-                                    <div className="w-5 h-5 border-2 border-t-white border-r-[#484DB5] border-b-[#484DB5] border-l-[#484DB5] rounded-full animate-spin mr-2"></div>
-                                ) : (
-                                    <span className="flex items-center">
-                                        {getSubmitButtonIcon()}
-                                        {getSubmitButtonText()}
-                                    </span>
-                                )}
+                                {getPublishButtonIcon()}{" "}
+                                {getPublishButtonText()}
                             </button>
                         </div>
                     </form>
                 </>
+            )}
+            
+            {/* Modal de Exclusão */}
+            {isEditingModeRef.current && (
+                <DeleteModal
+                    isOpen={showDeleteModal}
+                    title={`Excluir ${type === "story" ? "História" : "Capítulo"}`}
+                    message={`Tem certeza de que deseja excluir est${type === "story" ? "a história" : "e capítulo"}? Esta ação não pode ser desfeita.`}
+                    confirmLabel="Excluir"
+                    cancelLabel="Cancelar"
+                    isDeleting={isDeleting}
+                    onCancel={() => setShowDeleteModal(false)}
+                    onConfirm={handleDelete}
+                />
             )}
         </div>
     );

@@ -96,7 +96,7 @@ export default function RankedSeriesList({
 
     if (loading) {
         return (
-            <section className="py-8">
+            <section>
                 <div className="max-w-[75rem] mx-auto px-4 md:px-0">
                     <div className="flex items-center justify-between mb-6">
                         <div className="h-8 w-48 bg-gray-200 animate-pulse rounded"></div>
@@ -124,7 +124,7 @@ export default function RankedSeriesList({
     }
 
     return (
-        <section className="py-8">
+        <section>
             <div className="max-w-[75rem] mx-auto px-4 md:px-0">
                 <motion.div 
                     className="flex items-center justify-between mb-6"
