@@ -10,7 +10,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import { useState, useCallback, useEffect } from "react";
-import { Eye, Edit2, Columns } from "lucide-react";
+import { AlignLeft, AlignCenter, AlignRight, AlignJustify } from "lucide-react";
 
 export default function TipTapEditor({
     value,
@@ -25,7 +25,6 @@ export default function TipTapEditor({
     const [showLinkMenu, setShowLinkMenu] = useState(false);
     const [imageUrl, setImageUrl] = useState("");
     const [showImageMenu, setShowImageMenu] = useState(false);
-    const [viewMode, setViewMode] = useState("edit"); // edit, preview, split
     const [spellCheck, setSpellCheck] = useState(true);
 
     const editor = useEditor({
@@ -153,30 +152,6 @@ export default function TipTapEditor({
         return null;
     }
 
-    // Alternar entre os modos: edição, visualização e dividido
-    const toggleViewMode = (mode) => {
-        setViewMode(mode);
-    };
-
-    // Renderização do editor com base no modo selecionado
-    const renderEditor = () => {
-        return (
-            <div className="editor-content medium-content">
-                <EditorContent editor={editor} spellCheck={spellCheck} />
-            </div>
-        );
-    };
-
-    // Renderização da visualização prévia
-    const renderPreview = () => {
-        return (
-            <div
-                className="preview-content medium-story story-content prose medium-content"
-                dangerouslySetInnerHTML={{ __html: editor.getHTML() }}
-            />
-        );
-    };
-
     // Funções para contador de palavras e tempo de leitura
     const countWords = (text) => {
         // Remove tags HTML e caracteres especiais
@@ -213,7 +188,6 @@ export default function TipTapEditor({
                                 : "hover:bg-gray-200 text-gray-700"
                         }`}
                         title="Título 1"
-                        disabled={viewMode === "preview"}
                     >
                         H1
                     </button>
@@ -232,7 +206,6 @@ export default function TipTapEditor({
                                 : "hover:bg-gray-200 text-gray-700"
                         }`}
                         title="Título 2"
-                        disabled={viewMode === "preview"}
                     >
                         H2
                     </button>
@@ -250,7 +223,6 @@ export default function TipTapEditor({
                                 : "hover:bg-gray-200 text-gray-700"
                         }`}
                         title="Negrito"
-                        disabled={viewMode === "preview"}
                     >
                         <span className="font-bold">B</span>
                     </button>
@@ -265,7 +237,6 @@ export default function TipTapEditor({
                                 : "hover:bg-gray-200 text-gray-700"
                         }`}
                         title="Itálico"
-                        disabled={viewMode === "preview"}
                     >
                         <span className="italic">I</span>
                     </button>
@@ -280,7 +251,6 @@ export default function TipTapEditor({
                                 : "hover:bg-gray-200 text-gray-700"
                         }`}
                         title="Sublinhado"
-                        disabled={viewMode === "preview"}
                     >
                         <span className="underline">U</span>
                     </button>
@@ -295,7 +265,6 @@ export default function TipTapEditor({
                                 : "hover:bg-gray-200 text-gray-700"
                         }`}
                         title="Tachado"
-                        disabled={viewMode === "preview"}
                     >
                         <span className="line-through">S</span>
                     </button>
@@ -313,7 +282,6 @@ export default function TipTapEditor({
                                 : "hover:bg-gray-200 text-gray-700"
                         }`}
                         title="Lista com marcadores"
-                        disabled={viewMode === "preview"}
                     >
                         • Lista
                     </button>
@@ -328,7 +296,6 @@ export default function TipTapEditor({
                                 : "hover:bg-gray-200 text-gray-700"
                         }`}
                         title="Lista numerada"
-                        disabled={viewMode === "preview"}
                     >
                         1. Lista
                     </button>
@@ -343,9 +310,8 @@ export default function TipTapEditor({
                                 : "hover:bg-gray-200 text-gray-700"
                         }`}
                         title="Citação"
-                        disabled={viewMode === "preview"}
                     >
-                        " Citação
+                        &quot; Citação
                     </button>
                 </div>
 
@@ -361,9 +327,8 @@ export default function TipTapEditor({
                                 : "hover:bg-gray-200 text-gray-700"
                         }`}
                         title="Alinhar à esquerda"
-                        disabled={viewMode === "preview"}
                     >
-                        ←
+                        <AlignLeft size={18} />
                     </button>
                     <button
                         type="button"
@@ -376,9 +341,8 @@ export default function TipTapEditor({
                                 : "hover:bg-gray-200 text-gray-700"
                         }`}
                         title="Centralizar"
-                        disabled={viewMode === "preview"}
                     >
-                        ↔
+                        <AlignCenter size={18} />
                     </button>
                     <button
                         type="button"
@@ -391,9 +355,8 @@ export default function TipTapEditor({
                                 : "hover:bg-gray-200 text-gray-700"
                         }`}
                         title="Alinhar à direita"
-                        disabled={viewMode === "preview"}
                     >
-                        →
+                        <AlignRight size={18} />
                     </button>
                     <button
                         type="button"
@@ -406,9 +369,8 @@ export default function TipTapEditor({
                                 : "hover:bg-gray-200 text-gray-700"
                         }`}
                         title="Justificar"
-                        disabled={viewMode === "preview"}
                     >
-                        ↔↔
+                        <AlignJustify size={18} />
                     </button>
                 </div>
 
@@ -425,7 +387,6 @@ export default function TipTapEditor({
                                     : "hover:bg-gray-200 text-gray-700"
                             }`}
                             title="Adicionar link"
-                            disabled={viewMode === "preview"}
                         >
                             🔗 Link
                         </button>
@@ -471,7 +432,6 @@ export default function TipTapEditor({
                             onClick={removeLink}
                             className="h-10 px-3 rounded-md text-sm font-medium hover:bg-gray-200 text-gray-700 transition-colors"
                             title="Remover link"
-                            disabled={viewMode === "preview"}
                         >
                             🔗❌
                         </button>
@@ -483,7 +443,6 @@ export default function TipTapEditor({
                             onClick={() => setShowImageMenu(!showImageMenu)}
                             className="h-10 px-3 rounded-md text-sm font-medium hover:bg-gray-200 text-gray-700 transition-colors flex items-center"
                             title="Adicionar imagem"
-                            disabled={viewMode === "preview"}
                         >
                             🖼️ Imagem
                         </button>
@@ -540,56 +499,11 @@ export default function TipTapEditor({
                                 ? "Desativar verificação ortográfica"
                                 : "Ativar verificação ortográfica"
                         }
-                        disabled={viewMode === "preview"}
                     >
                         <span>ABC</span>
                         <span className={`ml-1 ${spellCheck ? "text-green-600" : "text-gray-400"}`}>
                             ✓
                         </span>
-                    </button>
-                </div>
-
-                <div className="h-8 w-px bg-gray-300 mx-2"></div>
-
-                <div className="flex items-center space-x-1">
-                    <button
-                        type="button"
-                        onClick={() => toggleViewMode("edit")}
-                        className={`h-10 px-3 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
-                            viewMode === "edit"
-                                ? "bg-[#484DB5]/10 text-[#484DB5]"
-                                : "hover:bg-gray-200 text-gray-700"
-                        }`}
-                        title="Modo de edição"
-                    >
-                        <Edit2 size={16} />
-                        <span>Editar</span>
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => toggleViewMode("preview")}
-                        className={`h-10 px-3 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
-                            viewMode === "preview"
-                                ? "bg-[#484DB5]/10 text-[#484DB5]"
-                                : "hover:bg-gray-200 text-gray-700"
-                        }`}
-                        title="Visualização prévia"
-                    >
-                        <Eye size={16} />
-                        <span>Visualizar</span>
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => toggleViewMode("split")}
-                        className={`h-10 px-3 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
-                            viewMode === "split"
-                                ? "bg-[#484DB5]/10 text-[#484DB5]"
-                                : "hover:bg-gray-200 text-gray-700"
-                        }`}
-                        title="Visualização dividida"
-                    >
-                        <Columns size={16} />
-                        <span>Dividido</span>
                     </button>
                 </div>
             </div>
@@ -606,8 +520,8 @@ export default function TipTapEditor({
                         from,
                         to,
                     }) => {
-                        // Exibir o menu de bolha apenas quando texto for selecionado e estiver no modo de edição
-                        return from !== to && viewMode !== "preview";
+                        // Exibir o menu de bolha apenas quando texto for selecionado
+                        return from !== to;
                     }}
                     className="flex items-center bg-white border border-[#E5E7EB] rounded-md shadow-md p-1 z-50"
                 >
@@ -662,31 +576,10 @@ export default function TipTapEditor({
                 </BubbleMenu>
             )}
 
-            <div className={`w-full ${viewMode === "split" ? "flex" : ""}`}>
-                {(viewMode === "edit" || viewMode === "split") && (
-                    <div
-                        className={`${
-                            viewMode === "split" ? "w-1/2 border-r border-[#E5E7EB]" : "w-full"
-                        }`}
-                    >
-                        <div className="min-h-[300px]">
-                            <EditorContent editor={editor} spellCheck={spellCheck} className="h-full" />
-                        </div>
-                    </div>
-                )}
-
-                {(viewMode === "preview" || viewMode === "split") && (
-                    <div
-                        className={`${
-                            viewMode === "split" ? "w-1/2" : "w-full"
-                        }`}
-                    >
-                        <div 
-                            className="min-h-[300px] p-4 prose prose-lg max-w-none"
-                            dangerouslySetInnerHTML={{ __html: editor.getHTML() }}
-                        />
-                    </div>
-                )}
+            <div className="w-full">
+                <div className="min-h-[300px]">
+                    <EditorContent editor={editor} spellCheck={spellCheck} className="h-full" />
+                </div>
             </div>
         </div>
     );
