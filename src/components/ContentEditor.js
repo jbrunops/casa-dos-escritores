@@ -22,23 +22,31 @@ import {
 } from "lucide-react";
 import { defaultCategories } from "@/lib/categories";
 import DeleteModal from "@/components/DeleteModal";
+import useTextStats from "@/hooks/useTextStats";
 
-export default function ContentEditor({
-    type = "story", // "story", "series", "chapter"
-    title = "",
-    content = "",
-    description = "",
-    category = "",
-    seriesId = null,
-    onBack = null,
-    onSubmit = null,
-    backPath = "/dashboard",
-    backLabel = "Voltar ao Dashboard",
-    headerTitle = "Criar Novo Conteúdo",
-    requireCategory = true,
-    existingId = null, // ID da história/série/capítulo existente em modo de edição
-    coverUrl = "" // URL da capa existente para séries em modo de edição
-}) {
+// Importar os novos editores especializados
+import StoryEditor from "./editors/StoryEditor";
+import SeriesEditor from "./editors/SeriesEditor";
+import ChapterEditor from "./editors/ChapterEditor";
+
+export default function ContentEditor(props) {
+    const {
+        type = "story",
+        title = "",
+        content = "",
+        description = "",
+        category = "",
+        seriesId = null,
+        onBack = null,
+        onSubmit = null,
+        backPath = "/dashboard",
+        backLabel = "Voltar ao Dashboard",
+        headerTitle: initialHeaderTitle = "Criar Novo Conteúdo",
+        requireCategory = true,
+        existingId = null,
+        coverUrl = ""
+    } = props;
+
     // Estados comuns
     const [currentTitle, setCurrentTitle] = useState(title);
     const [currentContent, setCurrentContent] = useState(content);
@@ -73,12 +81,11 @@ export default function ContentEditor({
 
     const router = useRouter();
     const supabase = createBrowserClient();
-
-    // Usa a lista importada de categorias
     const categories = defaultCategories;
-
-    // Determinar se estamos em modo de edição baseado na presença de um ID existente
     const isEditingModeRef = useRef(!!existingId);
+
+    // Adaptação do headerTitle caso não seja fornecido pelos editores especializados
+    const headerTitle = props.headerTitle || initialHeaderTitle;
 
     // Detectar mudanças no formulário
     useEffect(() => {
@@ -630,7 +637,7 @@ export default function ContentEditor({
 
     // Renderização do formulário baseada no tipo
     return (
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-0 py-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
             {loading ? (
                 <div className="flex items-center justify-center h-40">
                     <Loader2 size={40} className="animate-spin text-[#484DB5]" />
@@ -666,253 +673,65 @@ export default function ContentEditor({
                         </div>
                     )}
 
-                    <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-6">
-                        {/* Seção de título e categoria/gênero - comum a todos os tipos */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                                    {type === "story" ? "Título da História" : type === "series" ? "Título da Série" : "Título do Capítulo"}*
-                                </label>
-                                <input
-                                    id="title"
-                                    type="text"
-                                    value={currentTitle}
-                                    onChange={(e) => setCurrentTitle(e.target.value)}
-                                    className="w-full h-10 px-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200"
-                                    placeholder={`Um título cativante para ${type === "story" ? "sua história" : type === "series" ? "sua série" : "seu capítulo"}...`}
-                                    required
-                                />
-                            </div>
+                    {/* Lógica de Dispatch para o editor correto */}
+                    {(() => {
+                        // Props que serão passadas para todos os editores
+                        const commonEditorProps = {
+                            ...props, // Passa todas as props originais do ContentEditor
+                            // Estados e setters principais que ainda residem em ContentEditor
+                            // (estes serão gradualmente movidos para os editores ou hooks)
+                            currentTitle, setCurrentTitle,
+                            currentContent, setCurrentContent,
+                            currentCategory, setCurrentCategory,
+                            currentDescription, setCurrentDescription,
+                            tags, setTags,
+                            tagInput, setTagInput,
+                            coverFile, setCoverFile,
+                            coverPreview, setCoverPreview,
+                            chapterNumber, setChapterNumber, // chapterNumber já é estado
+                            loadingChapterNumber,
+                            seriesData: series, // Estado 'series' de ContentEditor
+                            saving, setSaving,           // Adicionado
+                            publishing, setPublishing, // Adicionado
+                            error, setError,             // Adicionado
+                            success, setSuccess,           // Adicionado
+                            formTouched, setFormTouched,     // Adicionado
+                            wordCount, charCount, readingTime,
+                            handleSubmit, // Função de submit (ainda em ContentEditor)
+                            handleDelete, // Função de delete (ainda em ContentEditor)
+                            showDeleteModal, setShowDeleteModal,
+                            isDeleting, setIsDeleting,
+                            isEditingMode: isEditingModeRef.current,
+                            // Funções de manipulação específicas (ainda em ContentEditor, serão movidas)
+                            handleAddTag, handleRemoveTag, handleCoverChange,
+                            // Funções de UI (ainda em ContentEditor, serão movidas ou os editores terão as suas)
+                            getSubmitButtonText, getSubmitButtonIcon, 
+                            getPublishButtonText, getPublishButtonIcon,
+                            // Outros estados e refs
+                            categories, // Lista de categorias
+                            supabase, // Instância do Supabase
+                            router, // Instância do Router
+                            validateForm, // Função de validação (será movida)
+                            isEditingModeRef // Ref para modo de edição
+                        };
 
-                            {(type === "story" || type === "series") && (
-                                <div className="space-y-2">
-                                    <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-                                        {type === "story" ? "Categoria" : "Gênero"}
-                                        {requireCategory && "*"}
-                                    </label>
-                                    <select
-                                        id="category"
-                                        value={currentCategory}
-                                        onChange={(e) => setCurrentCategory(e.target.value)}
-                                        className="w-full h-10 px-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200"
-                                        required={requireCategory}
-                                    >
-                                        <option value="">Selecione uma {type === "story" ? "categoria" : "gênero"}</option>
-                                        {categories.map((cat) => (
-                                            <option key={cat} value={cat}>
-                                                {cat}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            )}
-
-                            {/* Número do Capítulo (Apenas para tipo 'chapter') */}
-                            {type === "chapter" && (
-                               <div className="space-y-2">
-                                    <label htmlFor="chapterNumber" className="block text-sm font-medium text-gray-700">
-                                        Número do Capítulo*
-                                    </label>
-                                    {
-                                        // Se estiver criando (não editando) e carregando o número
-                                        !isEditingModeRef.current && loadingChapterNumber ? (
-                                            <div className="flex items-center text-gray-500 h-10 px-3 border border-[#E5E7EB] rounded-md bg-gray-100">
-                                                <Loader2 className="animate-spin mr-2" size={16} />
-                                                Buscando próximo número...
-                                            </div>
-                                        ) : (
-                                            // Se estiver criando (e já carregou) ou editando
-                                            <input
-                                                id="chapterNumber"
-                                                type="number"
-                                                min="1"
-                                                value={chapterNumber} // Usa o estado chapterNumber
-                                                // Se estiver criando, é readOnly. Se editando, também (gerenciado automaticamente)
-                                                readOnly
-                                                className="w-full h-10 px-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200 bg-gray-100 cursor-not-allowed"
-                                                required
-                                            />
-                                        )
-                                    }
-                                    <p className="text-xs text-gray-500">
-                                        {isEditingModeRef.current
-                                            ? "O número do capítulo não pode ser alterado."
-                                            : "Este número é determinado automaticamente com base nos capítulos existentes."}
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Campos específicos para séries */}
-                        {type === "series" && (
-                            <>
-                                <div className="space-y-2">
-                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                                        Descrição da Série
-                                    </label>
-                                    <textarea
-                                        id="description"
-                                        value={currentDescription}
-                                        onChange={(e) => setCurrentDescription(e.target.value)}
-                                        className="w-full h-32 px-3 py-2 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200"
-                                        placeholder="Descreva sua série em alguns parágrafos..."
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        Tags (até 5)
-                                    </label>
-                                    <div className="flex flex-wrap gap-2 mb-2">
-                                        {tags.map((tag, index) => (
-                                            <span
-                                                key={index}
-                                                className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-[#484DB5]/10 text-[#484DB5]"
-                                            >
-                                                {tag}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleRemoveTag(tag)}
-                                                    className="ml-2 text-[#484DB5] hover:text-opacity-70"
-                                                >
-                                                    &times;
-                                                </button>
-                                            </span>
-                                        ))}
-                                    </div>
-                                    <input
-                                        type="text"
-                                        value={tagInput}
-                                        onChange={(e) => setTagInput(e.target.value)}
-                                        onKeyDown={handleAddTag}
-                                        className="w-full h-10 px-3 border border-[#E5E7EB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200"
-                                        placeholder="Digite uma tag e pressione Enter"
-                                    />
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        Digite uma tag e pressione Enter para adicionar. Máximo de 5 tags.
-                                    </p>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        Imagem de Capa
-                                    </label>
-                                    <div className="flex items-center space-x-4">
-                                        <div className="relative w-40 h-40 border-2 border-dashed border-[#E5E7EB] rounded-lg flex flex-col items-center justify-center overflow-hidden">
-                                            {coverPreview ? (
-                                                <img
-                                                    src={coverPreview}
-                                                    alt="Preview"
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="text-center p-4 flex flex-col items-center">
-                                                    <Image
-                                                        size={32}
-                                                        className="text-gray-400 mb-2"
-                                                    />
-                                                    <span className="text-sm text-gray-500">
-                                                        Prévia da imagem
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex-1">
-                                            <input
-                                                type="file"
-                                                id="cover"
-                                                accept="image/jpeg,image/png,image/gif"
-                                                onChange={handleCoverChange}
-                                                className="hidden"
-                                            />
-                                            <label
-                                                htmlFor="cover"
-                                                className="h-10 px-4 inline-flex items-center cursor-pointer bg-white border border-[#E5E7EB] rounded-md text-gray-700 hover:bg-gray-50 hover:shadow-sm transition-all duration-200"
-                                            >
-                                                Selecionar imagem
-                                            </label>
-                                            <p className="text-xs text-gray-500 mt-2">
-                                                JPG, PNG ou GIF. Tamanho máximo de 2MB.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </>
-                        )}
-
-                        {/* Editor de conteúdo - apenas para histórias e capítulos */}
-                        {(type === "story" || type === "chapter") && (
-                            <div className="space-y-2">
-                                <label htmlFor="content" className="block text-sm font-medium text-gray-700">
-                                    Conteúdo*
-                                </label>
-                                <div className="border border-[#E5E7EB] rounded-md overflow-hidden">
-                                    <TipTapEditor
-                                        value={currentContent}
-                                        onChange={setCurrentContent}
-                                        placeholder={`Comece a escrever ${type === "story" ? "sua história" : "seu capítulo"} aqui... Deixe sua imaginação fluir!`}
-                                    />
-                                </div>
-                                <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-500">
-                                    <div className="flex items-center">
-                                        <FileText size={16} className="mr-1" />
-                                        <span>{wordCount} palavras</span>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <BookOpen size={16} className="mr-1" />
-                                        <span>{charCount} caracteres</span>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <Clock size={16} className="mr-1" />
-                                        <span>{readingTime} min. de leitura</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Botões de ação - comum a todos os tipos */}
-                        <div className="flex flex-col sm:flex-row justify-end items-center gap-3 mt-8 pt-6 border-t border-gray-200">
-                            {isEditingModeRef.current && type !== "series" && ( // Botão de excluir só para story/chapter em modo de edição
-                                <button
-                                    type="button"
-                                    onClick={() => setShowDeleteModal(true)}
-                                    disabled={saving || publishing || isDeleting}
-                                    className="w-full sm:w-auto h-10 px-4 inline-flex items-center justify-center gap-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed order-last sm:order-first"
-                                >
-                                    <Trash2 size={16} />
-                                    Excluir {type === "story" ? "História" : "Capítulo"}
-                                </button>
-                            )}
-                            
-                            {/* Espaçador para empurrar outros botões para a direita se o botão de excluir estiver presente */}
-                            {isEditingModeRef.current && type !== "series" && <div className="hidden sm:block sm:flex-grow"></div>}
-
-                            {type !== "series" && ( // Botão de salvar rascunho para story/chapter
-                                <button
-                                    type="button" // Mudado para type="button" para não submeter o form diretamente
-                                    onClick={(e) => handleSubmit(e, true)} // Chama handleSubmit com isDraft = true
-                                    disabled={saving || publishing || isDeleting || !formTouched}
-                                    className="w-full sm:w-auto h-10 px-4 inline-flex items-center justify-center gap-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    {getSubmitButtonIcon()}{" "}
-                                    {getSubmitButtonText()}
-                                </button>
-                            )}
-                            <button
-                                type="submit" // Botão principal de submissão (Publicar/Salvar Série)
-                                disabled={saving || publishing || isDeleting || (type !== "series" && !formTouched)}
-                                className="w-full sm:w-auto h-10 px-6 inline-flex items-center justify-center gap-2 bg-[#484DB5] text-white rounded-md hover:bg-[#484DB5]/90 focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:ring-opacity-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {getPublishButtonIcon()}{" "}
-                                {getPublishButtonText()}
-                            </button>
-                        </div>
-                    </form>
+                        switch (type) {
+                            case "story":
+                                return <StoryEditor {...commonEditorProps} />;
+                            case "series":
+                                return <SeriesEditor {...commonEditorProps} />;
+                            case "chapter":
+                                return <ChapterEditor {...commonEditorProps} seriesId={seriesId} />; // Garante que seriesId seja passado
+                            default:
+                                console.warn("ContentEditor: Tipo de conteúdo desconhecido -", type);
+                                return <div>Tipo de editor desconhecido.</div>;
+                        }
+                    })()}
                 </>
             )}
             
-            {/* Modal de Exclusão */}
-            {isEditingModeRef.current && (
+            {/* Modal de Exclusão (controlado por ContentEditor por enquanto) */}
+            {isEditingModeRef.current && (type === "story" || type === "chapter") && (
                 <DeleteModal
                     isOpen={showDeleteModal}
                     title={`Excluir ${type === "story" ? "História" : "Capítulo"}`}
