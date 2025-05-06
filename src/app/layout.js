@@ -71,14 +71,6 @@ export default function RootLayout({ children }) {
                     rel="stylesheet"
                 />
                 */}
-                <meta name="google-adsense-account" content="ca-pub-2169694779628621"></meta>
-                {/* AdSense Script */}
-                <Script
-                  async
-                  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2169694779628621"
-                  crossOrigin="anonymous"
-                  strategy="lazyOnload" // Opcional: controla quando carregar (lazyOnload é bom para desempenho)
-                />
                 {/* Schema Markup */}
                 <script 
                   type="application/ld+json" 

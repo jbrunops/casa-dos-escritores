@@ -6,7 +6,6 @@ import { generateSlug, createSummary, formatDate } from "@/lib/utils";
 import RecentContentList from "@/components/RecentContentList";
 import MostCommentedList from "@/components/MostCommentedList";
 import TopWritersList from "@/components/TopWritersList";
-import AdUnit1 from '@/components/Ads/AdUnit1';
 
 export default async function HomePage() {
     const supabase = await createServerSupabaseClient();
@@ -116,7 +115,6 @@ export default async function HomePage() {
 
                     {/* Coluna 3: Top 10 Escritores */}
                     <div className="column">
-                        <AdUnit1 />
                         <h2 className="text-2xl font-extrabold text-black mb-4 border-[#D7D7D7] pb-2 relative">
                             Escritores em Destaque
                             <span className="block h-1 w-32 mt-2 bg-gradient-to-r from-[#484DB5] to-[#E5E7EB] rounded-full animate-pulse"></span>
