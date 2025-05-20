@@ -30,6 +30,8 @@ export default function Header() {
     const router = useRouter();
     const [user, setUser] = useState(null);
     const [username, setUsername] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [avatarUrl, setAvatarUrl] = useState("");
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
     const [showUserDropdown, setShowUserDropdown] = useState(false);
@@ -86,7 +88,7 @@ export default function Header() {
                     // Buscar perfil do usuário com tratamento de erro
                     const { data, error } = await supabase
                         .from("profiles")
-                        .select("username, role, avatar_url")
+                        .select("username, role, avatar_url, first_name, last_name")
                         .eq("id", session.user.id)
                         .single();
 
@@ -97,6 +99,8 @@ export default function Header() {
 
                     if (data) {
                         setUsername(data.username);
+                        setFirstName(data.first_name || "");
+                        setLastName(data.last_name || "");
                         setIsAdmin(data.role === "admin");
                         setAvatarUrl(data.avatar_url);
                     }
@@ -118,6 +122,8 @@ export default function Header() {
             } else if (event === "SIGNED_OUT") {
                 setUser(null);
                 setUsername("");
+                setFirstName("");
+                setLastName("");
                 setIsAdmin(false);
                 setAvatarUrl("");
             }
@@ -185,6 +191,11 @@ export default function Header() {
         router.push("/");
     };
 
+    // Nome completo formatado
+    const fullName = (firstName || lastName) 
+        ? `${firstName} ${lastName}`.trim()
+        : username || "Usuário";
+
     // Configuração dos itens do menu de usuário
     const userMenuItems = user ? [
         {
@@ -195,7 +206,8 @@ export default function Header() {
         {
             label: "Meu Perfil",
             href: `/profile/${encodeURIComponent(username)}`,
-            icon: <User size={18} />
+            icon: <User size={18} />,
+            description: `@${username}` // Mostra nome de usuário no dropdown
         },
         ...(isAdmin ? [{
             label: "Administração",
@@ -385,7 +397,8 @@ export default function Header() {
                                                 icon={<User size={20} />}
                                                 onClick={() => setShowMobileMenu(false)}
                                             >
-                                                Meu Perfil
+                                                {fullName}
+                                                <span className="text-xs text-gray-500 block">@{username}</span>
                                             </MenuItem>
                                         </li>
                                         <li>
@@ -449,7 +462,7 @@ export default function Header() {
                                         onClick={() => setShowUserDropdown(!showUserDropdown)}
                                     >
                                         <User size={18} className="mr-1.5" />
-                                        <span className="mr-1">{username || "Usuário"}</span>
+                                        <span className="mr-1">{fullName}</span>
                                         <ChevronDown size={16} />
                                     </button>
                                 }

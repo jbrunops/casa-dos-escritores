@@ -18,6 +18,8 @@ import {
 
 export default function EditProfilePage() {
     const [username, setUsername] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [originalUsername, setOriginalUsername] = useState("");
     const [bio, setBio] = useState("");
     const [avatarUrl, setAvatarUrl] = useState("");
@@ -70,6 +72,8 @@ export default function EditProfilePage() {
 
                 // Preencher formulário com dados existentes
                 setUsername(profile.username || "");
+                setFirstName(profile.first_name || "");
+                setLastName(profile.last_name || "");
                 setOriginalUsername(profile.username || "");
                 setBio(profile.bio || "");
                 setAvatarUrl(profile.avatar_url || "");
@@ -125,8 +129,8 @@ export default function EditProfilePage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!username.trim()) {
-            setError("Nome de usuário é obrigatório");
+        if (!firstName.trim()) {
+            setError("Nome é obrigatório");
             return;
         }
 
@@ -146,21 +150,7 @@ export default function EditProfilePage() {
                 );
             }
 
-            // Verificar se o username já existe (exceto para o próprio usuário)
-            if (username !== originalUsername) {
-                const { data: existingUser, error: checkError } = await supabase
-                    .from("profiles")
-                    .select("id")
-                    .eq("username", username)
-                    .neq("id", user.id)
-                    .single();
-
-                if (!checkError && existingUser) {
-                    setError("Este nome de usuário já está em uso");
-                    setSaving(false);
-                    return;
-                }
-            }
+            // O usuário não pode mais alterar o nome de usuário, então não precisamos verificar duplicações
 
             // Upload do avatar, se necessário
             let finalAvatarUrl = avatarUrl;
@@ -200,7 +190,8 @@ export default function EditProfilePage() {
             const { error: updateError } = await supabase
                 .from("profiles")
                 .update({
-                    username,
+                    first_name: firstName,
+                    last_name: lastName,
                     bio,
                     avatar_url: finalAvatarUrl,
                     twitter_url: twitterUrl,
@@ -212,6 +203,18 @@ export default function EditProfilePage() {
                 .eq("id", user.id);
 
             if (updateError) throw updateError;
+
+            // Atualizar dados do usuário no Auth
+            const { error: authUpdateError } = await supabase.auth.updateUser({
+                data: {
+                    first_name: firstName,
+                    last_name: lastName
+                }
+            });
+
+            if (authUpdateError) {
+                console.error("Erro ao atualizar metadados:", authUpdateError);
+            }
 
             setSuccess(true);
 
@@ -283,7 +286,7 @@ export default function EditProfilePage() {
                                     ></div>
                                 ) : (
                                     <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center text-2xl font-bold text-gray-500">
-                                        {username.charAt(0).toUpperCase() || "U"}
+                                        {firstName ? firstName.charAt(0).toUpperCase() : (username.charAt(0).toUpperCase() || "U")}
                                     </div>
                                 )}
                             </div>
@@ -314,17 +317,50 @@ export default function EditProfilePage() {
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                                    Nome de usuário*
+                                    Nome de usuário
                                 </label>
                                 <input
                                     id="username"
                                     type="text"
                                     value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    required
-                                    className="w-full p-2 border border-[#E5E7EB] rounded-md focus:ring-2 focus:ring-[#484DB5] focus:border-transparent outline-none transition-all duration-200"
+                                    disabled
+                                    className="w-full p-2 border border-[#E5E7EB] rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
                                     placeholder="Seu nome de usuário único"
                                 />
+                                <p className="text-xs text-gray-500">
+                                    O nome de usuário não pode ser alterado
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                                        Nome*
+                                    </label>
+                                    <input
+                                        id="firstName"
+                                        type="text"
+                                        value={firstName}
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                        required
+                                        className="w-full p-2 border border-[#E5E7EB] rounded-md focus:ring-2 focus:ring-[#484DB5] focus:border-transparent outline-none transition-all duration-200"
+                                        placeholder="Seu nome"
+                                    />
+                                </div>
+                                
+                                <div className="space-y-2">
+                                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                                        Sobrenome
+                                    </label>
+                                    <input
+                                        id="lastName"
+                                        type="text"
+                                        value={lastName}
+                                        onChange={(e) => setLastName(e.target.value)}
+                                        className="w-full p-2 border border-[#E5E7EB] rounded-md focus:ring-2 focus:ring-[#484DB5] focus:border-transparent outline-none transition-all duration-200"
+                                        placeholder="Seu sobrenome"
+                                    />
+                                </div>
                             </div>
 
                             <div className="space-y-2">
@@ -414,7 +450,7 @@ export default function EditProfilePage() {
                 <div className="flex justify-end">
                     <button
                         type="submit"
-                        disabled={saving || !username.trim()}
+                        disabled={saving || !firstName.trim()}
                         className="inline-flex items-center justify-center h-10 px-6 bg-[#484DB5] text-white rounded-md hover:bg-opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {saving ? (
