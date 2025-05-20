@@ -8,6 +8,8 @@ import { createBrowserClient } from "@/lib/supabase-browser";
 import { UserPlus, Mail, Lock, User, Loader, AlertCircle, AlertTriangle, CheckCircle } from "lucide-react";
 
 export default function SignupPage() {
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [username, setUsername] = useState("");
@@ -27,7 +29,7 @@ export default function SignupPage() {
 
         try {
             // Validação básica
-            if (!username || !email || !password) {
+            if (!firstName || !lastName || !username || !email || !password) {
                 setError("Todos os campos são obrigatórios");
                 setLoading(false);
                 return;
@@ -68,6 +70,8 @@ export default function SignupPage() {
                 options: {
                     data: {
                         username,
+                        first_name: firstName,
+                        last_name: lastName,
                     },
                 },
             });
@@ -147,6 +151,38 @@ export default function SignupPage() {
 
                 <form onSubmit={handleSubmit} className="mt-8 space-y-6">
                     <div className="space-y-4">
+                        <div>
+                            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                                Nome
+                            </label>
+                            <input
+                                id="firstName"
+                                type="text"
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
+                                placeholder="Seu nome"
+                                disabled={loading || success}
+                                required
+                                className="mt-1 block w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-[#484DB5]"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                                Sobrenome
+                            </label>
+                            <input
+                                id="lastName"
+                                type="text"
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
+                                placeholder="Seu sobrenome"
+                                disabled={loading || success}
+                                required
+                                className="mt-1 block w-full px-3 py-2 bg-white border border-[#E5E7EB] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#484DB5] focus:border-[#484DB5]"
+                            />
+                        </div>
+
                         <div>
                             <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                                 Nome de usuário

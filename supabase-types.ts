@@ -297,9 +297,11 @@ export type Database = {
           created_at: string | null
           email: string | null
           facebook_url: string | null
+          first_name: string | null
           id: string
           instagram_url: string | null
           is_admin: boolean | null
+          last_name: string | null
           role: string
           twitter_url: string | null
           updated_at: string | null
@@ -312,9 +314,11 @@ export type Database = {
           created_at?: string | null
           email?: string | null
           facebook_url?: string | null
+          first_name?: string | null
           id: string
           instagram_url?: string | null
           is_admin?: boolean | null
+          last_name?: string | null
           role?: string
           twitter_url?: string | null
           updated_at?: string | null
@@ -327,9 +331,11 @@ export type Database = {
           created_at?: string | null
           email?: string | null
           facebook_url?: string | null
+          first_name?: string | null
           id?: string
           instagram_url?: string | null
           is_admin?: boolean | null
+          last_name?: string | null
           role?: string
           twitter_url?: string | null
           updated_at?: string | null
