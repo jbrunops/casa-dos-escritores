@@ -10,14 +10,20 @@ export async function generateMetadata({ params }) {
         const supabase = await createServerSupabaseClient();
         const { data } = await supabase
             .from("profiles")
-            .select("username")
+            .select("username, first_name, last_name")
             .eq("username", decodeURIComponent(username))
             .single();
 
         if (!data) return { title: "Perfil não encontrado" };
+        
+        // Usar nome completo quando disponível, caso contrário usar nome de usuário
+        const displayName = (data.first_name || data.last_name) 
+            ? `${data.first_name || ''} ${data.last_name || ''}`.trim() 
+            : data.username;
+            
         return {
-            title: `Seguidores de ${data.username}`,
-            description: `Lista de pessoas que seguem ${data.username}`,
+            title: `Seguidores de ${displayName}`,
+            description: `Lista de pessoas que seguem ${displayName}`,
         };
     } catch (error) {
         return { title: "Seguidores" };
@@ -94,7 +100,7 @@ export default async function FollowersPage({ params }) {
         const followerIds = followers.map(f => f.follower_id);
         const { data: followerProfiles, error: profilesError } = await supabase
             .from('profiles')
-            .select('id, username, avatar_url, bio')
+            .select('id, username, avatar_url, bio, first_name, last_name')
             .in('id', followerIds);
             
         if (profilesError) {
@@ -173,15 +179,24 @@ export default async function FollowersPage({ params }) {
                                                 ></div>
                                             ) : (
                                                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#484DB5] text-white flex items-center justify-center text-lg font-bold mr-3 sm:mr-4 flex-shrink-0">
-                                                    {follower.username.charAt(0).toUpperCase()}
+                                                    {follower.first_name ? follower.first_name.charAt(0).toUpperCase() : follower.username.charAt(0).toUpperCase()}
                                                 </div>
                                             )}
                                             
                                             {/* Informações do usuário */}
                                             <div className="min-w-0 flex-grow">
-                                                <div className="font-medium text-gray-900 truncate">{follower.username}</div>
+                                                {(follower.first_name || follower.last_name) ? (
+                                                    <>
+                                                        <div className="font-medium text-gray-900 truncate">
+                                                            {`${follower.first_name || ''} ${follower.last_name || ''}`.trim()}
+                                                        </div>
+                                                        <div className="text-xs text-gray-500">@{follower.username}</div>
+                                                    </>
+                                                ) : (
+                                                    <div className="font-medium text-gray-900 truncate">{follower.username}</div>
+                                                )}
                                                 {follower.bio && (
-                                                    <p className="text-sm text-gray-500 line-clamp-1 overflow-hidden text-ellipsis">{follower.bio}</p>
+                                                    <p className="text-sm text-gray-500 line-clamp-1 overflow-hidden text-ellipsis mt-1">{follower.bio}</p>
                                                 )}
                                             </div>
                                         </Link>

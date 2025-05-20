@@ -24,7 +24,8 @@ import {
     Trash2,
     PlusCircle,
     AlertTriangle,
-    CheckCircle2
+    CheckCircle2,
+    ArrowLeft
 } from "lucide-react";
 import UserFollowButton from "@/components/UserFollowButton";
 import ProfileStoryActions from "@/components/ProfileStoryActions";
@@ -62,14 +63,20 @@ export async function generateMetadata({ params }) {
         );
         const { data } = await supabase
             .from("profiles")
-            .select("username")
+            .select("username, first_name, last_name")
             .eq("username", decodeURIComponent(username))
             .single();
 
         if (!data) return { title: "Perfil não encontrado" };
+        
+        // Usar nome completo quando disponível, caso contrário usar nome de usuário
+        const displayName = (data.first_name || data.last_name) 
+            ? `${data.first_name || ''} ${data.last_name || ''}`.trim() 
+            : data.username;
+            
         return {
-            title: `Perfil de ${data.username}`,
-            description: `Conheça as histórias escritas por ${data.username} na Plataforma para Escritores`,
+            title: `Perfil de ${displayName}`,
+            description: `Conheça as histórias escritas por ${displayName} na Plataforma para Escritores`,
         };
     } catch (error) {
         return { title: "Perfil" };
@@ -330,13 +337,24 @@ export default async function ProfilePage({ params }) {
                                 ></div>
                             ) : (
                                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-[#484DB5] text-white flex items-center justify-center text-4xl font-bold border-4 border-[#484DB5]">
-                                    {profile.username.charAt(0).toUpperCase()}
+                                    {profile.first_name ? profile.first_name.charAt(0).toUpperCase() : profile.username.charAt(0).toUpperCase()}
                                 </div>
                             )}
                         </div>
 
                         <div className="flex-grow text-center md:text-left">
-                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{profile.username}</h1>
+                            {(profile.first_name || profile.last_name) ? (
+                                <>
+                                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
+                                        {`${profile.first_name || ''} ${profile.last_name || ''}`.trim()}
+                                    </h1>
+                                    <div className="text-gray-500 text-sm md:text-base mb-3">
+                                        @{profile.username}
+                                    </div>
+                                </>
+                            ) : (
+                                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{profile.username}</h1>
+                            )}
                             
                             <div className="flex flex-wrap items-center justify-center md:justify-start text-gray-600 mb-4 gap-4">
                                 <div className="flex items-center">
@@ -816,6 +834,25 @@ export default async function ProfilePage({ params }) {
                         </div>
                     </div>
                 </div>
+
+                <div className="mb-6">
+                    <Link 
+                        href={`/profile/${username}`} 
+                        className="inline-flex items-center text-[#484DB5] hover:underline"
+                    >
+                        <ArrowLeft size={16} className="mr-1" />
+                        <span>Voltar para o perfil de {(profile.first_name || profile.last_name) ? 
+                            `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
+                            profile.username}</span>
+                    </Link>
+                </div>
+                
+                <h1 className="text-2xl font-bold mb-6 flex items-center">
+                    <UserPlus size={24} className="mr-2 text-[#484DB5]" />
+                    Seguidores de {(profile.first_name || profile.last_name) ? 
+                        `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
+                        profile.username}
+                </h1>
             </div>
         );
     } catch (error) {

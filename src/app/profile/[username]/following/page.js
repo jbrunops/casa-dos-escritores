@@ -10,14 +10,20 @@ export async function generateMetadata({ params }) {
         const supabase = await createServerSupabaseClient();
         const { data } = await supabase
             .from("profiles")
-            .select("username")
+            .select("username, first_name, last_name")
             .eq("username", decodeURIComponent(username))
             .single();
 
         if (!data) return { title: "Perfil não encontrado" };
+        
+        // Usar nome completo quando disponível, caso contrário usar nome de usuário
+        const displayName = (data.first_name || data.last_name) 
+            ? `${data.first_name || ''} ${data.last_name || ''}`.trim() 
+            : data.username;
+            
         return {
-            title: `Quem ${data.username} segue`,
-            description: `Lista de pessoas que ${data.username} segue`,
+            title: `${displayName} segue`,
+            description: `Lista de pessoas que ${displayName} segue`,
         };
     } catch (error) {
         return { title: "Seguindo" };
@@ -90,11 +96,11 @@ export default async function FollowingPage({ params }) {
             );
         }
 
-        // Obter os perfis das pessoas seguidas
+        // Obter os perfis que são seguidos
         const followingIds = following.map(f => f.following_id);
         const { data: followingProfiles, error: profilesError } = await supabase
             .from('profiles')
-            .select('id, username, avatar_url, bio')
+            .select('id, username, avatar_url, bio, first_name, last_name')
             .in('id', followingIds);
             
         if (profilesError) {
@@ -179,15 +185,24 @@ export default async function FollowingPage({ params }) {
                                                 ></div>
                                             ) : (
                                                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#484DB5] text-white flex items-center justify-center text-lg font-bold mr-3 sm:mr-4 flex-shrink-0">
-                                                    {followingUser.username.charAt(0).toUpperCase()}
+                                                    {followingUser.first_name ? followingUser.first_name.charAt(0).toUpperCase() : followingUser.username.charAt(0).toUpperCase()}
                                                 </div>
                                             )}
                                             
                                             {/* Informações do usuário */}
                                             <div className="min-w-0 flex-grow">
-                                                <div className="font-medium text-gray-900 truncate">{followingUser.username}</div>
+                                                {(followingUser.first_name || followingUser.last_name) ? (
+                                                    <>
+                                                        <div className="font-medium text-gray-900 truncate">
+                                                            {`${followingUser.first_name || ''} ${followingUser.last_name || ''}`.trim()}
+                                                        </div>
+                                                        <div className="text-xs text-gray-500">@{followingUser.username}</div>
+                                                    </>
+                                                ) : (
+                                                    <div className="font-medium text-gray-900 truncate">{followingUser.username}</div>
+                                                )}
                                                 {followingUser.bio && (
-                                                    <p className="text-sm text-gray-500 line-clamp-1 overflow-hidden text-ellipsis">{followingUser.bio}</p>
+                                                    <p className="text-sm text-gray-500 line-clamp-1 overflow-hidden text-ellipsis mt-1">{followingUser.bio}</p>
                                                 )}
                                             </div>
                                         </Link>
