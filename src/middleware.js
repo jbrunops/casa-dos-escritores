@@ -117,8 +117,25 @@ export async function middleware(request) {
             return NextResponse.redirect(new URL("/login", request.url));
         }
     } catch (e) {
-        // Em caso de erro no middleware, permitir que a solicitação continue
+        // Fail-secure: em caso de erro crítico, negar acesso a rotas protegidas
         console.error("Middleware error:", e);
+        
+        const protectedRoutes = [
+            "/dashboard",
+            "/profile/edit", 
+            "/dashboard/new",
+            "/dashboard/edit",
+            "/admin"
+        ];
+        
+        const isProtectedRoute = protectedRoutes.some((route) =>
+            request.nextUrl.pathname.startsWith(route)
+        );
+        
+        if (isProtectedRoute) {
+            console.error(`[SECURITY] Negando acesso a rota protegida devido a erro: ${request.nextUrl.pathname}`);
+            return NextResponse.redirect(new URL("/login", request.url));
+        }
     }
 
     return response;

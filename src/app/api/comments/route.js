@@ -1,8 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { rateLimitMiddleware, addRateLimitHeaders, checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request) {
     try {
+        // Aplicar rate limiting
+        const rateLimitResponse = rateLimitMiddleware(request, 'comments');
+        if (rateLimitResponse) {
+            return rateLimitResponse;
+        }
         // Criar cliente supabase
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -12,13 +18,30 @@ export async function POST(request) {
         // Obter dados da requisição
         const { text, authorId, storyId, seriesId, chapterId, parentId } = await request.json();
 
-        // Verificar campos obrigatórios
-        if (!text || !text.trim()) {
+        // Importar sanitização
+        const { validateAndSanitizeForm } = await import("@/lib/sanitize");
+
+        // Definir regras de validação
+        const validationRules = {
+            text: {
+                type: 'comment',
+                required: true,
+                minLength: 1,
+                maxLength: 2000
+            }
+        };
+
+        // Validar e sanitizar dados
+        const validation = validateAndSanitizeForm({ text }, validationRules);
+        
+        if (!validation.isValid) {
             return NextResponse.json(
-                { error: "O texto do comentário é obrigatório" },
+                { error: validation.errors.join(', ') },
                 { status: 400 }
             );
         }
+
+        const sanitizedText = validation.sanitizedData.text;
 
         if (!authorId) {
             return NextResponse.json(
@@ -144,9 +167,9 @@ export async function POST(request) {
             }
         }
 
-        // Inserir comentário
+        // Inserir comentário com texto sanitizado
         const commentData = {
-            text,
+            text: sanitizedText,
             author_id: authorId,
             parent_id: parentId || null,
             created_at: new Date().toISOString(),

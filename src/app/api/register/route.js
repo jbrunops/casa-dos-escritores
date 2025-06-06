@@ -1,14 +1,57 @@
 // src/app/api/register/route.js
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { rateLimitMiddleware } from "@/lib/rate-limit";
 
 export async function POST(request) {
     try {
+        // Aplicar rate limiting para autenticação
+        const rateLimitResponse = rateLimitMiddleware(request, 'auth');
+        if (rateLimitResponse) {
+            return rateLimitResponse;
+        }
         const { email, password, username } = await request.json();
 
-        if (!email || !password || !username) {
+        // Importar sanitização
+        const { validateAndSanitizeForm } = await import("@/lib/sanitize");
+
+        // Definir regras de validação
+        const validationRules = {
+            email: {
+                type: 'email',
+                required: true,
+                maxLength: 255
+            },
+            username: {
+                type: 'text',
+                required: true,
+                minLength: 3,
+                maxLength: 30
+            },
+            password: {
+                type: 'text',
+                required: true,
+                minLength: 6,
+                maxLength: 128
+            }
+        };
+
+        // Validar e sanitizar dados
+        const validation = validateAndSanitizeForm({ email, username, password }, validationRules);
+        
+        if (!validation.isValid) {
             return NextResponse.json(
-                { error: "Todos os campos são obrigatórios" },
+                { error: validation.errors.join(', ') },
+                { status: 400 }
+            );
+        }
+
+        const { email: sanitizedEmail, username: sanitizedUsername, password: sanitizedPassword } = validation.sanitizedData;
+
+        // Validações adicionais para username
+        if (!/^[a-zA-Z0-9_-]+$/.test(sanitizedUsername)) {
+            return NextResponse.json(
+                { error: "Nome de usuário deve conter apenas letras, números, _ e -" },
                 { status: 400 }
             );
         }
@@ -23,7 +66,7 @@ export async function POST(request) {
         const { data: existingUsers, error: usernameError } = await supabase
             .from("profiles")
             .select("username")
-            .eq("username", username);
+            .eq("username", sanitizedUsername);
 
         if (usernameError) {
             console.error("Erro ao verificar nome de usuário:", usernameError);
@@ -43,10 +86,10 @@ export async function POST(request) {
         // Criar usuário usando API do Supabase
         const { data, error: authError } = await supabase.auth.admin.createUser(
             {
-                email,
-                password,
+                email: sanitizedEmail,
+                password: sanitizedPassword,
                 email_confirm: true,
-                user_metadata: { username },
+                user_metadata: { username: sanitizedUsername },
             }
         );
 
@@ -71,8 +114,8 @@ export async function POST(request) {
                 .from("profiles")
                 .insert({
                     id: data.user.id,
-                    username,
-                    email,
+                    username: sanitizedUsername,
+                    email: sanitizedEmail,
                     role: "user",
                     created_at: new Date().toISOString(),
                 });
