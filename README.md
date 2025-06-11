@@ -1,4 +1,8 @@
-# Casa Dos Escritores
+# Casa dos Escritores 🏠📚
+
+Uma plataforma moderna e intuitiva para escritores compartilharem suas histórias e construírem uma comunidade literária vibrante.
+
+> **Última atualização**: Configuração de produção otimizada para melhor performance - Janeiro 2025
 
 ## Visão Geral
 
