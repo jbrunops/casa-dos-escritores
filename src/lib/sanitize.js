@@ -24,11 +24,57 @@ const ALLOWED_ATTRIBUTES = {
     'h4': ['class'], 'h5': ['class'], 'h6': ['class'],
     'blockquote': ['class'],
     'pre': ['class'],
-    'code': ['class']
+    'code': ['class'],
+    'mark': ['class']
 };
 
 // Protocolos permitidos para links
 const ALLOWED_PROTOCOLS = ['http:', 'https:', 'mailto:'];
+
+/**
+ * Destaca termo de busca de forma segura contra XSS
+ * @param {string} text - Texto a ser destacado
+ * @param {string} query - Termo de busca
+ * @returns {string} Texto com destaque seguro
+ */
+export function safeHighlightText(text, query) {
+    if (!text || !query || typeof text !== 'string' || typeof query !== 'string') {
+        return escapeHtml(text || '');
+    }
+
+    // Escapar HTML no texto original
+    const escapedText = escapeHtml(text);
+    
+    // Escapar caracteres especiais na consulta
+    const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    
+    // Criar regex para buscar o termo (case insensitive)
+    const regex = new RegExp(`(${safeQuery})`, "gi");
+    
+    // Aplicar destaque apenas em texto já escapado
+    return escapedText.replace(regex, '<mark class="bg-yellow-200 rounded px-0.5">$1</mark>');
+}
+
+/**
+ * Escapa caracteres HTML para prevenir XSS
+ * @param {string} text - Texto a ser escapado
+ * @returns {string} Texto escapado
+ */
+export function escapeHtml(text) {
+    if (!text || typeof text !== 'string') {
+        return '';
+    }
+    
+    const htmlEscapes = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    };
+    
+    return text.replace(/[&<>"']/g, char => htmlEscapes[char]);
+}
 
 /**
  * Sanitiza HTML removendo tags e atributos perigosos

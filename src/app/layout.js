@@ -38,7 +38,7 @@ export const metadata = {
     },
 };
 
-// Definindo o objeto schema fora do return
+// Schema data estático e seguro - não contém entrada do usuário
 const schemaData = {
   "@context": "https://schema.org",
   "@graph": [
@@ -71,7 +71,7 @@ export default function RootLayout({ children }) {
                     rel="stylesheet"
                 />
                 */}
-                {/* Schema Markup */}
+                {/* Schema Markup - Seguro: apenas dados estáticos */}
                 <script 
                   type="application/ld+json" 
                   dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} 

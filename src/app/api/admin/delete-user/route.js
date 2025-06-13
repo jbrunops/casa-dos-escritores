@@ -3,9 +3,23 @@ import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { logAdminAction, logPrivilegeEscalation } from "@/lib/security-logger";
+import { rateLimitMiddleware } from "@/lib/rate-limit";
+import { csrfProtection, addCSRFHeaders } from "@/lib/csrf-protection";
 
 export async function POST(request) {
     try {
+        // Aplicar rate limiting para operações administrativas
+        const rateLimitResponse = rateLimitMiddleware(request, 'admin');
+        if (rateLimitResponse) {
+            return rateLimitResponse;
+        }
+
+        // Aplicar proteção CSRF crítica para operações administrativas
+        const csrfResponse = csrfProtection(request, 'admin_delete_user');
+        if (csrfResponse) {
+            return csrfResponse;
+        }
+
         // Verificar autenticação primeiro
         const supabaseAuth = await createServerSupabaseClient();
         const { data: { session }, error: sessionError } = await supabaseAuth.auth.getSession();
@@ -71,6 +85,35 @@ export async function POST(request) {
             process.env.SUPABASE_SERVICE_ROLE_KEY
         );
 
+        // Verificar se o usuário a ser excluído existe e obter informações
+        const { data: targetUser, error: getUserError } = await supabase
+            .from("profiles")
+            .select("username, role")
+            .eq("id", userId)
+            .single();
+
+        if (getUserError || !targetUser) {
+            return NextResponse.json(
+                { error: "Usuário não encontrado" },
+                { status: 404 }
+            );
+        }
+
+        // Impedir exclusão de outros administradores (proteção adicional)
+        if (targetUser.role === 'admin') {
+            logAdminAction(
+                session.user.id, 
+                'delete_admin_attempt', 
+                userId, 
+                request
+            );
+            
+            return NextResponse.json(
+                { error: "Não é possível excluir outro administrador" },
+                { status: 403 }
+            );
+        }
+
         // Log de auditoria antes da exclusão
         logAdminAction(session.user.id, 'delete_user_attempt', userId, request);
 
@@ -86,10 +129,13 @@ export async function POST(request) {
         // Log de auditoria após exclusão bem-sucedida
         logAdminAction(session.user.id, 'delete_user_success', userId, request);
 
-        return NextResponse.json({
+        const response = NextResponse.json({
             success: true,
             message: "Usuário excluído com sucesso",
         });
+
+        return addCSRFHeaders(response);
+        
     } catch (error) {
         console.error("Erro no servidor:", error);
         return NextResponse.json(
