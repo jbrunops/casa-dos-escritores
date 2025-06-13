@@ -1,237 +1,237 @@
 # Casa dos Escritores
 
-A modern literary platform built with Next.js, designed for writers to publish their work and build a community around digital storytelling.
+Uma plataforma literária moderna construída com Next.js, projetada para escritores publicarem seus trabalhos e construírem uma comunidade em torno da narrativa digital.
 
-## Overview
+## Visão Geral
 
-Casa dos Escritores is a full-stack web application that facilitates content creation and community engagement for writers and readers. The platform provides comprehensive content management, user authentication, and social interaction features.
+Casa dos Escritores é uma aplicação web full-stack que facilita a criação de conteúdo e o engajamento da comunidade para escritores e leitores. A plataforma oferece gerenciamento abrangente de conteúdo, autenticação de usuários e recursos de interação social.
 
-## Technical Stack
+## Stack Tecnológico
 
-### Core Technologies
+### Tecnologias Principais
 - **Framework**: Next.js 15.2.4 (App Router)
 - **Runtime**: React 19.1.0
-- **Language**: JavaScript/TypeScript
-- **Styling**: Tailwind CSS 3.4.17
+- **Linguagem**: JavaScript/TypeScript
+- **Estilização**: Tailwind CSS 3.4.17
 - **Backend**: Supabase (PostgreSQL + Auth + RPC)
-- **Editor**: Tiptap 2.11.5 (Rich Text Editor)
-- **UI Components**: Lucide React (Icons)
+- **Editor**: Tiptap 2.11.5 (Editor de Texto Rico)
+- **Componentes UI**: Lucide React (Ícones)
 
-### Development Dependencies
+### Dependências de Desenvolvimento
 - **Linting**: ESLint 9
-- **Styling**: PostCSS, Autoprefixer
-- **Build Tools**: TypeScript 5.8.3
-- **Utilities**: date-fns, DOMPurify, nanoid
+- **Estilização**: PostCSS, Autoprefixer
+- **Ferramentas de Build**: TypeScript 5.8.3
+- **Utilitários**: date-fns, DOMPurify, nanoid
 
-## Architecture
+## Arquitetura
 
-### Application Structure
+### Estrutura da Aplicação
 ```
 src/
 ├── app/                    # Next.js App Router
-│   ├── (auth)/            # Authentication routes
-│   ├── admin/             # Admin panel
-│   ├── api/               # API endpoints
-│   ├── categories/        # Content categorization
-│   ├── dashboard/         # User dashboard
-│   ├── notifications/     # Notification system
-│   ├── profile/           # User profiles
-│   ├── search/            # Search functionality
-│   ├── series/            # Series management
-│   └── story/             # Story management
-├── components/            # React components
-├── lib/                   # Utilities and configurations
-│   ├── supabase-client.js # Client-side Supabase
-│   ├── supabase-server.js # Server-side Supabase
-│   └── utils.js           # Helper functions
-└── styles/                # Global styles
+│   ├── (auth)/            # Rotas de autenticação
+│   ├── admin/             # Painel administrativo
+│   ├── api/               # Endpoints da API
+│   ├── categories/        # Categorização de conteúdo
+│   ├── dashboard/         # Dashboard do usuário
+│   ├── notifications/     # Sistema de notificações
+│   ├── profile/           # Perfis de usuário
+│   ├── search/            # Funcionalidade de busca
+│   ├── series/            # Gerenciamento de séries
+│   └── story/             # Gerenciamento de histórias
+├── components/            # Componentes React
+├── lib/                   # Utilitários e configurações
+│   ├── supabase-client.js # Supabase client-side
+│   ├── supabase-server.js # Supabase server-side
+│   └── utils.js           # Funções auxiliares
+└── styles/                # Estilos globais
 ```
 
-## Core Features
+## Funcionalidades Principais
 
-### Authentication & Authorization
-- Supabase Auth integration
-- Role-based access control (RBAC)
-- Protected routes and middleware
-- Session management
+### Autenticação e Autorização
+- Integração com Supabase Auth
+- Controle de acesso baseado em funções (RBAC)
+- Rotas protegidas e middleware
+- Gerenciamento de sessões
 
-### Content Management
-- **Stories**: Individual literary works
-- **Chapters**: Multi-part story segments
-- **Series**: Collections of related content
-- Rich text editing with Tiptap
-- Content publishing workflow
-- Draft and published states
+### Gerenciamento de Conteúdo
+- **Histórias**: Obras literárias individuais
+- **Capítulos**: Segmentos de histórias em múltiplas partes
+- **Séries**: Coleções de conteúdo relacionado
+- Edição de texto rico com Tiptap
+- Fluxo de publicação de conteúdo
+- Estados de rascunho e publicado
 
-### User Experience
-- Responsive design
-- Dynamic content discovery
-- Category-based navigation
-- Search functionality
-- User profiles and author pages
-- Social interaction (comments, follows)
+### Experiência do Usuário
+- Design responsivo
+- Descoberta dinâmica de conteúdo
+- Navegação baseada em categorias
+- Funcionalidade de busca
+- Perfis de usuário e páginas de autor
+- Interação social (comentários, seguidores)
 
-### Content Discovery
-- Featured series
-- New releases
-- Recent content
-- Most commented works
-- Featured writers
-- Category-based browsing
+### Descoberta de Conteúdo
+- Séries em destaque
+- Novos lançamentos
+- Conteúdo recente
+- Obras mais comentadas
+- Escritores em destaque
+- Navegação por categorias
 
-### Administrative Features
-- Content moderation
-- User management
-- Analytics dashboard
-- System monitoring
+### Recursos Administrativos
+- Moderação de conteúdo
+- Gerenciamento de usuários
+- Dashboard de analytics
+- Monitoramento do sistema
 
-## Database Schema
+## Schema do Banco de Dados
 
-The application uses Supabase PostgreSQL with the following core entities:
+A aplicação utiliza PostgreSQL via Supabase com as seguintes entidades principais:
 
-### Primary Tables
-- `profiles` - User profiles and metadata
-- `stories` - Individual story content
-- `series` - Story collections
-- `chapters` - Multi-part content segments
-- `comments` - User interactions
-- `categories` - Content classification
+### Tabelas Principais
+- `profiles` - Perfis e metadados de usuários
+- `stories` - Conteúdo de histórias individuais
+- `series` - Coleções de histórias
+- `chapters` - Segmentos de conteúdo em múltiplas partes
+- `comments` - Interações dos usuários
+- `categories` - Classificação de conteúdo
 
-### Relationships
-- One-to-many: Users to Stories/Series
-- One-to-many: Series to Chapters
-- Many-to-many: Stories to Categories
-- One-to-many: Content to Comments
+### Relacionamentos
+- Um-para-muitos: Usuários para Histórias/Séries
+- Um-para-muitos: Séries para Capítulos
+- Muitos-para-muitos: Histórias para Categorias
+- Um-para-muitos: Conteúdo para Comentários
 
-## API Architecture
+## Arquitetura da API
 
-### Internal APIs (`/api/`)
-- Authentication endpoints
-- Content CRUD operations
-- File upload handling
-- Administrative functions
+### APIs Internas (`/api/`)
+- Endpoints de autenticação
+- Operações CRUD de conteúdo
+- Manipulação de upload de arquivos
+- Funções administrativas
 
-### Supabase Integration
-- RPC function calls for complex queries
-- Real-time subscriptions
-- Row Level Security (RLS) policies
-- Edge functions for serverless computing
+### Integração com Supabase
+- Chamadas para funções RPC para consultas complexas
+- Assinaturas em tempo real
+- Políticas de Row Level Security (RLS)
+- Edge functions para computação serverless
 
-## Security Implementation
+## Implementação de Segurança
 
-### Authentication Security
-- JWT-based session management
-- Role-based access control
-- Protected API endpoints
-- Middleware authentication checks
+### Segurança de Autenticação
+- Gerenciamento de sessões baseado em JWT
+- Controle de acesso baseado em funções
+- Endpoints de API protegidos
+- Verificações de autenticação via middleware
 
-### Content Security
-- Input sanitization with DOMPurify
-- XSS protection
-- CSRF protection
-- SQL injection prevention via Supabase RLS
+### Segurança de Conteúdo
+- Sanitização de entrada com DOMPurify
+- Proteção contra XSS
+- Proteção contra CSRF
+- Prevenção de injeção SQL via RLS do Supabase
 
-### Infrastructure Security
-- Rate limiting on all endpoints
-- File upload validation
+### Segurança de Infraestrutura
+- Rate limiting em todos os endpoints
+- Validação de upload de arquivos
 - Content Security Policy (CSP)
-- Security headers implementation
+- Implementação de headers de segurança
 
-## Performance Optimization
+## Otimização de Performance
 
-### Frontend Optimization
+### Otimização do Frontend
 - Server-side rendering (SSR)
-- Static generation for public content
-- Image optimization with Next.js Image
-- Component-level code splitting
+- Geração estática para conteúdo público
+- Otimização de imagens com Next.js Image
+- Code splitting a nível de componente
 
-### Database Optimization
-- Indexed queries
-- RPC functions for complex operations
+### Otimização do Banco de Dados
+- Consultas indexadas
+- Funções RPC para operações complexas
 - Connection pooling via Supabase
-- Optimized data fetching patterns
+- Padrões otimizados de busca de dados
 
-## Development Workflow
+## Fluxo de Desenvolvimento
 
-### Getting Started
+### Começando
 ```bash
-# Install dependencies
+# Instalar dependências
 npm install
 
-# Configure environment variables
+# Configurar variáveis de ambiente
 cp env-template.txt .env.local
 
-# Run development server
+# Executar servidor de desenvolvimento
 npm run dev
 ```
 
-### Environment Configuration
-Required environment variables:
+### Configuração de Ambiente
+Variáveis de ambiente necessárias:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 
-### Build and Deployment
+### Build e Deploy
 ```bash
-# Production build
+# Build de produção
 npm run build
 
-# Start production server
+# Iniciar servidor de produção
 npm run start
 
-# Code linting
+# Linting de código
 npm run lint
 ```
 
-## Deployment
+## Deploy
 
-### Vercel Configuration
-The application is optimized for Vercel deployment with:
-- Automatic deployments from Git
-- Environment variable management
-- Edge function support
-- Built-in analytics
+### Configuração da Vercel
+A aplicação está otimizada para deploy na Vercel com:
+- Deploys automáticos a partir do Git
+- Gerenciamento de variáveis de ambiente
+- Suporte a edge functions
+- Analytics integrados
 
-### Configuration Files
-- `vercel.json` - Deployment configuration
-- `next.config.mjs` - Next.js optimization settings
-- Security headers and CSP configuration
+### Arquivos de Configuração
+- `vercel.json` - Configuração de deployment
+- `next.config.mjs` - Configurações de otimização do Next.js
+- Headers de segurança e configuração CSP
 
-## Monitoring and Analytics
+## Monitoramento e Analytics
 
-### Application Monitoring
-- Error tracking and logging
-- Performance metrics
-- User analytics
-- Security event monitoring
+### Monitoramento da Aplicação
+- Rastreamento e logging de erros
+- Métricas de performance
+- Analytics de usuário
+- Monitoramento de eventos de segurança
 
 ### Business Intelligence
-- Content engagement metrics
-- User behavior analytics
-- Growth tracking
-- Platform usage statistics
+- Métricas de engajamento de conteúdo
+- Analytics de comportamento do usuário
+- Rastreamento de crescimento
+- Estatísticas de uso da plataforma
 
-## Contributing
+## Contribuindo
 
-### Code Standards
-- ESLint configuration for code quality
-- TypeScript for type safety
-- Tailwind CSS for consistent styling
-- Component-based architecture
+### Padrões de Código
+- Configuração ESLint para qualidade de código
+- TypeScript para type safety
+- Tailwind CSS para estilização consistente
+- Arquitetura baseada em componentes
 
-### Development Guidelines
-- Follow Next.js best practices
-- Implement proper error boundaries
-- Use semantic HTML structure
-- Maintain accessibility standards
+### Diretrizes de Desenvolvimento
+- Seguir melhores práticas do Next.js
+- Implementar error boundaries adequados
+- Usar estrutura HTML semântica
+- Manter padrões de acessibilidade
 
-## License
+## Licença
 
-This project is proprietary software. All rights reserved.
+Este projeto está sob a licença MIT. Todos os direitos reservados.
 
 ---
 
-**Maintainers**: Development Team  
-**Last Updated**: January 2025  
-**Next.js Version**: 15.2.4  
-**Node.js Requirement**: >= 18.0.0
+**Mantenedores**: Equipe de Desenvolvimento  
+**Última Atualização**: Janeiro 2025  
+**Versão do Next.js**: 15.2.4  
+**Requisito Node.js**: >= 18.0.0
